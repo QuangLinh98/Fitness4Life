@@ -2,8 +2,12 @@ package fpt.aptech.dashboardservice.controller;
 
 import fpt.aptech.dashboardservice.dtos.ClubPrimaryImageDTO;
 import fpt.aptech.dashboardservice.helpers.ApiResponse;
+import fpt.aptech.dashboardservice.models.Branch;
 import fpt.aptech.dashboardservice.models.Club;
+import fpt.aptech.dashboardservice.models.Trainer;
+import fpt.aptech.dashboardservice.service.BranchService;
 import fpt.aptech.dashboardservice.service.ClubService;
+import fpt.aptech.dashboardservice.service.TrainerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/public")
+@RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
 public class PublicController {
     private final ClubService clubService;
+    private final BranchService branchService;
+    private final TrainerService trainerService;
 
     //======================= CLUB ============================
     @GetMapping("/clubs")
@@ -47,6 +53,56 @@ public class PublicController {
         try {
             List<ClubPrimaryImageDTO> clubs = clubService.getAllClubWithPrimaryImage();
             return ResponseEntity.ok(ApiResponse.success(clubs, "Get All Clubs successfull"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    //======================= BRANCH ============================
+    @GetMapping("/branchs")
+    public ResponseEntity<?> getAllBranch() {
+        try {
+            List<Branch> branches = branchService.getAllBranch();
+            return ResponseEntity.status(200).body(ApiResponse.success(branches, "Get All Branch successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/branch/{id}")
+    public ResponseEntity<?> getBranchById(@PathVariable int id) {
+        try {
+            Branch branch = branchService.getBranchById(id);
+            if (branch == null) {
+                return ResponseEntity.status(404).body(ApiResponse.errorServer("Branch not found"));
+            }
+            return ResponseEntity.status(200).body(ApiResponse.success(branch, "Get Branch successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    //======================= TRAINER ============================
+    @GetMapping("/trainers")
+    public ResponseEntity<?> getAllTrainer() {
+        try {
+            List<Trainer> trainers = trainerService.getAllTrainer();
+            return ResponseEntity.status(200).body(ApiResponse.success(trainers, "Get All Trainer successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/trainer/{id}")
+    public ResponseEntity<?> getTrainerById(@PathVariable int id) {
+        try {
+            Trainer trainer = trainerService.getTrainerById(id);
+            if (trainer == null) {
+                return ResponseEntity.status(404).body(ApiResponse.errorServer("Trainer not found"));
+            }
+            return ResponseEntity.status(200).body(ApiResponse.success(trainer, "Get Trainer successfully"));
         }
         catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
