@@ -4,9 +4,11 @@ import fpt.aptech.dashboardservice.dtos.ClubPrimaryImageDTO;
 import fpt.aptech.dashboardservice.helpers.ApiResponse;
 import fpt.aptech.dashboardservice.models.Branch;
 import fpt.aptech.dashboardservice.models.Club;
+import fpt.aptech.dashboardservice.models.Room;
 import fpt.aptech.dashboardservice.models.Trainer;
 import fpt.aptech.dashboardservice.service.BranchService;
 import fpt.aptech.dashboardservice.service.ClubService;
+import fpt.aptech.dashboardservice.service.RoomService;
 import fpt.aptech.dashboardservice.service.TrainerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class PublicController {
     private final ClubService clubService;
     private final BranchService branchService;
     private final TrainerService trainerService;
+    private final RoomService roomService;
 
     //======================= CLUB ============================
     @GetMapping("/clubs")
@@ -103,6 +106,32 @@ public class PublicController {
                 return ResponseEntity.status(404).body(ApiResponse.errorServer("Trainer not found"));
             }
             return ResponseEntity.status(200).body(ApiResponse.success(trainer, "Get Trainer successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    //======================= ROOM ============================
+    @GetMapping("/rooms")
+    public ResponseEntity<?> getAllRoom() {
+        try {
+            List<Room> rooms =  roomService.getAllRoom();
+            return ResponseEntity.status(200).body(ApiResponse.success(rooms, "Get All Room successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/room/{id}")
+    public ResponseEntity<?> getRoomById(@PathVariable int id) {
+        try {
+            Room room = roomService.getRoomById(id);
+            if (room == null) {
+                return ResponseEntity.status(404).body(ApiResponse.errorServer("Room not found"));
+            }
+            return ResponseEntity.status(200).body(ApiResponse.success(room, "Get Room successfully"));
         }
         catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));

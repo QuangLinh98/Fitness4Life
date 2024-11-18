@@ -1,16 +1,11 @@
 package fpt.aptech.dashboardservice.controller;
 
-import fpt.aptech.dashboardservice.dtos.BranchDTO;
-import fpt.aptech.dashboardservice.dtos.ClubDTO;
-import fpt.aptech.dashboardservice.dtos.ClubImageDTO;
-import fpt.aptech.dashboardservice.dtos.TrainerDTO;
+import fpt.aptech.dashboardservice.dtos.*;
 import fpt.aptech.dashboardservice.helpers.ApiResponse;
-import fpt.aptech.dashboardservice.models.Branch;
-import fpt.aptech.dashboardservice.models.Club;
-import fpt.aptech.dashboardservice.models.ClubImages;
-import fpt.aptech.dashboardservice.models.Trainer;
+import fpt.aptech.dashboardservice.models.*;
 import fpt.aptech.dashboardservice.service.BranchService;
 import fpt.aptech.dashboardservice.service.ClubService;
+import fpt.aptech.dashboardservice.service.RoomService;
 import fpt.aptech.dashboardservice.service.TrainerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +23,7 @@ public class ManagerController {
     private final ClubService clubService;
     private final BranchService branchService;
     private final TrainerService trainerService;
+    private final RoomService roomService;
 
     //======================= CLUB ============================
     @PostMapping("/club/add")
@@ -253,6 +249,59 @@ public class ManagerController {
             trainerService.deleteTrainer(id);
             return ResponseEntity.status(200).body(ApiResponse.success(null, "Delete Trainer successfully"));
         } catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    //======================= ROOM ============================
+    @PostMapping("/room/add")
+    public ResponseEntity<?> addRoom(@Valid @RequestBody RoomDTO roomDTO, BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Branch branchExisting = branchService.getBranchById(roomDTO.getBranch());
+            if (branchExisting == null) {
+                return ResponseEntity.status(404).body(ApiResponse.notfound("Branch not found"));
+            }
+            Room newRoom = roomService.addRoom(roomDTO);
+            return ResponseEntity.status(201).body(ApiResponse.success(newRoom, "Add Room successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/room/update/{id}")
+    public ResponseEntity<?> editRoom(@PathVariable int id, @Valid @RequestBody RoomDTO roomDTO, BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Room updateRoom = roomService.updateRoom(id, roomDTO);
+            return ResponseEntity.status(201).body(ApiResponse.success(updateRoom, "Update Room successfully"));
+        }
+        catch (Exception e) {
+            if (e.getMessage().contains("RoomNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound("Room not found"));
+            }
+            if (e.getMessage().contains("BranchNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound("Branch not found"));
+            }
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/room/delete/{id}")
+    public ResponseEntity<?> deleteRoom(@PathVariable int id) {
+        try {
+            roomService.deleteRoom(id);
+            return ResponseEntity.status(200).body(ApiResponse.success(null, "Delete Room successfully"));
+        }
+        catch (Exception e) {
+            if (e.getMessage().contains("RoomNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound("Room not found"));
+            }
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
         }
     }

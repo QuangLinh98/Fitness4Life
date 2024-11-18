@@ -38,4 +38,7 @@ public class Branch {
 
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
     private List<Trainer> trainers;
+
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+    private List<Room> rooms;
 }
