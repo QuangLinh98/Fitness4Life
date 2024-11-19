@@ -41,4 +41,7 @@ public class    Trainer {
     @JsonIgnore
     private Branch branch;
 
+    @OneToMany(mappedBy = "trainer",cascade = CascadeType.ALL)
+    private List<Room> rooms;
+
 }

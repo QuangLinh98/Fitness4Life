@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class RoomDTO {
     private int branch;
+    private int trainer;
     @NotNull(message = "Room name can not is required")
     private String roomName;
     @NotNull(message = "Capacity can not is required")

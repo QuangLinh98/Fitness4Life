@@ -258,14 +258,16 @@ public class ManagerController {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            Branch branchExisting = branchService.getBranchById(roomDTO.getBranch());
-            if (branchExisting == null) {
-                return ResponseEntity.status(404).body(ApiResponse.notfound("Branch not found"));
-            }
             Room newRoom = roomService.addRoom(roomDTO);
             return ResponseEntity.status(201).body(ApiResponse.success(newRoom, "Add Room successfully"));
         }
         catch (Exception e) {
+            if (e.getMessage().contains("BranchNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound( "Branch not found"));
+            }
+            if (e.getMessage().contains("TrainerNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound( "Trainer not found"));
+            }
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
         }
     }

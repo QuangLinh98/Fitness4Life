@@ -31,4 +31,8 @@ public class Room {
     @JsonIgnore
     private Branch branch;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainer_id", nullable = false)
+    @JsonIgnore
+    private Trainer trainer;
 }

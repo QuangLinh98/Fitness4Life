@@ -5,8 +5,10 @@ import fpt.aptech.dashboardservice.dtos.RoomDTO;
 import fpt.aptech.dashboardservice.models.Branch;
 import fpt.aptech.dashboardservice.models.Club;
 import fpt.aptech.dashboardservice.models.Room;
+import fpt.aptech.dashboardservice.models.Trainer;
 import fpt.aptech.dashboardservice.repository.BranchRepository;
 import fpt.aptech.dashboardservice.repository.RoomRepository;
+import fpt.aptech.dashboardservice.repository.TrainerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import java.util.List;
 public class RoomService {
     private final RoomRepository roomRepository;
     private final BranchRepository branchRepository;
+    private final TrainerRepository trainerRepository;
+
     private final ObjectMapper objectMapper;
 
     //Handle get all data
@@ -33,6 +37,8 @@ public class RoomService {
 
     //Handle create a new room
     public Room addRoom(RoomDTO roomDTO) {
+        Branch branchExisting = branchRepository.findById(roomDTO.getBranch()).orElseThrow(() -> new RuntimeException("BranchNotFound"));
+        Trainer trainerExisting = trainerRepository.findById(roomDTO.getTrainer()).orElseThrow(() -> new RuntimeException("TrainerNotFound"));
         Room room = Room.builder()
                 .roomName(roomDTO.getRoomName())
                 .capacity(roomDTO.getCapacity())
@@ -40,8 +46,8 @@ public class RoomService {
                 .status(true)
                 .createdAt(LocalDateTime.now())
                 .build();
-        Branch branchExisting = branchRepository.findById(roomDTO.getBranch()).orElse(null);
         room.setBranch(branchExisting);
+        room.setTrainer(trainerExisting);
         return roomRepository.save(room);
     }
 
@@ -49,6 +55,7 @@ public class RoomService {
     public Room updateRoom(int id, RoomDTO roomDTO) {
         Room roomExisting = roomRepository.findById(id).orElseThrow(() -> new RuntimeException("RoomNotFound"));
         Branch branchExisting = branchRepository.findById(roomDTO.getBranch()).orElseThrow(() -> new RuntimeException("BranchNotFound"));
+        Trainer trainerExisting = trainerRepository.findById(roomDTO.getTrainer()).orElseThrow(() -> new RuntimeException("TrainerNotFound"));
 
         roomExisting.setRoomName(roomDTO.getRoomName());
         roomExisting.setCapacity(roomDTO.getCapacity());
@@ -56,6 +63,7 @@ public class RoomService {
         roomExisting.setStatus(roomDTO.isStatus());
         roomExisting.setUpdatedAt(LocalDateTime.now());
         roomExisting.setBranch(branchExisting);
+        roomExisting.setTrainer(trainerExisting);
 
         return roomRepository.save(roomExisting);
     }
