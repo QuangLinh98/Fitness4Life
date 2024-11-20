@@ -36,6 +36,9 @@ public class Blog {
     private Integer likesCount = 0;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "blog")
     private List<BlogImage> thumbnailUrl;
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;  // Liên kết với bảng Comment
 }
 
 

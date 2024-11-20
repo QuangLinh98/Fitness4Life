@@ -81,18 +81,21 @@ public class BlogService {
         blogs.setCategory(updateBlogDTO.getCategory());
         blogs.setTags(updateBlogDTO.getTags());
 
-        if(updateBlogDTO.getThumbnailUrl() != null && !updateBlogDTO.getDeleteImageUrl().isEmpty()) {
+        if(updateBlogDTO.getDeleteImageUrl() != null && !updateBlogDTO.getDeleteImageUrl().isEmpty()) {
+
             List<BlogImage> imagesToDelete = blogs.getThumbnailUrl().stream()
+
                     .filter(image -> updateBlogDTO.getDeleteImageUrl()
                             .contains(image.getId()))
                     .collect(Collectors.toList());
 
             for (BlogImage image : imagesToDelete) {
-                fileUploadAvata.deleteImage(image.getImageUrl());
+                fileUploadAvata.deleteImage(image.getImageUrl().substring(GlobalConstant.rootUrl.length()));
                 blogs.getThumbnailUrl().remove(image);
                 blogImageRepository.delete(image);
             }
         }
+
         if (updateBlogDTO.getThumbnailUrl() != null) {
             List<MultipartFile> nonEmptyFiles = Arrays.stream(updateBlogDTO.getThumbnailUrl())
                     .filter(file -> file != null && !file.isEmpty())
