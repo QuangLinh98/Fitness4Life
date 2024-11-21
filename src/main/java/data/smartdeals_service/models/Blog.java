@@ -17,7 +17,7 @@ public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long authorId;
+
     @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String authorName;
     @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")

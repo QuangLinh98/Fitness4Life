@@ -1,11 +1,8 @@
 package data.smartdeals_service.services;
 
-import data.smartdeals_service.dto.CreateCommentForumDTO;
-import data.smartdeals_service.dto.CreateQuestionDTO;
-import data.smartdeals_service.models.CommentForum;
-import data.smartdeals_service.models.Question;
-import data.smartdeals_service.repository.CommentForumRepository;
-import data.smartdeals_service.repository.QuestionRepository;
+import data.smartdeals_service.dto.*;
+import data.smartdeals_service.models.*;
+import data.smartdeals_service.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +13,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ForumService {
-    private final CommentForumRepository commentForumRepository;
+    private final CommentRepository commentRepository;
     private final QuestionRepository questionRepository;
 
     public Question createQuestion(CreateQuestionDTO questionDTO) {
@@ -35,34 +32,36 @@ public class ForumService {
         return questionRepository.findById(id);
     }
 
-    public CommentForum createComment(CreateCommentForumDTO createCommentForumDTO) {
-        CommentForum comment = new CommentForum();
-        comment.setContent(createCommentForumDTO.getContent());
-        comment.setAuthor(createCommentForumDTO.getAuthor());
+    public Comment createCommentForum(CommentDTO commentDTO) {
+        Comment comment = new Comment();
+        comment.setUserId(commentDTO.getUserId());
+        comment.setContent(commentDTO.getContent());
+        comment.setUserName(commentDTO.getUserName());
         comment.setCreatedAt(LocalDateTime.now());
+        comment.setIsPublished(true);
 
-        // Gán câu hỏi hoặc bình luận cha
-        if (createCommentForumDTO.getQuestionId() != null) {
-            Question question = questionRepository.findById(createCommentForumDTO.getQuestionId())
+        // kiểm tra câu hỏi có tồn tại ko
+        if (commentDTO.getQuestionId() != null) {
+            Question question = questionRepository.findById(commentDTO.getQuestionId())
                     .orElseThrow(() -> new RuntimeException("Question not found"));
             comment.setQuestion(question);
         }
-        if (createCommentForumDTO.getParentId() != null) {
-            CommentForum parentComment = commentForumRepository.findById(createCommentForumDTO.getParentId())
+        if (commentDTO.getParentCommentId() != null) {
+            Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("Parent comment not found"));
             comment.setParentComment(parentComment);
         }
-        return commentForumRepository.save(comment);
+        return commentRepository.save(comment);
     }
-    public List<CommentForum> getCommentsByQuestion(Long questionId) {
+    public List<Comment> getCommentsByQuestion(Long questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found"));
-        return commentForumRepository.findByQuestionAndParentCommentIsNull(question);
+        return commentRepository.findByQuestionAndParentCommentIsNull(question);
     }
     // Lấy tất cả các bình luận con của một bình luận cha
-    public List<CommentForum> getReplies(Long parentCommentId) {
-        CommentForum parentComment = commentForumRepository.findById(parentCommentId)
+    public List<Comment> getReplies(Long parentCommentId) {
+        Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new RuntimeException("Parent comment not found"));
-        return commentForumRepository.findByParentComment(parentComment);
+        return commentRepository.findByParentComment(parentComment);
     }
 }

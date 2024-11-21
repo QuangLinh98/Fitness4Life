@@ -1,12 +1,9 @@
 package data.smartdeals_service.services;
-import data.smartdeals_service.dto.CreateBlogDTO;
-import data.smartdeals_service.dto.UpdateBlogDTO;
-import data.smartdeals_service.helpers.FileUploadAvata;
-import data.smartdeals_service.helpers.GlobalConstant;
-import data.smartdeals_service.models.Blog;
-import data.smartdeals_service.models.BlogImage;
-import data.smartdeals_service.repository.BlogImageRepository;
-import data.smartdeals_service.repository.BlogRepository;
+
+import data.smartdeals_service.helpers.*;
+import data.smartdeals_service.dto.*;
+import data.smartdeals_service.models.*;
+import data.smartdeals_service.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +19,7 @@ import java.util.stream.Collectors;
 public class BlogService {
     private final BlogRepository blogRepository;
     private final BlogImageRepository blogImageRepository;
+    private final CommentRepository commentRepository;
 
     private final FileUploadAvata fileUploadAvata;
     private String subFolder = "BlogImage";
@@ -44,7 +39,6 @@ public class BlogService {
     //Tao Blog
     public Blog CreateBlog(CreateBlogDTO createBlogDTO) throws IOException {
         Blog blog = new Blog();
-        blog.setAuthorId(createBlogDTO.getAuthorId());
         blog.setAuthorName(createBlogDTO.getAuthorName());
         blog.setTitle(createBlogDTO.getTitle());
         blog.setContent(createBlogDTO.getContent());
@@ -135,6 +129,69 @@ public class BlogService {
             }
         }
         blogRepository.deleteById(id);
+    }
+
+
+    // 1. Lấy tất cả bình luận
+    public List<Comment> getAllComments() {
+        return commentRepository.findAll();
+    }
+
+    // 2. Tìm bình luận theo id
+    public Optional<Comment> findCommentById(Long id) {
+        return commentRepository.findById(id);
+    }
+
+    // 3. Tìm tất cả bình luận của một bài blog
+    public List<Comment> findCommentsByBlog(Long blogId) {
+        return commentRepository.findByBlogId(blogId);
+    }
+
+    public Comment createCommentBlog(CommentDTO commentDTO) {
+        // Kiểm tra blog tồn tại
+        Optional<Blog> blog = blogRepository.findById(commentDTO.getBlogId());
+        if (!blog.isPresent()) {
+            throw new IllegalArgumentException("Bài blog không tồn tại");
+        }
+        // Tạo bình luận
+        Comment comment = new Comment();
+        comment.setBlog(blog.get());
+        comment.setContent(commentDTO.getContent());
+        comment.setUserId(commentDTO.getUserId());
+        comment.setUserName(commentDTO.getUserName());
+        comment.setIsPublished(true);
+        comment.setCreatedAt(LocalDateTime.now());
+        comment.setUpdatedAt(null);
+        comment.setParentComment(null); // Bình luận cha sẽ không có parentComment
+
+        return commentRepository.save(comment);
+    }
+
+    public Comment createReplyBlog(CommentDTO commentDTO) {
+        // Kiểm tra blog tồn tại
+        Optional<Blog> blogs = blogRepository.findById(commentDTO.getBlogId());
+        if (!blogs.isPresent()) {
+            throw new IllegalArgumentException("Bài blog không tồn tại");
+        }
+
+        // Kiểm tra bình luận cha
+        Optional<Comment> parentComment = commentRepository.findById(commentDTO.getParentCommentId());
+        if (!parentComment.isPresent()) {
+            throw new IllegalArgumentException("Bình luận cha không tồn tại");
+        }
+
+        // Tạo bình luận con
+        Comment comment = new Comment();
+        comment.setBlog(blogs.get());
+        comment.setContent(commentDTO.getContent());
+        comment.setUserId(commentDTO.getUserId());
+        comment.setUserName(commentDTO.getUserName());
+        comment.setIsPublished(true);
+        comment.setParentComment(parentComment.get()); // Liên kết với bình luận cha
+        comment.setCreatedAt(LocalDateTime.now());
+        comment.setUpdatedAt(null);
+
+        return commentRepository.save(comment);
     }
 }
 

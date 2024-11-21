@@ -1,9 +1,9 @@
 package data.smartdeals_service.controller;
 
-import data.smartdeals_service.dto.CreateCommentForumDTO;
+import data.smartdeals_service.dto.CommentDTO;
 import data.smartdeals_service.dto.CreateQuestionDTO;
 import data.smartdeals_service.helpers.ApiResponse;
-import data.smartdeals_service.models.CommentForum;
+import data.smartdeals_service.models.Comment;
 import data.smartdeals_service.models.Question;
 import data.smartdeals_service.services.ForumService;
 import lombok.RequiredArgsConstructor;
@@ -64,14 +64,14 @@ public class ForumController {
         }
     }
     // Tạo bình luận hoặc trả lời bình luận
-    @PostMapping("/create/comment")
-    public ResponseEntity<?> createComment(@RequestBody CreateCommentForumDTO createCommentForumDTO,
+    @PostMapping("/comment/create")
+    public ResponseEntity<?> createComment(@RequestBody CommentDTO commentDTO,
                                            BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            CommentForum savedComment = forumService.createComment(createCommentForumDTO);
+            Comment savedComment = forumService.createCommentForum(commentDTO);
             return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
                     .created(savedComment,"create Comment successfully"));
         } catch (Exception e) {
@@ -81,10 +81,10 @@ public class ForumController {
     }
 
     // Lấy danh sách bình luận theo câu hỏi
-    @GetMapping("/comment/questions/{questionId}")
+    @GetMapping("/commentFlowerQuestions/{questionId}")
     public ResponseEntity<?> getCommentsByQuestion(@PathVariable Long questionId) {
         try {
-            List<CommentForum> commentInQuestions = forumService.getCommentsByQuestion(questionId);
+            List<Comment> commentInQuestions = forumService.getCommentsByQuestion(questionId);
             if (commentInQuestions != null) {
                 return ResponseEntity.status(200).body(ApiResponse
                         .success(commentInQuestions, "get one comment In Questions successfully"));

@@ -13,8 +13,11 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String title;
+    @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String content;
+    @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String author;
     private LocalDateTime createdAt;
 }
