@@ -24,6 +24,7 @@ public class Club {
     private String address;
     private String contactPhone;
     private String description;
+    private String slug;
     private LocalTime openHour;
     private LocalTime closeHour;
     private LocalDateTime createAt;

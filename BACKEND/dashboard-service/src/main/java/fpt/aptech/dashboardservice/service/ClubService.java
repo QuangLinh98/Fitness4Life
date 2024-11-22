@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.swing.text.html.Option;
 import java.io.File;
 import java.io.IOException;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +56,28 @@ public class ClubService {
         if (existByContactPhone(clubDTO.getContactPhone())) {
             throw new RuntimeException("ContactPhoneAlreadyExists");
         }
+
         clubDTO.setCreateAt(LocalDateTime.now());
         Club club = objectMapper.convertValue(clubDTO, Club.class);
+        club = clubRepository.save(club);
+        //Lưu data vào db để có did trước khi tạo slug
+        String slug = generateSlug(club.getName(), club.getId());
+        club.setSlug(slug);
         return clubRepository.save(club);
+    }
+
+    /**
+     * Phương thức generateSlug sẽ tạo ra một slug thân thiện với URL bằng cách chuyển tên sản phẩm thành dạng không dấu,
+     * loại bỏ ký tự đặc biệt, thay thế khoảng trắng bằng dấu gạch ngang và kết hợp với ID để đảm bảo tính duy nhất của slug.
+     */
+    public String generateSlug(String name, int id) {
+        String result = Normalizer.normalize(name, Normalizer.Form.NFD)
+                .toLowerCase()                                       // Chuyển tất cả ký tự thành chữ thường
+                .replaceAll("\\p{IsM}+", "")        // Loại bỏ dấu tiếng Việt (hoặc các ký tự dấu khác)
+                .replaceAll("\\p{IsP}+", " ")       // Loại bỏ các ký tự đặc biệt (dấu chấm, dấu phẩy, ...)
+                .trim()                                              // Loại bỏ khoảng trắng thừa ở đầu và cuối chuỗi
+                .replaceAll("\\s+", "-");           // Chuyển khoảng trắng thành dấu gạch ngang
+        return result + "-" + id;                                    // Kết hợp với ID để tạo slug duy nhất
     }
 
     //Handle update a club
@@ -74,6 +94,10 @@ public class ClubService {
             clubUpdate.setOpenHour(clubDTO.getOpenHour());
             clubUpdate.setCloseHour(clubDTO.getCloseHour());
             clubUpdate.setUpdateAt(LocalDateTime.now());
+
+            //update lại slug dựa trên club name
+            String slug = generateSlug(clubUpdate.getName(), clubUpdate.getId());
+            clubUpdate.setSlug(slug);
 
             objectMapper.updateValue(clubDTO, Club.class);
             return clubRepository.save(clubUpdate);
@@ -102,15 +126,15 @@ public class ClubService {
             }
         }
         //Tạo image name
-        String imageName =fileUpload.storeImage(subFolder, clubImageDTO.getFile());
+        String imageName = fileUpload.storeImage(subFolder, clubImageDTO.getFile());
         //Tạo đường dẫn chính xác
-        String exacImagePath = urlImage +File.separator + imageName;
+        String exacImagePath = urlImage + File.separator + imageName;
 
         //Tìm Club theo id
         Optional<Club> clubExisting = clubRepository.findById(clubImageDTO.getClubId());
         ClubImages clubImages = ClubImages.builder()
                 .createdAt(LocalDateTime.now())
-                .imageUrl(exacImagePath.replace("\\","/"))
+                .imageUrl(exacImagePath.replace("\\", "/"))
                 .isPrimary(clubImageDTO.isPrimary())
                 .build();
         clubImages.setClub(clubExisting.get());
@@ -137,13 +161,13 @@ public class ClubService {
         String clubImageUrl = imageExisting.get().getImageUrl();
         if (clubImageDTO.getFile() != null && clubImageDTO.getFile().getSize() > 0) {
             //Tạo image name
-            String imageName =fileUpload.storeImage(subFolder, clubImageDTO.getFile());
+            String imageName = fileUpload.storeImage(subFolder, clubImageDTO.getFile());
             //Tạo đường dẫn chính xác
-            String exacImagePath = urlImage +File.separator + imageName;
+            String exacImagePath = urlImage + File.separator + imageName;
             if (clubImageUrl != null) {
                 fileUpload.deleteImage(clubImageUrl.substring(rootUrl.length()));
             }
-            clubImageUrl = exacImagePath.replace("\\","/");
+            clubImageUrl = exacImagePath.replace("\\", "/");
         }
         Optional<Club> club = clubRepository.findById(clubImageDTO.getClubId());
         ClubImages clubImages = ClubImages.builder()
@@ -191,17 +215,17 @@ public class ClubService {
     }
 
     //Handle delete image of club by id
-    public ClubImages deleteClubImageById(int id){
+    public ClubImages deleteClubImageById(int id) {
         Optional<ClubImages> imageExisting = clubImageRepository.findById(id);
         if (imageExisting.get().getImageUrl() != null) {
             fileUpload.deleteImage(imageExisting.get().getImageUrl().substring(rootUrl.length()));
         }
         clubImageRepository.deleteById(id);
-        return  imageExisting.get();
+        return imageExisting.get();
     }
 
     //Handle set primary image for club
-    public void activePrimaryClubImageById(int id , int clubId){
+    public void activePrimaryClubImageById(int id, int clubId) {
         clubImageRepository.updateOtherClubImagesPrimary(id, clubId);
     }
 
