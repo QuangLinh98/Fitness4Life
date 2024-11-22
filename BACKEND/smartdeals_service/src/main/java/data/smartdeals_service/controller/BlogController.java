@@ -1,9 +1,9 @@
 package data.smartdeals_service.controller;
 
-import data.smartdeals_service.dto.CreateBlogDTO;
-import data.smartdeals_service.dto.UpdateBlogDTO;
+import data.smartdeals_service.dto.*;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.Blog;
+import data.smartdeals_service.models.Comment;
 import data.smartdeals_service.services.BlogService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -105,6 +105,77 @@ public class BlogController {
         }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("error server" + ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/comment")
+    public ResponseEntity<?> getAllComments() {
+        try {
+            List<Comment>  comments = blogService.getAllComments();
+            return ResponseEntity.ok(ApiResponse.success(comments, "get all comment successfully"));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
+    }
+
+    @GetMapping("/comment{id}")
+    public ResponseEntity<?> getCommentById(@PathVariable Long id) {
+        try {
+            Optional<Comment> comment = blogService.findCommentById(id);
+            if (comment != null) {
+                return ResponseEntity.status(200).body(ApiResponse
+                        .success(comment, "get one comment successfully"));
+            } else {
+                return ResponseEntity.status(404).body(ApiResponse
+                        .notfound("blog not found"));
+            }
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Unexpected error: " + ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/commentInBlog/{blogId}")
+    public ResponseEntity<?> getCommentInBlog(@PathVariable Long blogId) {
+        try {
+            List<Comment>  commentInBlog = blogService.findCommentsByBlog(blogId);
+            return ResponseEntity.ok(ApiResponse.success(commentInBlog, "get comment In Blog successfully"));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
+    }
+
+    @PostMapping("/comment/create")
+    public ResponseEntity<?> createComment(@Valid @RequestBody CommentDTO comment,
+                                              BindingResult bindingResult)
+    {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Comment createdComment = blogService.createCommentBlog(comment);
+            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
+                    .created(createdComment,"create Comment successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
+    }
+
+    @PostMapping("/comment/reply")
+    public ResponseEntity<?> createReply(@Valid @RequestBody CommentDTO reply,
+                                              BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Comment createdReply = blogService.createReplyBlog(reply);
+            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
+                    .created(createdReply,"create reply successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
         }
     }
 }

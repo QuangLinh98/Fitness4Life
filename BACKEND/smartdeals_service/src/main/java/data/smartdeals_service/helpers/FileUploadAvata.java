@@ -31,9 +31,18 @@ public class FileUploadAvata {
     public void deleteImage(String imageExisted) {
         try {
             Path imageDelete = Paths.get(imageExisted);
-            Files.delete(imageDelete);
-        }catch(Exception e){
+            if (Files.exists(imageDelete)) {
+                Files.delete(imageDelete);
+                System.out.println("Successfully deleted file: " + imageExisted);
+            } else {
+                System.err.println("File not found: " + imageExisted);
+            }
+        } catch (IOException e) {
+            System.err.println("Error deleting file: " + imageExisted);
             e.printStackTrace();
         }
     }
+
+
+
 }

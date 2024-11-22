@@ -17,7 +17,7 @@ public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long authorId;
+
     @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String authorName;
     @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
@@ -36,6 +36,9 @@ public class Blog {
     private Integer likesCount = 0;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "blog")
     private List<BlogImage> thumbnailUrl;
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;  // Liên kết với bảng Comment
 }
 
 

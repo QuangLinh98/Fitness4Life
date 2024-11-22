@@ -11,7 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateBlogDTO {
-    private Long authorId;
     private String authorName;
     private String title;
     private String content;
