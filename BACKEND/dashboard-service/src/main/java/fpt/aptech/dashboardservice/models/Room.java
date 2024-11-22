@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -21,8 +22,11 @@ public class Room {
     private int id;
     private String roomName;
     private int capacity;    //Sức chứa của pòng
+    private int availableSeats;    //chỗ trống hiện tại của lớp học
     private String facilities;
     private boolean status;    //Trạng thái của room(VD: có thể sử dụng hoặc đang bảo trì )
+    private LocalTime startTime;
+    private LocalTime endTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

@@ -22,7 +22,7 @@ public class PublicController {
     private final BranchService branchService;
     private final TrainerService trainerService;
     private final RoomService roomService;
-    private final WorkoutPackageService workoutPackageService;
+
 
     //======================= CLUB ============================
     @GetMapping("/clubs")
@@ -133,30 +133,6 @@ public class PublicController {
         }
     }
 
-    //======================= WORKOUT PACKAGE ============================
-    @GetMapping("/packages")
-    public ResponseEntity<?> getAllPackage() {
-        try {
-            List<WorkoutPackage> pakages =  workoutPackageService.getAllData();
-            return ResponseEntity.status(200).body(ApiResponse.success(pakages, "Get All Package successfully"));
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
-        }
-    }
 
-    @GetMapping("/package/{id}")
-    public ResponseEntity<?> getPackageById(@PathVariable int id) {
-        try {
-            WorkoutPackage wPackage = workoutPackageService.getWorkoutPackageById(id);
-            return ResponseEntity.status(200).body(ApiResponse.success(wPackage, "Get package successfully"));
-        }
-        catch (Exception e) {
-            if (e.getMessage().contains("PackageNotFound")) {
-                return ResponseEntity.status(404).body(ApiResponse.errorServer("Package not found"));
-            }
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
-        }
-    }
 
 }

@@ -42,8 +42,11 @@ public class RoomService {
         Room room = Room.builder()
                 .roomName(roomDTO.getRoomName())
                 .capacity(roomDTO.getCapacity())
+                .availableSeats(roomDTO.getAvailableSeats())
                 .facilities(roomDTO.getFacilities())
                 .status(true)
+                .startTime(roomDTO.getStartTime())
+                .endTime(roomDTO.getEndTime())
                 .createdAt(LocalDateTime.now())
                 .build();
         room.setBranch(branchExisting);
