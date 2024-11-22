@@ -38,9 +38,8 @@ public class PromotionService {
         promotion.setCreatedDate(LocalDateTime.now());
         return promotionRepository.save(promotion);
     }
-    public Promotion updatePromotion(Long id, PromotionDTO promotionDTO) {
-        Promotion promotionById = promotionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Promotion not found with id: " + id));
+    public Promotion updatePromotion(Long id,PromotionDTO promotionDTO) {
+        Promotion promotionById = promotionRepository.findById(id).orElse(null);
         promotionById.setTitle(promotionDTO.getTitle());
         promotionById.setDescription(promotionDTO.getDescription());
         promotionById.setDiscountType(promotionDTO.getDiscountType());
@@ -76,9 +75,9 @@ public class PromotionService {
     }
 
     // Phương thức cập nhật trạng thái
-    public Promotion closePromotionStatus(PromotionStatusDTO status) {
-        Promotion promotion = promotionRepository.findById(status.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Promotion not found with id: " + status.getId()));
+    public Promotion closePromotionStatus(Long id,PromotionStatusDTO status) {
+        Promotion promotion = promotionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Promotion not found with id: " + id));
         promotion.setIsActive(status.getIsActive());
         return promotionRepository.save(promotion);
     }
