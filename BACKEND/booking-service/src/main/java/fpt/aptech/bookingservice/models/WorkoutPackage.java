@@ -1,4 +1,4 @@
-package fpt.aptech.dashboardservice.models;
+package fpt.aptech.bookingservice.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

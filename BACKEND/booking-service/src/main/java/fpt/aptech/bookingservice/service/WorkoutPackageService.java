@@ -1,7 +1,8 @@
-package fpt.aptech.dashboardservice.service;
+package fpt.aptech.bookingservice.service;
 
-import fpt.aptech.dashboardservice.models.WorkoutPackage;
-import fpt.aptech.dashboardservice.repository.WorkoutPackageRepository;
+
+import fpt.aptech.bookingservice.models.WorkoutPackage;
+import fpt.aptech.bookingservice.repository.WorkoutPackageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
