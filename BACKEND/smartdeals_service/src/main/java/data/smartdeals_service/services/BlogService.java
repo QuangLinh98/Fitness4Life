@@ -173,13 +173,11 @@ public class BlogService {
         if (!blogs.isPresent()) {
             throw new IllegalArgumentException("Bài blog không tồn tại");
         }
-
         // Kiểm tra bình luận cha
         Optional<Comment> parentComment = commentRepository.findById(commentDTO.getParentCommentId());
         if (!parentComment.isPresent()) {
             throw new IllegalArgumentException("Bình luận cha không tồn tại");
         }
-
         // Tạo bình luận con
         Comment comment = new Comment();
         comment.setBlog(blogs.get());
@@ -193,5 +191,40 @@ public class BlogService {
 
         return commentRepository.save(comment);
     }
+
+    public Comment updateComment(Long id, CommentDTO commentDTO) {
+        Comment commentFindById = commentRepository.findById(id).orElse(null);
+        // Kiểm tra blog tồn tại
+        Optional<Blog> blogs = blogRepository.findById(commentDTO.getBlogId());
+        if (!blogs.isPresent()) {
+            throw new IllegalArgumentException("Bài blog không tồn tại");
+        }
+        // Kiểm tra bình luận cha
+        Optional<Comment> parentComment = commentRepository.findById(commentDTO.getParentCommentId());
+        if (!parentComment.isPresent()) {
+            throw new IllegalArgumentException("Bình luận cha không tồn tại");
+        }
+
+        commentFindById.setBlog(blogs.get());
+        commentFindById.setContent(commentDTO.getContent());
+        commentFindById.setUserId(commentDTO.getUserId());
+        commentFindById.setUserName(commentDTO.getUserName());
+        commentFindById.setParentComment(parentComment.get()); // Liên kết với bình luận cha
+        commentFindById.setUpdatedAt(LocalDateTime.now());
+
+        return commentRepository.save(commentFindById);
+    }
+
+    public void deleteComment(Long id) {
+        commentRepository.deleteById(id);
+    }
+    // Phương thức cập nhật trạng thái
+    public Comment changeStatusCMB(Long id,ChangeStatusCommentDTO status) {
+        Comment comments = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("comments not found with id: " + id));
+        comments.setIsPublished(status.getIsPublished());
+        return commentRepository.save(comments);
+    }
+
 }
 

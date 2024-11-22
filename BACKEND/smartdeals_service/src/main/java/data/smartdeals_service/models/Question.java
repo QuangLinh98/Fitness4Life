@@ -20,4 +20,5 @@ public class Question {
     @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String author;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

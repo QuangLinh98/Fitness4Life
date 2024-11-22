@@ -178,5 +178,39 @@ public class BlogController {
                     .body(ApiResponse.errorServer("error server"));
         }
     }
+    @PutMapping("/comment/update/{id}")
+    public ResponseEntity<?> updateComment(@PathVariable Long id,@Valid  @RequestBody CommentDTO commentDTO,
+                                         BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Comment updateCommment = blogService.updateComment(id,commentDTO);
+            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
+                    .created(updateCommment,"update Commment successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
+    }
+    @DeleteMapping("/{id}")
+    public void deleteComment(@PathVariable Long id) {
+        blogService.deleteComment(id);
+    }
+    @PutMapping("/comment/changePublished/{id}")
+    public ResponseEntity<?> updateComment(@PathVariable Long id, @RequestBody ChangeStatusCommentDTO changeStatusCommentDTO,
+                                           BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Comment changePublished = blogService.changeStatusCMB(id,changeStatusCommentDTO);
+            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
+                    .created(changePublished,"change Published successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
+    }
 }
 

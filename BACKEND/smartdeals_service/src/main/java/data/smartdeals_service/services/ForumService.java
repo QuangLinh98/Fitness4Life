@@ -16,7 +16,7 @@ public class ForumService {
     private final CommentRepository commentRepository;
     private final QuestionRepository questionRepository;
 
-    public Question createQuestion(CreateQuestionDTO questionDTO) {
+    public Question createQuestion(QuestionDTO questionDTO) {
         Question question = new Question();
         question.setTitle(questionDTO.getTitle());
         question.setContent(questionDTO.getContent());
@@ -30,6 +30,19 @@ public class ForumService {
     }
     public Optional<Question> findById(Long id) {
         return questionRepository.findById(id);
+    }
+
+    public Question updateQuestion(Long id, QuestionDTO questionDTO) {
+        Question questionById = questionRepository.findById(id).orElse(null);
+        questionById.setTitle(questionDTO.getTitle());
+        questionById.setContent(questionDTO.getContent());
+        questionById.setAuthor(questionDTO.getAuthor());
+        questionById.setUpdatedAt(LocalDateTime.now());
+        return questionRepository.save(questionById);
+    }
+
+    public void deleteQuestion(Long id) {
+        questionRepository.deleteById(id);
     }
 
     public Comment createCommentForum(CommentDTO commentDTO) {
@@ -53,6 +66,30 @@ public class ForumService {
         }
         return commentRepository.save(comment);
     }
+
+    public Comment updateCommentForum(Long id,CommentDTO commentDTO) {
+
+        Comment commentById = commentRepository.findById(id).orElse(null);
+        commentById.setUserId(commentDTO.getUserId());
+        commentById.setContent(commentDTO.getContent());
+        commentById.setUserName(commentDTO.getUserName());
+        commentById.setUpdatedAt(LocalDateTime.now());
+        // kiểm tra câu hỏi có tồn tại ko
+        if (commentDTO.getQuestionId() != null) {
+            Question question = questionRepository.findById(commentDTO.getQuestionId())
+                    .orElseThrow(() -> new RuntimeException("Question not found"));
+            commentById.setQuestion(question);
+        }
+        if (commentDTO.getParentCommentId() != null) {
+            Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId())
+                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+            commentById.setParentComment(parentComment);
+        }
+        return commentRepository.save(commentById);
+    }
+    public void deleteCommentForum(Long id) {
+        commentRepository.deleteById(id);
+    }
     public List<Comment> getCommentsByQuestion(Long questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found"));
@@ -63,5 +100,12 @@ public class ForumService {
         Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new RuntimeException("Parent comment not found"));
         return commentRepository.findByParentComment(parentComment);
+    }
+    // Phương thức cập nhật trạng thái
+    public Comment changeStatusCMF(Long id,ChangeStatusCommentDTO status) {
+        Comment comments = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("comments not found with id: " + id));
+        comments.setIsPublished(status.getIsPublished());
+        return commentRepository.save(comments);
     }
 }
