@@ -5,6 +5,7 @@ import fpt.aptech.dashboardservice.dtos.BranchDTO;
 import fpt.aptech.dashboardservice.models.Branch;
 import fpt.aptech.dashboardservice.models.ServiceBranch;
 import fpt.aptech.dashboardservice.repository.BranchRepository;
+import fpt.aptech.dashboardservice.service.SlugUtil.Slug;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,9 @@ public class BranchService {
     public Branch createBranch(BranchDTO branchDTO) {
         branchDTO.setCreateAt(LocalDateTime.now());
         Branch newBranch = objectMapper.convertValue(branchDTO, Branch.class);
+        newBranch = branchRepository.save(newBranch);
+        String slug = Slug.generateSlug(newBranch.getBranchName(), newBranch.getId());
+        newBranch.setSlug(slug);
         return branchRepository.save(newBranch);
     }
 
@@ -48,6 +52,9 @@ public class BranchService {
         branchUpdate.setCloseHours(branchDTO.getCloseHours());
         branchUpdate.setServices(branchDTO.getServices());
         branchUpdate.setUpdateAt(LocalDateTime.now());
+
+        String slug = Slug.generateSlug(branchUpdate.getBranchName(), branchUpdate.getId());
+        branchUpdate.setSlug(slug);
 
         objectMapper.convertValue(branchUpdate, Branch.class);
         return branchRepository.save(branchUpdate);

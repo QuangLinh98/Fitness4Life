@@ -261,8 +261,8 @@ public class ManagerController {
             return ResponseEntity.status(201).body(ApiResponse.success(newRoom, "Add Room successfully"));
         }
         catch (Exception e) {
-            if (e.getMessage().contains("BranchNotFound")){
-                return ResponseEntity.status(404).body(ApiResponse.notfound( "Branch not found"));
+            if (e.getMessage().contains("ClubNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound( "Club not found"));
             }
             if (e.getMessage().contains("TrainerNotFound")){
                 return ResponseEntity.status(404).body(ApiResponse.notfound( "Trainer not found"));
@@ -284,8 +284,8 @@ public class ManagerController {
             if (e.getMessage().contains("RoomNotFound")){
                 return ResponseEntity.status(404).body(ApiResponse.notfound("Room not found"));
             }
-            if (e.getMessage().contains("BranchNotFound")){
-                return ResponseEntity.status(404).body(ApiResponse.notfound("Branch not found"));
+            if (e.getMessage().contains("ClubNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound("Club not found"));
             }
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server " + e.getMessage()));
         }

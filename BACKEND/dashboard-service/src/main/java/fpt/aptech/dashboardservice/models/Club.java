@@ -32,4 +32,7 @@ public class Club {
 
     @OneToMany(mappedBy = "club",cascade = CascadeType.ALL)
     private List<ClubImages> clubImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
+    private List<Room> rooms;
 }

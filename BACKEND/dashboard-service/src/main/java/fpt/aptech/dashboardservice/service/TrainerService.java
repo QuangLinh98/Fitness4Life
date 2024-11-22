@@ -7,6 +7,7 @@ import fpt.aptech.dashboardservice.models.Branch;
 import fpt.aptech.dashboardservice.models.Trainer;
 import fpt.aptech.dashboardservice.repository.BranchRepository;
 import fpt.aptech.dashboardservice.repository.TrainerRepository;
+import fpt.aptech.dashboardservice.service.SlugUtil.Slug;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +60,9 @@ public class TrainerService {
                 .createAt(LocalDateTime.now())
                 .build();
         trainer.setBranch(branchExisting.get());
+        trainer = trainerRepository.save(trainer);
+        String slug = Slug.generateSlug(trainer.getFullName(), trainer.getId());
+        trainer.setSlug(slug);
         return trainerRepository.save(trainer);
     }
 
@@ -85,6 +89,10 @@ public class TrainerService {
         trainerExisting.setScheduleTrainers(trainerDTO.getScheduleTrainers());
         trainerExisting.setUpdateAt(LocalDateTime.now());
         trainerExisting.setBranch(branchExisting);
+
+        String slug = Slug.generateSlug(trainerExisting.getFullName(), trainerExisting.getId());
+        trainerExisting.setSlug(slug);
+
         return trainerRepository.save(trainerExisting);
     }
 

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -21,6 +22,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String roomName;
+    private String slug;
     private int capacity;    //Sức chứa của pòng
     private int availableSeats;    //chỗ trống hiện tại của lớp học
     private String facilities;
@@ -31,9 +33,9 @@ public class Room {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id", nullable = false)
+    @JoinColumn(name = "club_id", nullable = false)
     @JsonIgnore
-    private Branch branch;
+    private Club club;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainer_id", nullable = false)

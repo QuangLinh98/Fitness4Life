@@ -22,6 +22,7 @@ public class Branch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String branchName;
+    private String slug;
     private String address;
     private String phoneNumber;
     private String email;
@@ -39,6 +40,5 @@ public class Branch {
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
     private List<Trainer> trainers;
 
-    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
-    private List<Room> rooms;
+
 }

@@ -19,6 +19,7 @@ public class TrainerDTO {
     @NotBlank(message = "Full name must not be empty")
     @Size(min = 3, max = 100, message = "Full name must be between 3 and 100 characters")
     private String fullName;
+    private String slug;
     private MultipartFile file;
     @NotBlank(message = "Specialization must not be empty")
     private String specialization;

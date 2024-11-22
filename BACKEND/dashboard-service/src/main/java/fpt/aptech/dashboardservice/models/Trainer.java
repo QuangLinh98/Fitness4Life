@@ -21,6 +21,7 @@ public class    Trainer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String fullName;
+    private String slug;
     private String photo;
     private String specialization;
     private double experienceYear;

@@ -2,6 +2,7 @@ package fpt.aptech.dashboardservice.service;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fpt.aptech.dashboardservice.service.SlugUtil.Slug;
 import fpt.aptech.dashboardservice.dtos.ClubDTO;
 import fpt.aptech.dashboardservice.dtos.ClubImageDTO;
 import fpt.aptech.dashboardservice.dtos.ClubPrimaryImageDTO;
@@ -14,10 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.io.File;
 import java.io.IOException;
-import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,24 +60,11 @@ public class ClubService {
         Club club = objectMapper.convertValue(clubDTO, Club.class);
         club = clubRepository.save(club);
         //Lưu data vào db để có did trước khi tạo slug
-        String slug = generateSlug(club.getName(), club.getId());
+        String slug = Slug.generateSlug(club.getName(), club.getId());
         club.setSlug(slug);
         return clubRepository.save(club);
     }
 
-    /**
-     * Phương thức generateSlug sẽ tạo ra một slug thân thiện với URL bằng cách chuyển tên sản phẩm thành dạng không dấu,
-     * loại bỏ ký tự đặc biệt, thay thế khoảng trắng bằng dấu gạch ngang và kết hợp với ID để đảm bảo tính duy nhất của slug.
-     */
-    public String generateSlug(String name, int id) {
-        String result = Normalizer.normalize(name, Normalizer.Form.NFD)
-                .toLowerCase()                                       // Chuyển tất cả ký tự thành chữ thường
-                .replaceAll("\\p{IsM}+", "")        // Loại bỏ dấu tiếng Việt (hoặc các ký tự dấu khác)
-                .replaceAll("\\p{IsP}+", " ")       // Loại bỏ các ký tự đặc biệt (dấu chấm, dấu phẩy, ...)
-                .trim()                                              // Loại bỏ khoảng trắng thừa ở đầu và cuối chuỗi
-                .replaceAll("\\s+", "-");           // Chuyển khoảng trắng thành dấu gạch ngang
-        return result + "-" + id;                                    // Kết hợp với ID để tạo slug duy nhất
-    }
 
     //Handle update a club
     public Club updateClub(int id, ClubDTO clubDTO) throws JsonMappingException {
@@ -96,7 +82,7 @@ public class ClubService {
             clubUpdate.setUpdateAt(LocalDateTime.now());
 
             //update lại slug dựa trên club name
-            String slug = generateSlug(clubUpdate.getName(), clubUpdate.getId());
+            String slug = Slug.generateSlug(clubUpdate.getName(), clubUpdate.getId());
             clubUpdate.setSlug(slug);
 
             objectMapper.updateValue(clubDTO, Club.class);

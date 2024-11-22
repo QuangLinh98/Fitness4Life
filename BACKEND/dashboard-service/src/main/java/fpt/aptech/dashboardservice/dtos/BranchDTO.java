@@ -17,6 +17,7 @@ import java.util.List;
 public class BranchDTO {
     @NotNull(message = "Branch name is required.")
     private String branchName;
+    private String slug;
     @NotBlank(message = "Address is required.")
     private String address;
     @NotBlank(message = "Phone number is required.")

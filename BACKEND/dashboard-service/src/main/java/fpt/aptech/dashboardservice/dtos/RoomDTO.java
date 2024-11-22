@@ -5,16 +5,18 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
 @Builder
 public class RoomDTO {
-    private int branch;
+    private int club;
     private int trainer;
     @NotNull(message = "Room name can not is required")
     private String roomName;
+    private String slug;
     @NotNull(message = "Capacity can not is required")
     private int capacity;    //Sức chứa của pòng
     @NotNull(message = "availableSeats can not is required")
