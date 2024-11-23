@@ -291,6 +291,25 @@ public class ManagerController {
         }
     }
 
+    @PutMapping("/availableSeats/update/{id}")
+    public ResponseEntity<?> editAvailableSeatsRoom(@PathVariable int id,  @RequestBody AvailableSeatsRoomUpdateDTO availableSeatsRoomUpdateDTO) {
+        try {
+
+            Room updateAvailableSeats = roomService.updateAvailableSeatsRoom(id, availableSeatsRoomUpdateDTO);
+            return ResponseEntity.status(201).body(ApiResponse.success(updateAvailableSeats, "Update AvailableSeats of Room successfully"));
+        }
+        catch (Exception e) {
+            if (e.getMessage().contains("RoomNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound("Room not found"));
+            }
+            if (e.getMessage().contains("ClubNotFound")){
+                return ResponseEntity.status(404).body(ApiResponse.notfound("Club not found"));
+            }
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server " + e.getMessage()));
+        }
+    }
+
+
     @DeleteMapping("/room/delete/{id}")
     public ResponseEntity<?> deleteRoom(@PathVariable int id) {
         try {

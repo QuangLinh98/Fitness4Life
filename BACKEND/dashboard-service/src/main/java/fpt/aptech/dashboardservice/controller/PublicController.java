@@ -126,7 +126,7 @@ public class PublicController {
             if (room == null) {
                 return ResponseEntity.status(404).body(ApiResponse.errorServer("Room not found"));
             }
-            return ResponseEntity.status(200).body(ApiResponse.success(room, "Get Room successfully"));
+            return ResponseEntity.ok(room);
         }
         catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));

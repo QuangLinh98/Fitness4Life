@@ -1,6 +1,7 @@
 package fpt.aptech.dashboardservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fpt.aptech.dashboardservice.dtos.AvailableSeatsRoomUpdateDTO;
 import fpt.aptech.dashboardservice.dtos.RoomDTO;
 import fpt.aptech.dashboardservice.models.Branch;
 import fpt.aptech.dashboardservice.models.Club;
@@ -45,7 +46,6 @@ public class RoomService {
         Room room = Room.builder()
                 .roomName(roomDTO.getRoomName())
                 .capacity(roomDTO.getCapacity())
-                .availableSeats(roomDTO.getAvailableSeats())
                 .facilities(roomDTO.getFacilities())
                 .status(true)
                 .startTime(roomDTO.getStartTime())
@@ -72,6 +72,8 @@ public class RoomService {
         roomExisting.setCapacity(roomDTO.getCapacity());
         roomExisting.setFacilities(roomDTO.getFacilities());
         roomExisting.setStatus(roomDTO.isStatus());
+        roomExisting.setStartTime(roomDTO.getStartTime());
+        roomExisting.setEndTime(roomDTO.getEndTime());
         roomExisting.setUpdatedAt(LocalDateTime.now());
         roomExisting.setClub(clubExisting);
         roomExisting.setTrainer(trainerExisting);
@@ -79,6 +81,13 @@ public class RoomService {
         String slug = Slug.generateSlug(roomExisting.getRoomName(), roomExisting.getId());
         roomExisting.setSlug(slug);
 
+        return roomRepository.save(roomExisting);
+    }
+
+    //Phương thức update availableSeats của room
+    public Room updateAvailableSeatsRoom(int id, AvailableSeatsRoomUpdateDTO availableSeatsDTO) {
+        Room roomExisting = roomRepository.findById(id).orElseThrow(() -> new RuntimeException("RoomNotFound"));
+        roomExisting.setAvailableSeats(availableSeatsDTO.getAvailableSeats());
         return roomRepository.save(roomExisting);
     }
 

@@ -19,8 +19,6 @@ public class RoomDTO {
     private String slug;
     @NotNull(message = "Capacity can not is required")
     private int capacity;    //Sức chứa của pòng
-    @NotNull(message = "availableSeats can not is required")
-    private int availableSeats;
     @NotNull(message = "Facilities can not is required")
     private String facilities;
     @NotNull(message = "Status can not is required")

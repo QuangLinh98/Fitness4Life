@@ -23,7 +23,7 @@ public class Room {
     private int id;
     private String roomName;
     private String slug;
-    private int capacity;    //Sức chứa của pòng
+    private int capacity;    //Sức chứa của phòng
     private int availableSeats;    //chỗ trống hiện tại của lớp học
     private String facilities;
     private boolean status;    //Trạng thái của room(VD: có thể sử dụng hoặc đang bảo trì )
@@ -41,4 +41,5 @@ public class Room {
     @JoinColumn(name = "trainer_id", nullable = false)
     @JsonIgnore
     private Trainer trainer;
+
 }
