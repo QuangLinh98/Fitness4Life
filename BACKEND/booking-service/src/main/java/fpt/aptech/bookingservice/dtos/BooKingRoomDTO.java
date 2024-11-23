@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 public class BooKingRoomDTO {
     @NotNull(message = "UserId is required")
     private int userId;
+    private String userName;
 
     @NotNull(message = "RoomId is required")
     private int roomId;
+    private String roomName;
 
     private LocalDateTime bookingDate;
 
-    @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
     private BookingStatus status;  //Trạng thái Pending , Confirmed , Cancel
     private LocalDateTime createAt;
-    private LocalDateTime updateAt;
 }

@@ -1,7 +1,9 @@
 package fpt.aptech.bookingservice.controller;
 
 import fpt.aptech.bookingservice.helpers.ApiResponse;
+import fpt.aptech.bookingservice.models.BookingRoom;
 import fpt.aptech.bookingservice.models.WorkoutPackage;
+import fpt.aptech.bookingservice.service.BookingRoomService;
 import fpt.aptech.bookingservice.service.WorkoutPackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PublicController {
     private final WorkoutPackageService workoutPackageService;
+    private final BookingRoomService bookingRoomService;
 
     //======================= WORKOUT PACKAGE ============================
     @GetMapping("/packages")
@@ -40,6 +43,18 @@ public class PublicController {
             if (e.getMessage().contains("PackageNotFound")) {
                 return ResponseEntity.status(404).body(ApiResponse.errorServer("Package not found"));
             }
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    //======================= WORKOUT PACKAGE ============================
+    @GetMapping("/bookingRooms")
+    public ResponseEntity<?> getAllBookingRoom() {
+        try {
+            List<BookingRoom> bookings =  bookingRoomService.getAllBookingRoom();
+            return ResponseEntity.status(200).body(ApiResponse.success(bookings, "Get All booking successfully"));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
         }
     }
