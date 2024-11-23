@@ -1,5 +1,6 @@
 package kj001.user_service.controllers;
 
+import kj001.user_service.dtos.UserDTO;
 import kj001.user_service.dtos.UserResponseDTO;
 import kj001.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ManagerController {
 
     @GetMapping("manager/users/{id}")
     public ResponseEntity<?> getUserById(@PathVariable long id){
-        UserResponseDTO userResponseDTO = userService.getOneUser(id);
-        return ResponseEntity.ok(userResponseDTO);
+        UserDTO userDTO = userService.getUserById(id);
+        return ResponseEntity.ok(userDTO);
     }
 }

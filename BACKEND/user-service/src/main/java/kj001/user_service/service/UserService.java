@@ -51,32 +51,16 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    //Phương thức lấy 1 user
-    public UserResponseDTO getOneUser(Long userId) {
-        Optional<User> existingUser = userRepository.findById(userId);
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            //Chuyển đổi User sang UserResponseDTO
-            UserResponseDTO userResponseDTO = objectMapper.convertValue(user, UserResponseDTO.class);
-
-            //Lấy thông tin từ profile
-            Profile profile = user.getProfile();
-            if (profile != null) {
-                ProfileDTO profileDTO = new ProfileDTO();
-                profileDTO.setId(profile.getId());
-                profileDTO.setHobbies(profile.getHobbies());
-                profileDTO.setAddress(profile.getAddress());
-                profileDTO.setAge(profile.getAge());
-                profileDTO.setAvatar(profile.getAvatar());
-                profileDTO.setDescription(profile.getDescription());
-                profileDTO.setMaritalStatus(profile.getMaritalStatus());
-
-                //Thêm ProfileDTO và UserResponseDTO
-                userResponseDTO.setProfileDTO(profileDTO);
-            }
-            return userResponseDTO;
+    public UserDTO getUserById(Long id) {
+        Optional<User> existingUser = userRepository.findById(id);
+        if (existingUser.isEmpty()) {
+            return null;
         }
-        return null;
+        UserDTO userDTO = UserDTO.builder()
+                .fullName(existingUser.get().getFullName())
+                .email(existingUser.get().getEmail())
+                .build();
+        return userDTO;
     }
 
     //Phương thức Register User
