@@ -1,6 +1,7 @@
 package fpt.aptech.bookingservice.controller;
 
 import fpt.aptech.bookingservice.dtos.BooKingRoomDTO;
+import fpt.aptech.bookingservice.dtos.BookingRoomQRCodeDTO;
 import fpt.aptech.bookingservice.helpers.ApiResponse;
 import fpt.aptech.bookingservice.models.BookingRoom;
 import fpt.aptech.bookingservice.models.WorkoutPackage;
@@ -71,21 +72,23 @@ public class ManagerController {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
             BookingRoom newBooking = bookingRoomService.saveBookRoom(booKingRoomDTO);
-            return ResponseEntity.status(201).body(ApiResponse.success(newBooking, "Booking room successfully"));
+            // Chuyển đổi thành BookingRoomQRCodeDTO
+            BookingRoomQRCodeDTO responseDTO = new BookingRoomQRCodeDTO(newBooking.getId(), newBooking.getCheckInQRCode());
+            return ResponseEntity.status(201).body(ApiResponse.success(responseDTO, "Booking room successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server: " + e.getMessage()));
         }
     }
 
-    @PutMapping("/confirmBookingRoom/{id}")
-    public ResponseEntity<String> confirmBooking(@PathVariable int id) {
-        try {
-            bookingRoomService.confirmBookingRoom(id);
-            return ResponseEntity.ok("Booking confirmed successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+//    @PutMapping("/confirmBookingRoom/{id}")
+//    public ResponseEntity<String> confirmBooking(@PathVariable int id) {
+//        try {
+//            bookingRoomService.confirmBookingRoom(id);
+//            return ResponseEntity.ok("Booking confirmed successfully");
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
 
     @PutMapping("/cancelBookingRoom/{id}")
     public ResponseEntity<?> cancelBooking(@PathVariable int id) {

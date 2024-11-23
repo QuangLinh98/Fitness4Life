@@ -1,10 +1,9 @@
 package fpt.aptech.bookingservice.service;
 
-import fpt.aptech.bookingservice.dtos.BooKingRoomDTO;
-import fpt.aptech.bookingservice.dtos.RoomDTO;
-import fpt.aptech.bookingservice.dtos.UserDTO;
+import fpt.aptech.bookingservice.dtos.*;
 import fpt.aptech.bookingservice.eureka_client.RoomEurekaClient;
 import fpt.aptech.bookingservice.eureka_client.UserEurekaClient;
+import fpt.aptech.bookingservice.helpers.QRCodeGenerator;
 import fpt.aptech.bookingservice.models.BookingRoom;
 import fpt.aptech.bookingservice.models.BookingStatus;
 import fpt.aptech.bookingservice.repository.BookingRoomRepository;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class BookingRoomService {
     private final BookingRoomRepository bookingRoomRepository;
     private final UserEurekaClient userEurekaClient;
     private final RoomEurekaClient roomEurekaClient;
+
 
     //Handle get all data
     public List<BookingRoom> getAllBookingRoom() {
@@ -65,40 +66,71 @@ public class BookingRoomService {
         for (BookingRoom bookingRoom : existingBooking) {
             RoomDTO bookedRoom = roomEurekaClient.getRoomById(bookingRoom.getRoomId());
             if (bookedRoom.getStartTime().equals(roomExiting.getStartTime()) &&
-                    bookedRoom.getEndTime().equals(roomExiting.getEndTime()))
-            {
+                    bookedRoom.getEndTime().equals(roomExiting.getEndTime())) {
                 throw new RuntimeException(" You Already Have A Confirmed Booking For This Time.");
             }
         }
-
-
         BookingRoom newBooking = BookingRoom.builder()
                 .userId(booKRoomDTO.getUserId())
                 .userName(userExisting.getFullName())    //Lấy name từ userDTO
                 .roomId(booKRoomDTO.getRoomId())
                 .roomName(roomExiting.getRoomName())     //Lấy name từ roomDTO
                 .bookingDate(LocalDateTime.now())
-                .status(BookingStatus.PENDING)
+                .status(BookingStatus.CONFIRMED)
                 .createAt(LocalDateTime.now())
                 .build();
 
+        //Update số lượng ghế khả dụng trong Room
+        roomExiting.setAvailableSeats(roomExiting.getAvailableSeats() + 1);
+        roomEurekaClient.updateRoom(roomExiting.getId(), roomExiting);
+
+        // Sinh mã check-in code (UUID để đảm bảo duy nhất)
+        String checkInCode = UUID.randomUUID().toString();
+        newBooking.setCheckInQRCode(checkInCode);
         bookingRoomRepository.save(newBooking);
+
+        // Tạo thông tin booking thành chuỗi JSON để lưu vào mã QR
+        String bookingInfoJson = String.format(
+                "{\"userId\": %d, \n \"userName\": '%s', \n \"roomName\": '%s', \n \"bookingDate\": '%s'}",
+                newBooking.getUserId(),
+                newBooking.getUserName(),
+                newBooking.getRoomName(),
+                newBooking.getBookingDate().toString()
+        );
+
+        // Tạo QR code
+        try {
+            String qrCodePath = "src/main/resources/static/qrcodes/" + checkInCode + ".png";
+            QRCodeGenerator.generateQRCodeImage(bookingInfoJson, qrCodePath);
+
+            // Tạo URL cho file QR code
+            String qrCodeURL = "http://localhost:8082/qrcodes/" + checkInCode + ".png";
+
+            // Tạo đối tượng phản hồi
+            BookingRoomQRCodeDTO roomQRCodeDTO = new BookingRoomQRCodeDTO();
+            roomQRCodeDTO.setId(newBooking.getId());
+            roomQRCodeDTO.setQrCodeUrl(qrCodeURL);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate QR code", e);
+        }
+
         return newBooking;
     }
 
     //Handle confirm booking room
-    public void confirmBookingRoom(int id) {
-        BookingRoom bookingRoom = bookingRoomRepository.findById(id).get();
-        if (bookingRoom.getStatus() == BookingStatus.PENDING) {
-            bookingRoom.setStatus(BookingStatus.CONFIRMED);
-            bookingRoomRepository.save(bookingRoom);
-
-            //Update số lượng ghế khả dụng trong Room
-            RoomDTO roomExiting = roomEurekaClient.getRoomById(bookingRoom.getRoomId());
-            roomExiting.setAvailableSeats(roomExiting.getAvailableSeats() + 1);
-            roomEurekaClient.updateRoom(roomExiting.getId(), roomExiting);
-        }
-    }
+//    public void confirmBookingRoom(int id) {
+//        BookingRoom bookingRoom = bookingRoomRepository.findById(id).get();
+//        if (bookingRoom.getStatus() == BookingStatus.PENDING) {
+//            bookingRoom.setStatus(BookingStatus.CONFIRMED);
+//            bookingRoomRepository.save(bookingRoom);
+//
+//            //Update số lượng ghế khả dụng trong Room
+//            RoomDTO roomExiting = roomEurekaClient.getRoomById(bookingRoom.getRoomId());
+//            roomExiting.setAvailableSeats(roomExiting.getAvailableSeats() + 1);
+//            roomEurekaClient.updateRoom(roomExiting.getId(), roomExiting);
+//        }
+//    }
 
     //Handle cancel booking room
     public void cancelBookingRoom(int id) {

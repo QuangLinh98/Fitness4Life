@@ -21,6 +21,7 @@ public class BookingRoom {
     private int roomId;
     private String roomName;
     private LocalDateTime bookingDate;
+    private String checkInQRCode;    // Mã check-in để tạo QR code
     @Enumerated(EnumType.STRING)
     private BookingStatus status;  //Trạng thái Pending , Confirmed , Cancel
     private LocalDateTime createAt;

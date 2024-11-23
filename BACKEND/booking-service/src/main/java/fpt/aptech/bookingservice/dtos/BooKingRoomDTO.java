@@ -19,6 +19,7 @@ public class BooKingRoomDTO {
     private String roomName;
 
     private LocalDateTime bookingDate;
+    private String checkInQRCode;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;  //Trạng thái Pending , Confirmed , Cancel
