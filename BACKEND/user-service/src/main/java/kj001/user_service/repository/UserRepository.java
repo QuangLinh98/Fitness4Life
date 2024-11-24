@@ -19,6 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.isActive = true")
     List<User> findByEmailAndIsActiveTrue(@Param("email") String email);
     Optional<User> findByEmailAndOtpCode(String email,String code);
+
     // Lấy tất cả người dùng có email và ngày đăng ký trong khoảng thời gian
     @Query("SELECT u FROM User u WHERE u.email = :email" +
             " AND u.createAt BETWEEN :startDate AND :endDate")
@@ -26,6 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("email") String email,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
+
     // Xóa tất cả các bản ghi cho email trước thời gian nhất định với isActive = false
     @Modifying
     @Query("DELETE FROM User u WHERE u.email = :email AND u.createAt < :dateTime AND u.isActive = false")
@@ -36,4 +38,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query("DELETE FROM User u WHERE u.email = :email AND u.isActive = false AND u.id <> :currentUserId")    //<> : ký hiệu là != id hiện tại
     void deleteInactiveUsersByEmail(@Param("email") String email, @Param("currentUserId") Long currentUserId);
+
+//    @Query("SELECT u FROM User u JOIN FETCH u.profile WHERE u.id = :id")
+//    Optional<User> findByIdWithProfile(@Param("id") Long id);
 }

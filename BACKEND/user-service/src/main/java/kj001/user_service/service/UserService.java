@@ -63,6 +63,32 @@ public class UserService {
         return userDTO;
     }
 
+//    public UserResponseDTO toUserResponseDTO(User user) {
+//        UserResponseDTO userResponseDTO = new UserResponseDTO();
+//        userResponseDTO.setId(user.getId());
+//        userResponseDTO.setFullName(user.getFullName());
+//        userResponseDTO.setEmail(user.getEmail());
+//        userResponseDTO.setActive(user.isActive());
+//        userResponseDTO.setPhone(user.getPhone());
+//        userResponseDTO.setRole(user.getRole());
+//        userResponseDTO.setGender(user.getGender());
+//
+//        // Chuyển đổi Profile sang ProfileDTO
+//        if (user.getProfile() != null) {
+//            ProfileDTO profileDTO = new ProfileDTO();
+//            profileDTO.setId(user.getProfile().getId());
+//            profileDTO.setAvatar(user.getProfile().getAvatar());
+//            profileDTO.setAge(user.getProfile().getAge());
+//            profileDTO.setHobbies(user.getProfile().getHobbies());
+//            profileDTO.setAddress(user.getProfile().getAddress());
+//            profileDTO.setMaritalStatus(user.getProfile().getMaritalStatus());
+//            profileDTO.setDescription(user.getProfile().getDescription());
+//            userResponseDTO.setProfileDTO(profileDTO);
+//        }
+//        return userResponseDTO;
+//    }
+
+
     //Phương thức Register User
     @Transactional
     public UserResponseDTO createUser(CreateUserDTO createUserDTO) throws MessagingException, IOException {
