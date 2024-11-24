@@ -4,21 +4,28 @@ import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 import fpt.aptech.bookingservice.dtos.MembershipSubscriptionDTO;
+import fpt.aptech.bookingservice.dtos.UserDTO;
+import fpt.aptech.bookingservice.eureka_client.UserEurekaClient;
 import fpt.aptech.bookingservice.models.MembershipSubscription;
 import fpt.aptech.bookingservice.models.PayMethodType;
 import fpt.aptech.bookingservice.models.PayStatusType;
+import fpt.aptech.bookingservice.models.WorkoutPackage;
 import fpt.aptech.bookingservice.repository.MembershipSubscriptionRepository;
+import fpt.aptech.bookingservice.repository.WorkoutPackageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PayPalService {
     private final APIContext apiContext;
+    private final UserEurekaClient userEurekaClient;
+    private final WorkoutPackageRepository workoutPackageRepository;
     private final MembershipSubscriptionRepository membershipRepository;
 
     /**
@@ -36,37 +43,51 @@ public class PayPalService {
      * @throws PayPalRESTException Nếu có lỗi trong quá trình tương tác với PayPal
      */
     public Payment createPayment(MembershipSubscriptionDTO subscriptionDTO) throws PayPalRESTException {
+        //Kiểm tra sự tôn tại của userId có hợp lệ hay không
+        UserDTO userExisting = userEurekaClient.getUserById(subscriptionDTO.getUserId());
+        if (userExisting == null) {
+            throw new PayPalRESTException("User not found");
+        }
+
         // Tạo đối tượng Amount và thiết lập tiền tệ và tổng số tiền
         Amount amount = new Amount();
         amount.setCurrency(subscriptionDTO.getCurrency());
         amount.setTotal(String.format("%.2f", subscriptionDTO.getTotalAmount()));   //Format cho nó chỉ lấy 2 chữ số phía sau
+
         // Tạo đối tượng Transaction và thiết lập mô tả và số tiền
         Transaction transaction = new Transaction();
         transaction.setDescription(subscriptionDTO.getDescription());
         transaction.setAmount(amount);
+
         // Tạo danh sách các giao dịch và thêm giao dịch vừa tạo vào danh sách
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
+
         // Tạo đối tượng Payer và thiết lập phương thức thanh toán
         Payer payer = new Payer();
         payer.setPaymentMethod(PayMethodType.PAYPAL.toString());
+
         // Tạo đối tượng Payment và thiết lập các thuộc tính liên quan
         Payment payment = new Payment();
         payment.setIntent(subscriptionDTO.getIntent());
         payment.setPayer(payer);
         payment.setTransactions(transactions);
+
         // Tạo đối tượng RedirectUrls và thiết lập các URL chuyển hướng
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setCancelUrl(subscriptionDTO.getCancelUrl());
         redirectUrls.setReturnUrl(subscriptionDTO.getSuccessUrl());
         payment.setRedirectUrls(redirectUrls);
+
         // Tạo một Payment mới trên PayPal
+
         Payment createdPayment = payment.create(apiContext);
         // Lưu thông tin thanh toán vào cơ sở dữ liệu
-//        Optional<Hotel> hotelExisting = hotelRepository.findById(bookingDTO.getHotelId());
+        Optional<WorkoutPackage> hotelExisting = workoutPackageRepository.findById(subscriptionDTO.getPackageId());
         MembershipSubscription membershipSubscription = MembershipSubscription.builder()
                 .packageId(subscriptionDTO.getPackageId())
                 .userId(subscriptionDTO.getUserId())
+                .fullName(userExisting.getFullName())
                 .buyDate(LocalDateTime.now())
                 .startDate(subscriptionDTO.getStartDate())
                 .endDate(subscriptionDTO.getEndDate())

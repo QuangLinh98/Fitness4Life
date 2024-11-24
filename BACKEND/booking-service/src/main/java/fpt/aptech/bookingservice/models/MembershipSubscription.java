@@ -20,6 +20,7 @@ public class MembershipSubscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private long userId;
+    private String fullName;
     private int packageId;
     private String paymentId;    // Mã giao dịch thanh toán
     private String payerId;     //Mã của người thanh toán
