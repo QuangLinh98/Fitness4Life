@@ -5,6 +5,8 @@ import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.Blog;
 import data.smartdeals_service.models.Comment;
 import data.smartdeals_service.services.BlogService;
+import data.smartdeals_service.services.CommentProducer;
+import data.smartdeals_service.services.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,8 @@ import java.util.Optional;
 
 public class BlogController {
     private final BlogService blogService;
+    private final CommentService commentService;
+    private final CommentProducer commentProducer;
 
     @GetMapping
     public ResponseEntity<?> getAllBlog() {
@@ -90,7 +94,7 @@ public class BlogController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteBlog/{id}")
     public ResponseEntity<ApiResponse<?>> deleteBlog(@PathVariable Long id){
         try {
             Optional<Blog> blogExisting = blogService.findById(id);
@@ -111,7 +115,7 @@ public class BlogController {
     @GetMapping("/comment")
     public ResponseEntity<?> getAllComments() {
         try {
-            List<Comment>  comments = blogService.getAllComments();
+            List<Comment>  comments = commentService.getAllComments();
             return ResponseEntity.ok(ApiResponse.success(comments, "get all comment successfully"));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -122,7 +126,7 @@ public class BlogController {
     @GetMapping("/comment{id}")
     public ResponseEntity<?> getCommentById(@PathVariable Long id) {
         try {
-            Optional<Comment> comment = blogService.findCommentById(id);
+            Optional<Comment> comment = commentService.findCommentById(id);
             if (comment != null) {
                 return ResponseEntity.status(200).body(ApiResponse
                         .success(comment, "get one comment successfully"));
@@ -138,7 +142,7 @@ public class BlogController {
     @GetMapping("/commentInBlog/{blogId}")
     public ResponseEntity<?> getCommentInBlog(@PathVariable Long blogId) {
         try {
-            List<Comment>  commentInBlog = blogService.findCommentsByBlog(blogId);
+            List<Comment>  commentInBlog = commentService.findCommentsByBlog(blogId);
             return ResponseEntity.ok(ApiResponse.success(commentInBlog, "get comment In Blog successfully"));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -154,30 +158,17 @@ public class BlogController {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            Comment createdComment = blogService.createCommentBlog(comment);
-            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
-                    .created(createdComment,"create Comment successfully"));
-        } catch (Exception e) {
+           commentProducer.sendComment(comment);
+            return  ResponseEntity.ok("create Comment successfully");
+        }catch (Exception ex) {
+            if(ex.getMessage().contains("BLOGANDQUESTIONNOTFOUND")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("blog not found"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("error server"));
         }
     }
 
-    @PostMapping("/comment/reply")
-    public ResponseEntity<?> createReply(@Valid @RequestBody CommentDTO reply,
-                                              BindingResult bindingResult) {
-        try {
-            if (bindingResult.hasErrors()) {
-                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
-            }
-            Comment createdReply = blogService.createReplyBlog(reply);
-            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
-                    .created(createdReply,"create reply successfully"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.errorServer("error server"));
-        }
-    }
     @PutMapping("/comment/update/{id}")
     public ResponseEntity<?> updateComment(@PathVariable Long id,@Valid  @RequestBody CommentDTO commentDTO,
                                          BindingResult bindingResult) {
@@ -185,7 +176,7 @@ public class BlogController {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            Comment updateCommment = blogService.updateComment(id,commentDTO);
+            Comment updateCommment = commentService.updateComment(id,commentDTO);
             return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
                     .created(updateCommment,"update Commment successfully"));
         } catch (Exception e) {
@@ -193,9 +184,9 @@ public class BlogController {
                     .body(ApiResponse.errorServer("error server"));
         }
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteCommment/{id}")
     public void deleteComment(@PathVariable Long id) {
-        blogService.deleteComment(id);
+        commentService.deleteComment(id);
     }
     @PutMapping("/comment/changePublished/{id}")
     public ResponseEntity<?> updateComment(@PathVariable Long id, @RequestBody ChangeStatusCommentDTO changeStatusCommentDTO,
@@ -204,7 +195,7 @@ public class BlogController {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            Comment changePublished = blogService.changeStatusCMB(id,changeStatusCommentDTO);
+            Comment changePublished = commentService.changeStatusCMB(id,changeStatusCommentDTO);
             return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
                     .created(changePublished,"change Published successfully"));
         } catch (Exception e) {

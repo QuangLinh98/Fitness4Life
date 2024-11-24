@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class BlogService {
     private final BlogRepository blogRepository;
     private final BlogImageRepository blogImageRepository;
-    private final CommentRepository commentRepository;
+
 
     private final FileUploadAvata fileUploadAvata;
     private String subFolder = "BlogImage";
@@ -132,99 +132,7 @@ public class BlogService {
     }
 
 
-    // 1. Lấy tất cả bình luận
-    public List<Comment> getAllComments() {
-        return commentRepository.findAll();
-    }
 
-    // 2. Tìm bình luận theo id
-    public Optional<Comment> findCommentById(Long id) {
-        return commentRepository.findById(id);
-    }
-
-    // 3. Tìm tất cả bình luận của một bài blog
-    public List<Comment> findCommentsByBlog(Long blogId) {
-        return commentRepository.findByBlogId(blogId);
-    }
-
-    public Comment createCommentBlog(CommentDTO commentDTO) {
-        // Kiểm tra blog tồn tại
-        Optional<Blog> blog = blogRepository.findById(commentDTO.getBlogId());
-        if (!blog.isPresent()) {
-            throw new IllegalArgumentException("Bài blog không tồn tại");
-        }
-        // Tạo bình luận
-        Comment comment = new Comment();
-        comment.setBlog(blog.get());
-        comment.setContent(commentDTO.getContent());
-        comment.setUserId(commentDTO.getUserId());
-        comment.setUserName(commentDTO.getUserName());
-        comment.setIsPublished(true);
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setUpdatedAt(null);
-        comment.setParentComment(null); // Bình luận cha sẽ không có parentComment
-
-        return commentRepository.save(comment);
-    }
-
-    public Comment createReplyBlog(CommentDTO commentDTO) {
-        // Kiểm tra blog tồn tại
-        Optional<Blog> blogs = blogRepository.findById(commentDTO.getBlogId());
-        if (!blogs.isPresent()) {
-            throw new IllegalArgumentException("Bài blog không tồn tại");
-        }
-        // Kiểm tra bình luận cha
-        Optional<Comment> parentComment = commentRepository.findById(commentDTO.getParentCommentId());
-        if (!parentComment.isPresent()) {
-            throw new IllegalArgumentException("Bình luận cha không tồn tại");
-        }
-        // Tạo bình luận con
-        Comment comment = new Comment();
-        comment.setBlog(blogs.get());
-        comment.setContent(commentDTO.getContent());
-        comment.setUserId(commentDTO.getUserId());
-        comment.setUserName(commentDTO.getUserName());
-        comment.setIsPublished(true);
-        comment.setParentComment(parentComment.get()); // Liên kết với bình luận cha
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setUpdatedAt(null);
-
-        return commentRepository.save(comment);
-    }
-
-    public Comment updateComment(Long id, CommentDTO commentDTO) {
-        Comment commentFindById = commentRepository.findById(id).orElse(null);
-        // Kiểm tra blog tồn tại
-        Optional<Blog> blogs = blogRepository.findById(commentDTO.getBlogId());
-        if (!blogs.isPresent()) {
-            throw new IllegalArgumentException("Bài blog không tồn tại");
-        }
-        // Kiểm tra bình luận cha
-        Optional<Comment> parentComment = commentRepository.findById(commentDTO.getParentCommentId());
-        if (!parentComment.isPresent()) {
-            throw new IllegalArgumentException("Bình luận cha không tồn tại");
-        }
-
-        commentFindById.setBlog(blogs.get());
-        commentFindById.setContent(commentDTO.getContent());
-        commentFindById.setUserId(commentDTO.getUserId());
-        commentFindById.setUserName(commentDTO.getUserName());
-        commentFindById.setParentComment(parentComment.get()); // Liên kết với bình luận cha
-        commentFindById.setUpdatedAt(LocalDateTime.now());
-
-        return commentRepository.save(commentFindById);
-    }
-
-    public void deleteComment(Long id) {
-        commentRepository.deleteById(id);
-    }
-    // Phương thức cập nhật trạng thái
-    public Comment changeStatusCMB(Long id,ChangeStatusCommentDTO status) {
-        Comment comments = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("comments not found with id: " + id));
-        comments.setIsPublished(status.getIsPublished());
-        return commentRepository.save(comments);
-    }
 
 }
 

@@ -6,6 +6,8 @@ import data.smartdeals_service.dto.QuestionDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.Comment;
 import data.smartdeals_service.models.Question;
+import data.smartdeals_service.services.CommentProducer;
+import data.smartdeals_service.services.CommentService;
 import data.smartdeals_service.services.ForumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ForumController {
     private final ForumService forumService;
+    private final CommentService commentService;
+    private final CommentProducer commentProducer;
     @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestion() {
         try {
@@ -79,7 +83,7 @@ public class ForumController {
                     .body(ApiResponse.errorServer("error server"));
         }
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteQuestion/{id}")
     public void deleteQuestion(@PathVariable Long id) {
         forumService.deleteQuestion(id);
     }
@@ -91,10 +95,12 @@ public class ForumController {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            Comment savedComment = forumService.createCommentForum(commentDTO);
-            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
-                    .created(savedComment,"create Comment successfully"));
-        } catch (Exception e) {
+            commentProducer.sendComment(commentDTO);
+            return  ResponseEntity.ok("create Comment successfully");
+        } catch (Exception ex) {
+            if(ex.getMessage().contains("BLOGANDQUESTIONNOTFOUND")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("question not found"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("error server"));
         }
@@ -104,7 +110,7 @@ public class ForumController {
     @GetMapping("/commentFlowerQuestions/{questionId}")
     public ResponseEntity<?> getCommentsByQuestion(@PathVariable Long questionId) {
         try {
-            List<Comment> commentInQuestions = forumService.getCommentsByQuestion(questionId);
+            List<Comment> commentInQuestions = commentService.getCommentsByQuestion(questionId);
             if (commentInQuestions != null) {
                 return ResponseEntity.status(200).body(ApiResponse
                         .success(commentInQuestions, "get one comment In Questions successfully"));
@@ -120,7 +126,7 @@ public class ForumController {
     @GetMapping("/comment/replyInParent/{id}")
     public ResponseEntity<?> getCommentInBlog(@PathVariable Long id) {
         try {
-            List<Comment>  commentInParent = forumService.getReplies(id);
+            List<Comment>  commentInParent = commentService.getReplies(id);
             return ResponseEntity.ok(ApiResponse.success(commentInParent, "get comment reply In comment Parent successfully"));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -135,7 +141,7 @@ public class ForumController {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            Comment updateComment = forumService.updateCommentForum(id,commentDTO);
+            Comment updateComment = commentService.updateCommentForum(id,commentDTO);
             return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
                     .created(updateComment,"update Comment successfully"));
         } catch (Exception e) {
@@ -143,19 +149,19 @@ public class ForumController {
                     .body(ApiResponse.errorServer("error server"));
         }
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteComment/{id}")
     public void deleteComment(@PathVariable Long id) {
-        forumService.deleteCommentForum(id);
+        commentService.deleteCommentForum(id);
     }
 
     @PutMapping("/comment/changePublished/{id}")
-    public ResponseEntity<?> updateComment(@PathVariable Long id, @RequestBody ChangeStatusCommentDTO changeStatusCommentDTO,
+    public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody ChangeStatusCommentDTO changeStatusCommentDTO,
                                            BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
-            Comment changePublished = forumService.changeStatusCMF(id,changeStatusCommentDTO);
+            Comment changePublished = commentService.changeStatusCMF(id,changeStatusCommentDTO);
             return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
                     .created(changePublished,"change Published successfully"));
         } catch (Exception e) {
