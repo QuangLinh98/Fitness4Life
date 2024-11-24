@@ -1,6 +1,7 @@
 package data.smartdeals_service.controller;
 
 import data.smartdeals_service.dto.PromotionDTO;
+import data.smartdeals_service.dto.PromotionStatusDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.Promotion;
 import data.smartdeals_service.services.PromotionService;
@@ -63,5 +64,20 @@ public class PromotionController {
     @DeleteMapping("/{id}")
     public void deletePromotion(@PathVariable Long id) {
         promotionService.deletePromotion(id);
+    }
+    @PutMapping("/changePublished/{id}")
+    public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody PromotionStatusDTO promotionStatusDTO,
+                                             BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Promotion changePublished = promotionService.closePromotionStatus(id,promotionStatusDTO);
+            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
+                    .created(changePublished,"change Published successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
     }
 }
