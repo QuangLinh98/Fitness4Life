@@ -45,10 +45,29 @@ public class UserService {
     private static final int OTP_EXPIRATION_MINUTES = 5;   //Đặt thời gian hết hạn cho mã OTP
 
     //Phương thức Show Data
+//    public List<UserResponseDTO> getAllUser() {
+//        List<User> users = userRepository.findAll();
+//        return users.stream().map(user -> objectMapper.convertValue(user, UserResponseDTO.class))
+//                .collect(Collectors.toList());
+//    }
     public List<UserResponseDTO> getAllUser() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(user -> objectMapper.convertValue(user, UserResponseDTO.class))
-                .collect(Collectors.toList());
+        return users.stream().map(user -> {
+            UserResponseDTO dto = objectMapper.convertValue(user, UserResponseDTO.class);
+
+            //set dto
+            if (user.getProfile() != null) {
+                ProfileDTO profileDTO = new ProfileDTO();
+                profileDTO.setHobbies(user.getProfile().getHobbies());
+                profileDTO.setAddress(user.getProfile().getAddress());
+                profileDTO.setAvatar(user.getProfile().getAvatar());
+                profileDTO.setAge(user.getProfile().getAge());
+                profileDTO.setMaritalStatus(user.getProfile().getMaritalStatus());
+                profileDTO.setDescription(user.getProfile().getDescription());
+                dto.setProfileDTO(profileDTO); // Set the profileDTO in the UserResponseDTO
+            }
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     public UserDTO getUserById(Long id) {
