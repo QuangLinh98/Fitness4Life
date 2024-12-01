@@ -23,7 +23,7 @@ public class MailResetPass {
     public void sendMailOTP(MailEntity mailEntity) throws MessagingException, UnsupportedEncodingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom(new InternetAddress(sender, "Trip Planner"));
+        mimeMessageHelper.setFrom(new InternetAddress(sender, "Fitness4Life"));
         mimeMessageHelper.setTo(mailEntity.getEmail());
         mimeMessageHelper.setSubject(mailEntity.getSubject());
         mimeMessageHelper.setText(mailEntity.getContent(), true);
