@@ -19,6 +19,7 @@ public class Profile {
     private String hobbies;
     private String address;
     private int age;
+    private int heightValue;   //Giá trị chiều cao
     private String avatar;
     private String description;
 

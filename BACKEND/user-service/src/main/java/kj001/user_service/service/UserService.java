@@ -62,6 +62,7 @@ public class UserService {
                 profileDTO.setAddress(user.getProfile().getAddress());
                 profileDTO.setAvatar(user.getProfile().getAvatar());
                 profileDTO.setAge(user.getProfile().getAge());
+                profileDTO.setHeightValue(user.getProfile().getHeightValue());
                 profileDTO.setMaritalStatus(user.getProfile().getMaritalStatus());
                 profileDTO.setDescription(user.getProfile().getDescription());
                 dto.setProfileDTO(profileDTO); // Set the profileDTO in the UserResponseDTO
@@ -75,9 +76,17 @@ public class UserService {
         if (existingUser.isEmpty()) {
             return null;
         }
+        Profile profile = existingUser.get().getProfile();
+        //Chuyển đổi entity thanh dto
+        ProfileUserDTO profileUserDTO = new ProfileUserDTO(
+                profile.getAge(),
+                profile.getHeightValue()
+        );
         UserDTO userDTO = UserDTO.builder()
                 .fullName(existingUser.get().getFullName())
                 .email(existingUser.get().getEmail())
+                .gender(existingUser.get().getGender())
+                .profileUserDTO(profileUserDTO)
                 .build();
         return userDTO;
     }
