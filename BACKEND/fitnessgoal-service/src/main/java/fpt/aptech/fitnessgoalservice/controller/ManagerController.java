@@ -1,11 +1,11 @@
 package fpt.aptech.fitnessgoalservice.controller;
 
-import fpt.aptech.fitnessgoalservice.dtos.ChangeGoalStatusDTO;
-import fpt.aptech.fitnessgoalservice.dtos.GoalDTO;
-import fpt.aptech.fitnessgoalservice.dtos.UpdateGoalDTO;
+import fpt.aptech.fitnessgoalservice.dtos.*;
 import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
 import fpt.aptech.fitnessgoalservice.models.Goal;
+import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.service.GoalService;
+import fpt.aptech.fitnessgoalservice.service.ProgressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ManagerController {
     private final GoalService goalService;
+    private final ProgressService progressService;
 
     @PostMapping("/add")
     public ResponseEntity<?> AddGoal(@RequestBody GoalDTO goalDTO) {
@@ -56,6 +57,40 @@ public class ManagerController {
         try {
                goalService.deleteGoal(id);
                return ResponseEntity.ok().build();
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+        }
+    }
+
+    //================================== PROGRESS ==============================
+    @PostMapping("/progress/add")
+    public ResponseEntity<?> AddProgress(@RequestBody ProgressDTO progressDTO) {
+        try {
+            Progress newProgress = progressService.createProgress(progressDTO);
+            return ResponseEntity.status(201).body(ApiResponse.created(newProgress,"Create progress successfully") );
+        }catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+        }
+    }
+
+    @PutMapping("/progress/update/{id}")
+    public ResponseEntity<?> UpdateProgress(@Valid @PathVariable int id, @RequestBody UpdateProgressDTO progressDTO , BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));            }
+            Progress updateProgress = progressService.updateProgress(id, progressDTO);
+            return ResponseEntity.ok(updateProgress);
+        }catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/progress/delete/{id}")
+    public ResponseEntity<?> DeleteProgress(@PathVariable int id) {
+        try {
+            progressService.deleteProgress(id);
+            return ResponseEntity.ok().build();
         }
         catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());

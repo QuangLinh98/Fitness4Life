@@ -7,24 +7,31 @@ import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
 import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.models.GoalStatus;
+import fpt.aptech.fitnessgoalservice.models.GoalType;
+import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.repository.GoalRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
+    private final CalculationService calculationService;
     private final UserEurekaClient userEurekaClient;
 
     //Handle get all data
     public List<Goal> getAllGoals() {
         return goalRepository.findAll();
+    }
+
+    //Handle get one goal by id
+    public Goal getGoalById(int id) {
+        return goalRepository.findById(id).get();
     }
 
     //Handle create Goal
@@ -33,15 +40,50 @@ public class GoalService {
         if (existingUser == null) {
             throw new RuntimeException("User not found");
         }
+        // Lấy thông tin cân nặng và giá trị hiện tại
+        Double weight = goalDTO.getWeight();
+        Double currentValue = goalDTO.getCurrentValue();
+
+        // Chỉ xử lý đồng bộ khi mục tiêu là WEIGHT_LOSS hoặc WEIGHT_GAIN
+        if (goalDTO.getGoalType() == GoalType.WEIGHT_LOSS || goalDTO.getGoalType() == GoalType.WEIGHT_GAIN) {
+            if (weight == null && currentValue == null) {
+                throw new RuntimeException("For weight-related goals, at least one of weight or currentValue must be provided.");
+            }
+
+            // Nếu chỉ có currentValue
+            if (weight == null) {
+                weight = currentValue; // Gán weight bằng currentValue
+            }
+
+            // Nếu chỉ có weight
+            if (currentValue == null) {
+                currentValue = weight; // Gán currentValue bằng weight
+            }
+
+            // Kiểm tra tính hợp lệ
+            if (weight <= 0 || currentValue <= 0) {
+                throw new RuntimeException("Weight and currentValue must be greater than 0 for weight-related goals.");
+            }
+        }
+        // Lấy giá trị activityLevel(hệ số hoạt động)
+        String activityLevel = goalDTO.getActivityLevel().name();
+        //Tính TDEE
+        double tdee = calculationService.calculateTdee(weight, existingUser, activityLevel);
+
+        //Tính calo mục tiêu
+        double targetCalories = goalDTO.getGoalType().calculateTargetCalories(tdee);
         Goal goal = Goal.builder()
                 .userId(goalDTO.getUserId())
                 .fullName(existingUser.getFullName())
                 .goalType(goalDTO.getGoalType())
                 .targetValue(goalDTO.getTargetValue())
                 .currentValue(goalDTO.getCurrentValue())
+                .weight(weight)
                 .startDate(goalDTO.getStartDate())
                 .endDate(goalDTO.getEndDate())
                 .goalStatus(GoalStatus.PLANNING)
+                .activityLevel(goalDTO.getActivityLevel())
+                .targetCalories(targetCalories)
                 .createdAt(LocalDateTime.now())
                 .build();
         return goalRepository.save(goal);
@@ -50,18 +92,62 @@ public class GoalService {
     //Handle update Goal
     public Goal updateGoal(int id, UpdateGoalDTO goalDTO) {
         Goal existingGoal = goalRepository.findById(id).orElseThrow(() -> new RuntimeException("Goal not found"));
+        UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
+        if (existingUser == null) {
+            throw new RuntimeException("User not found");
+        }
+        // Nếu mục tiêu đã hoàn thành, không thể cập nhật
         if (existingGoal.getGoalStatus() == GoalStatus.COMPLETED) {
             throw new RuntimeException("Goal already completed");
         }
-        if (existingGoal.getGoalStatus() != GoalStatus.IN_PROGRESS && existingGoal.getGoalStatus() != GoalStatus.FAILED) {
-            existingGoal.setStartDate(goalDTO.getStartDate());
-            existingGoal.setEndDate(goalDTO.getEndDate());
+
+        // Kiểm tra các giá trị mục tiêu (nếu cần thiết, có thể thêm các kiểm tra tính hợp lệ khác)
+        Double weight = goalDTO.getWeight();
+        Double currentValue = goalDTO.getCurrentValue();
+        if ((goalDTO.getGoalType() == GoalType.WEIGHT_LOSS || goalDTO.getGoalType() == GoalType.WEIGHT_GAIN) &&
+                (weight == null && currentValue == null)) {
+            throw new RuntimeException("For weight-related goals, at least one of weight or currentValue must be provided.");
         }
+
+        // Nếu chỉ có một trong hai giá trị (weight hoặc currentValue), gán giá trị còn lại
+        if (weight == null) {
+            weight = currentValue;
+        }
+        if (currentValue == null) {
+            currentValue = weight;
+        }
+
+        // Kiểm tra hợp lệ (cân nặng và giá trị mục tiêu phải > 0)
+        if (weight <= 0 || currentValue <= 0) {
+            throw new RuntimeException("Weight and currentValue must be greater than 0 for weight-related goals.");
+        }
+
+        // Cập nhật các thuộc tính của goal từ goalDTO
         existingGoal.setGoalType(goalDTO.getGoalType());
         existingGoal.setTargetValue(goalDTO.getTargetValue());
         existingGoal.setCurrentValue(goalDTO.getCurrentValue());
+        existingGoal.setWeight(weight);
+        existingGoal.setActivityLevel(goalDTO.getActivityLevel());
+
+        // Nếu trạng thái của goal đang trong tiến trình hoặc thất bại, cho phép cập nhật ngày bắt đầu và ngày kết thúc
+        if (existingGoal.getGoalStatus() == GoalStatus.IN_PROGRESS || existingGoal.getGoalStatus() == GoalStatus.FAILED) {
+            existingGoal.setStartDate(goalDTO.getStartDate());
+            existingGoal.setEndDate(goalDTO.getEndDate());
+        }
+
+        // Tính toán lại TDEE dựa trên thông tin mới
+        double tdee = calculationService.calculateTdee(weight, existingUser, goalDTO.getActivityLevel().name());
+
+        // Tính lại calo mục tiêu
+        double targetCalories = goalDTO.getGoalType().calculateTargetCalories(tdee);
+
+        // Cập nhật lại targetCalories trong mục tiêu
+        existingGoal.setTargetCalories(targetCalories);
+
+        // Lưu mục tiêu đã được cập nhật vào cơ sở dữ liệu
         return goalRepository.save(existingGoal);
     }
+
 
     //Handle update goal status
     public Goal changeGoalStatusById(int id, ChangeGoalStatusDTO goalStatusDTO) {

@@ -22,13 +22,17 @@ public class GoalDTO {
     private Double targetValue;    // Giá trị mục tiêu (VD: cân nặng, % mỡ cơ thể)
     @NotNull(message = "Current Value is required")
     private Double currentValue;   // Giá trị hiện tại
+    private Double weight;
     @NotNull(message = "Start Date is required")
     private LocalDate startDate;   //Ngày bắt đầu
     @NotNull(message = "End Date is required")
     private LocalDate endDate;     //Ngày kết thúc
 
-    @NotNull(message = "Goal status is required")
     @Enumerated(EnumType.STRING)
     private GoalStatus goalStatus;  //Trạng thái của mục tiêu
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "ActivityLevel is required")
+    private ActivityLevel activityLevel;    //Mức độ hoạt động
     private LocalDateTime createdAt;
 }
