@@ -1,7 +1,7 @@
 package data.smartdeals_service.component;
 
-import data.smartdeals_service.models.Promotion;
-import data.smartdeals_service.repository.PromotionRepository;
+import data.smartdeals_service.models.promotion.Promotion;
+import data.smartdeals_service.repository.promotioRepositories.PromotionRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
