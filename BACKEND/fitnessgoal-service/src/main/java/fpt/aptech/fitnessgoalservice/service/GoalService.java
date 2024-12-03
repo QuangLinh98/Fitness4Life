@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -152,15 +153,29 @@ public class GoalService {
     //Handle update goal status
     public Goal changeGoalStatusById(int id, ChangeGoalStatusDTO goalStatusDTO) {
         Goal existingGoal = goalRepository.findById(id).orElseThrow(() -> new RuntimeException("Goal not found"));
-        if (existingGoal.getGoalStatus() == GoalStatus.COMPLETED) {
-            throw new RuntimeException("Error: Goal Completed");
-        }
-        GoalStatus newStatus = GoalStatus.valueOf(goalStatusDTO.getGoalStatus());
-        if (existingGoal.getGoalStatus() == GoalStatus.IN_PROGRESS) {
-            if (newStatus == GoalStatus.PLANNING ) {
-                throw new RuntimeException("Error: Goal Planning");
+        // Kiểm tra nếu mục tiêu đã hết hạn
+        if (existingGoal.getEndDate().isBefore(LocalDate.now())) {
+            if (existingGoal.getGoalStatus() != GoalStatus.COMPLETED) {
+                existingGoal.setGoalStatus(GoalStatus.FAILED);
+                goalRepository.save(existingGoal);
+                throw new RuntimeException("Goal has expired and is set to FAILED.");
             }
         }
+
+        // Lấy trạng thái hiện tại và trạng thái mới
+        GoalStatus currentStatus = existingGoal.getGoalStatus();
+        GoalStatus newStatus = GoalStatus.valueOf(goalStatusDTO.getGoalStatus());
+
+        // Kiểm tra trạng thái hiện tại
+        if (currentStatus == GoalStatus.COMPLETED || currentStatus == GoalStatus.FAILED) {
+            throw new RuntimeException("Cannot change status. Current goal is already " + currentStatus);
+        }
+
+        // Kiểm tra logic chuyển đổi trạng thái
+        if (currentStatus == GoalStatus.IN_PROGRESS && newStatus == GoalStatus.PLANNING) {
+            throw new RuntimeException("Cannot revert goal from IN_PROGRESS to PLANNING");
+        }
+        // Cập nhật trạng thái mới
         existingGoal.setGoalStatus(newStatus);
         goalRepository.save(existingGoal);
         return existingGoal;

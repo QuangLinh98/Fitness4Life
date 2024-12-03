@@ -1,6 +1,10 @@
 package fpt.aptech.fitnessgoalservice.dtos;
 
+import fpt.aptech.fitnessgoalservice.models.MetricName;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -8,10 +12,12 @@ import java.time.LocalDateTime;
 
 @Data
 public class UpdateProgressDTO {
+    private int goalId;
     private LocalDate trackingDate; // Ngày cập nhật
 
-    @Column(nullable = false)
-    private String metricName; // Chỉ số được cập nhật (VD: weight, body_fat, muscle_mass)
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private MetricName metricName; // Chỉ số được cập nhật
 
     private Double value; // Giá trị cập nhật
 

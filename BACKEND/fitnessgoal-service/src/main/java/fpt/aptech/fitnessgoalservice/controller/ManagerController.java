@@ -96,4 +96,15 @@ public class ManagerController {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
         }
     }
+
+    @GetMapping("/progress/analyze")
+    public ResponseEntity<?> AnalyzeProgress(@RequestParam long userId) {
+        try {
+            String analysis = progressService.analyzeProgress(userId);
+            return ResponseEntity.status(200).body(ApiResponse.success(analysis,"Get analyze data successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+        }
+    }
 }

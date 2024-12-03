@@ -29,16 +29,18 @@ public class Progress {
     private Goal goal;
 
     @Column(nullable = false)
-    private LocalDate trackingDate; // Ngày cập nhật
+    private LocalDate trackingDate; // Ngày cập nhật dữ liệu
 
-    @Column(nullable = false)
-    private String metricName; // Chỉ số được cập nhật (VD: weight, body_fat, muscle_mass)
+    @Enumerated(EnumType.STRING)
+    private MetricName metricName; // Chỉ số được cập nhật
 
     private Double value; // Các Giá trị khác biến đổi được cập nhật sau mỗi lần tập luyện (vd : lượng cơ , lượng mỡ ,.. cho mục tiêu tăng cơ , giảm mỡ )
     private Double weight; // Giá trị biến đổi được cập nhật sau mỗi lần tập luyện ( weight = 40kg)
 
     @Column(nullable = false)
     private double caloriesConsumed;   //Lượng calo tiêu thụ hàng ngày
+    @Column(length = 500)
+    private String message; // Thông báo về calo thiếu/hợp lý/dư thừa (tuỳ chọn)
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
