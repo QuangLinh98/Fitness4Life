@@ -1,7 +1,5 @@
 package data.smartdeals_service.services;
 
-import data.smartdeals_service.dto.PromotionDTO;
-import data.smartdeals_service.dto.PromotionStatusDTO;
 import data.smartdeals_service.models.Promotion;
 import data.smartdeals_service.repository.PromotionRepository;
 import lombok.RequiredArgsConstructor;

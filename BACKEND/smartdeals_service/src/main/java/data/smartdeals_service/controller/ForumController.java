@@ -1,8 +1,5 @@
 package data.smartdeals_service.controller;
 
-import data.smartdeals_service.dto.ChangeStatusCommentDTO;
-import data.smartdeals_service.dto.CommentDTO;
-import data.smartdeals_service.dto.QuestionDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.Comment;
 import data.smartdeals_service.models.Question;

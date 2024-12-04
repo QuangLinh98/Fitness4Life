@@ -1,6 +1,5 @@
 package data.smartdeals_service.controller;
 
-import data.smartdeals_service.dto.PromotionDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.Promotion;
 import data.smartdeals_service.services.PromotionService;
