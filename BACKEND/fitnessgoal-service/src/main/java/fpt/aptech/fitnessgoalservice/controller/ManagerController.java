@@ -1,8 +1,11 @@
 package fpt.aptech.fitnessgoalservice.controller;
 
 import fpt.aptech.fitnessgoalservice.dtos.*;
+import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
+import fpt.aptech.fitnessgoalservice.kafka.NotifyProducer;
 import fpt.aptech.fitnessgoalservice.models.Goal;
+import fpt.aptech.fitnessgoalservice.dtos.NotifyDTO;
 import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.service.GoalService;
 import fpt.aptech.fitnessgoalservice.service.ProgressService;
@@ -17,12 +20,28 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ManagerController {
     private final GoalService goalService;
+    private final NotifyProducer notifyProducer;
     private final ProgressService progressService;
+    private final UserEurekaClient userEurekaClient;
 
     @PostMapping("/add")
     public ResponseEntity<?> AddGoal(@RequestBody GoalDTO goalDTO) {
         try {
             Goal newGoal = goalService.createGoal(goalDTO);
+            //Test user
+
+            UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
+            System.out.println("Có nhận đươc user không : " + existingUser);
+            //Send notification to user . When user add a goal successfully
+            NotifyDTO notifyDTO = NotifyDTO.builder()
+                    .itemId(newGoal.getId())
+                    .userId(goalDTO.getUserId())
+                    .fullName(existingUser.getFullName())
+                    .title("Chào mừng " + existingUser.getFullName() + " đến với mục tiêu " +newGoal.getGoalType())
+                    .content("Chúc bạn sớm hoàn thành được mục tiêu đề ra.")
+                    .build();
+            notifyProducer.sendNotify(notifyDTO);
+            System.out.println("Notify add goal success : "+ notifyDTO);
             return ResponseEntity.status(201).body(ApiResponse.created(newGoal,"Create goal successfully") );
         }catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
