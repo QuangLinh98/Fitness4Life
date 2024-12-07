@@ -9,7 +9,4 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UserEurekaClient {
     @GetMapping("api/users/manager/users/{id}")
     UserDTO getUserById(@PathVariable long id);
-
-    //Lấy giá trị age và heightValue từ profileUserDTO
-
 }

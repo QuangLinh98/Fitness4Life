@@ -4,17 +4,17 @@ import fpt.aptech.fitnessgoalservice.dtos.ProgressDTO;
 import fpt.aptech.fitnessgoalservice.dtos.UpdateProgressDTO;
 import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
 import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
-import fpt.aptech.fitnessgoalservice.models.Goal;
-import fpt.aptech.fitnessgoalservice.models.GoalStatus;
-import fpt.aptech.fitnessgoalservice.models.GoalType;
-import fpt.aptech.fitnessgoalservice.models.Progress;
+import fpt.aptech.fitnessgoalservice.models.*;
+import fpt.aptech.fitnessgoalservice.notification.NotifyService;
 import fpt.aptech.fitnessgoalservice.repository.GoalRepository;
 import fpt.aptech.fitnessgoalservice.repository.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +22,7 @@ public class ProgressService {
     private final ProgressRepository progressRepository;
     private final GoalRepository goalRepository;
     private final UserEurekaClient userEurekaClient;
+    private final NotifyService notifyService;
 
     //Handle get all progress data
     public List<Progress> getAllProgress() {
@@ -170,11 +171,122 @@ public class ProgressService {
         }
     }
 
-    //Xử lý phân tích tiến trình tập luyện của user
-    public String analyzeProgress(long userId) {
-        List<Progress> progressList = progressRepository.findByUserId(userId);
-        // Logic phân tích: Xu hướng cân nặng tăng hay giảm
-        double totalCalories = progressList.stream().mapToDouble(Progress::getCaloriesConsumed).sum();
-        return "Tổng lượng calo cần tiêu thụ trong tuần : " + totalCalories;
+    //Lấy chỉ số sức khỏe trong khoảng thời gian khi người dùng thực hiện so sánh các chỉ số sức khỏe so với ban đầu
+    public List<Progress> getProgressData(int userId, LocalDate startDate, LocalDate endDate) {
+        List<Progress> progressList = progressRepository.findByUserIdAndTrackingDateBetween(userId, startDate, endDate);
+        return progressList;
     }
+
+    // Tính sự thay đổi về cân nặng, mỡ cơ thể, hoặc khối cơ
+    public double calculateChangeOverPeriod(List<Progress> progressList,
+                                            MetricName metricName,
+                                            double targetValue) {
+        Double endValue = null;
+        // Lọc ra các progress có metricName tương ứng và tính toán giá trị bắt đầu và kết thúc
+        for (Progress progress : progressList) {
+            if (progress.getMetricName() == metricName) {
+                endValue = progress.getValueByMetric();  // Lấy giá trị cuối cùng
+            }
+        }
+
+        // Nếu không có giá trị hợp lệ cho metric, trả về 0
+        if (endValue == null) {
+            return 0.0;  // Không có sự thay đổi nếu không có dữ liệu
+        }
+        System.out.println("Change value " + (endValue - targetValue));
+        // So sánh endValue với targetValue và tính sự thay đổi
+        return  endValue - targetValue ;
+    }
+
+    //Phân tích các chỉ số tiến trình tập luyện trong khoảng thời gian và gửi thông báo
+    public String analyzeProgress(int userId, LocalDate startDate, LocalDate endDate) {
+        // lấy dữ liệu cân nặng , mỡ cơ thể , cơ , calo tiêu thụ
+        List<Progress> progressList = getProgressData(userId, startDate, endDate);
+        if (progressList.isEmpty()) {
+            return "There is no data for this time period.";
+        }
+
+        //Lấy mục tiêu của người dùng (targetValue)
+        Goal goal = goalRepository.findGoalByUserId(userId);
+        if (goal == null) {
+            throw new RuntimeException("No goal found for user");
+        }
+        // Tính sự thay đổi và so sánh với mục tiêu
+        double weightChange = calculateChangeOverPeriod(progressList, MetricName.WEIGHT, goal.getTargetValue());
+        double bodyFatChange = calculateChangeOverPeriod(progressList, MetricName.BODY_FAT, goal.getTargetValue());
+        double muscleMassChange = calculateChangeOverPeriod(progressList, MetricName.MUSCLEMASS, goal.getTargetValue());
+
+        // So sánh và in thông báo theo metricName
+        String message = "";
+
+        UserDTO existingUser = userEurekaClient.getUserById(userId);
+        // Gửi thông báo chỉ khi change có sự thay đổi
+        if (weightChange != 0) {
+            message = compareWithGoal(weightChange, goal);
+            notifyService.sendAnalyticsNotification(existingUser, goal, message);
+        }
+        if (bodyFatChange != 0) {
+            message = compareWithGoal(bodyFatChange, goal);
+            notifyService.sendAnalyticsNotification(existingUser, goal, message);
+        }
+        if (muscleMassChange != 0) {
+            message = compareWithGoal(muscleMassChange, goal);
+            notifyService.sendAnalyticsNotification(existingUser, goal, message);
+        }
+
+        // Trả về tất cả các thông báo
+        return message;
+
+    }
+
+    //So sánh với mục tiêu của người dùng
+    public String compareWithGoal(double change, Goal goal) {
+        String result = "";
+
+        // Kiểm tra mục tiêu giảm cân (WEIGHT_LOSS)
+        if (goal.getGoalType() == GoalType.WEIGHT_LOSS) {
+            if (change > 0) {
+                result = "Ban can giam them " + Math.abs(change) + "kg,de dat muc tieu giam can ve " + goal.getTargetValue()+ "kg";
+            } else {
+                result = "Ban da giam " + change + "kg de dat muc tieu giam can.";
+            }
+        }
+
+        // Kiểm tra mục tiêu tăng cân (WEIGHT_GAIN)
+        else if (goal.getGoalType() == GoalType.WEIGHT_GAIN) {
+            if (change > 0) {
+                result = "Ban da tang " + change + "kg, dat muc tieu tang can.";
+            } else if (change < 0){
+                result = "Ban can tang them " + Math.abs(change) + "kg de dat muc tieu tang can len " + goal.getTargetValue()+ "kg";
+            }
+        }
+
+        // Kiểm tra mục tiêu tăng cơ (MUSCLE_GAIN)
+        else if (goal.getGoalType() == GoalType.MUSCLE_GAIN) {
+            if (change < 0) {
+                result = "Ban can tang them " + Math.abs(change) + "% cơ, dat muc tieu tang co len " + goal.getTargetValue() + "% co";
+            } else if (change > 0) {
+                result = "Ban da mat " + change + "% cơ, can tang them % cơ de dat muc tieu tang co.";
+            }
+        }
+
+        // Kiểm tra mục tiêu giảm mỡ (FAT_LOSS)
+        else if (goal.getGoalType() == GoalType.FAT_LOSS) {
+            if (change < 0) {
+                result = "Ban da giam " + Math.abs(change) + "% mo, dat muc tieu giam mo.";
+            } else if (change > 0) {
+                result = "Ban can giam them " + change + "% mo de dat muc tieu giam mo.";
+            }
+        }
+        // Nếu không khớp với bất kỳ mục tiêu nào
+        else {
+            result = "Muc tieu khong hop le hoac khong co thay doi nao.";
+        }
+
+        return result;
+    }
+
+
+
+
 }

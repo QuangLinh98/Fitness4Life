@@ -7,6 +7,7 @@ import fpt.aptech.fitnessgoalservice.kafka.NotifyProducer;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.dtos.NotifyDTO;
 import fpt.aptech.fitnessgoalservice.models.Progress;
+import fpt.aptech.fitnessgoalservice.notification.NotifyService;
 import fpt.aptech.fitnessgoalservice.service.GoalService;
 import fpt.aptech.fitnessgoalservice.service.ProgressService;
 import jakarta.validation.Valid;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/goal")
@@ -23,25 +26,22 @@ public class ManagerController {
     private final NotifyProducer notifyProducer;
     private final ProgressService progressService;
     private final UserEurekaClient userEurekaClient;
+    private final NotifyService notifyService;
 
     @PostMapping("/add")
     public ResponseEntity<?> AddGoal(@RequestBody GoalDTO goalDTO) {
         try {
             Goal newGoal = goalService.createGoal(goalDTO);
             //Test user
-
             UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
             System.out.println("Có nhận đươc user không : " + existingUser);
+
             //Send notification to user . When user add a goal successfully
-            NotifyDTO notifyDTO = NotifyDTO.builder()
-                    .itemId(newGoal.getId())
-                    .userId(goalDTO.getUserId())
-                    .fullName(existingUser.getFullName())
-                    .title("Chào mừng " + existingUser.getFullName() + " đến với mục tiêu " +newGoal.getGoalType())
-                    .content("Chúc bạn sớm hoàn thành được mục tiêu đề ra.")
-                    .build();
-            notifyProducer.sendNotify(notifyDTO);
-            System.out.println("Notify add goal success : "+ notifyDTO);
+            NotifyDTO notifyDTO = new NotifyDTO();
+            notifyDTO.setItemId(newGoal.getId());
+            notifyDTO.setUserId(goalDTO.getUserId());
+            notifyService.sendCreatedNotification(existingUser ,notifyDTO , goalDTO);
+
             return ResponseEntity.status(201).body(ApiResponse.created(newGoal,"Create goal successfully") );
         }catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
@@ -82,6 +82,7 @@ public class ManagerController {
         }
     }
 
+
     //================================== PROGRESS ==============================
     @PostMapping("/progress/add")
     public ResponseEntity<?> AddProgress(@RequestBody ProgressDTO progressDTO) {
@@ -116,14 +117,19 @@ public class ManagerController {
         }
     }
 
-    @GetMapping("/progress/analyze")
-    public ResponseEntity<?> AnalyzeProgress(@RequestParam long userId) {
-        try {
-            String analysis = progressService.analyzeProgress(userId);
-            return ResponseEntity.status(200).body(ApiResponse.success(analysis,"Get analyze data successfully"));
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
-        }
+    @GetMapping("/compare-progress")
+    public ResponseEntity<?> compareProgress(@RequestParam int userId , @RequestParam String startDate, @RequestParam String endDate) {
+       try {
+           //Chuyển đổi chuỗi thành LocalDate
+           LocalDate start = LocalDate.parse(startDate);
+           LocalDate end = LocalDate.parse(endDate);
+
+           //Phân tích tiến trình người dùng
+           String result = progressService.analyzeProgress(userId,start,end);
+           return ResponseEntity.status(200).body(ApiResponse.success(result,"Get progress data successfully"));
+       } catch (Exception e) {
+           return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+       }
     }
+
 }

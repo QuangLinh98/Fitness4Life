@@ -45,4 +45,18 @@ public class Progress {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Phương thức trả về giá trị của chỉ số dựa trên metricName
+    public Double getValueByMetric() {
+        switch (this.metricName) {
+            case WEIGHT:
+                return this.weight;  // Trả về giá trị cân nặng
+            case BODY_FAT:
+                return this.value;
+            case MUSCLEMASS:
+                return this.value;  // Trả về giá trị mỡ cơ thể hoặc khối cơ
+            default:
+                throw new IllegalArgumentException("Invalid metric name: " + this.metricName);
+        }
+    }
 }
