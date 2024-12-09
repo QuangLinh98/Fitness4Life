@@ -3,11 +3,8 @@ package fpt.aptech.fitnessgoalservice.service;
 import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
 import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.models.Gender;
-import fpt.aptech.fitnessgoalservice.models.Goal;
-import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.repository.ProgressRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service

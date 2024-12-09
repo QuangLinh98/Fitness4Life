@@ -8,10 +8,8 @@ import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.models.GoalStatus;
 import fpt.aptech.fitnessgoalservice.models.GoalType;
-import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.repository.GoalRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +21,7 @@ import java.util.List;
 public class GoalService {
     private final GoalRepository goalRepository;
     private final CalculationService calculationService;
+    private final DietPlanService dietPlanService;
     private final UserEurekaClient userEurekaClient;
 
     //Handle get all data
@@ -87,7 +86,10 @@ public class GoalService {
                 .targetCalories(targetCalories)
                 .createdAt(LocalDateTime.now())
                 .build();
-        return goalRepository.save(goal);
+        Goal saveGoal = goalRepository.save(goal);
+        //Sau khi tạo goal hệ thống sẽ gợi ý chế độ ăn bằng cách gọi lại hàm
+        dietPlanService.createDietPlanForUser(saveGoal);
+        return saveGoal;
     }
 
     //Handle update Goal

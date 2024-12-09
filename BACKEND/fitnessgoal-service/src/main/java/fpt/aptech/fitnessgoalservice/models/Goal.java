@@ -28,11 +28,11 @@ public class Goal {
     private Double targetValue;    // Giá trị mục tiêu (VD: cân nặng, % mỡ cơ thể)
     private Double currentValue;   // Giá trị hiện tại
     private Double weight;
-    private LocalDate startDate;   //Ngày bắt đầu
-    private LocalDate endDate;     //Ngày kết thúc
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
-    private GoalStatus goalStatus;  //Trạng thái của mục tiêu
+    private GoalStatus goalStatus;
 
     @Enumerated(EnumType.STRING)
     private ActivityLevel activityLevel;  //Mức độ hoạt động
@@ -48,5 +48,10 @@ public class Goal {
     private List<Progress>progresses;
 
     @OneToMany(mappedBy = "goal")
-    private List<Recommendation>recommendations;
+    private List<DietPlan>dietPlans;
+
+//    @OneToMany(mappedBy = "goal")
+//    private List<ExercisePlan>exercisePlans;
+
+
 }

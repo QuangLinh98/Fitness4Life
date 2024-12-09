@@ -1,7 +1,8 @@
 package fpt.aptech.fitnessgoalservice.dtos;
 
-import fpt.aptech.fitnessgoalservice.models.*;
-import jakarta.persistence.Column;
+import fpt.aptech.fitnessgoalservice.models.ActivityLevel;
+import fpt.aptech.fitnessgoalservice.models.GoalStatus;
+import fpt.aptech.fitnessgoalservice.models.GoalType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;

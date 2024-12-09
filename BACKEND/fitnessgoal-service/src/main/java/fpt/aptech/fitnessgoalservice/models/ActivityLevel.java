@@ -7,7 +7,7 @@ public enum ActivityLevel {
     MODERATELY_ACTIVE(1.55,"Hoạt động vừa phải (3-5 ngày /tuần"),
     VERY_ACTIVE(1.725,"Hoạt động cao (6-7 ngày /tuần"),
     EXTREMELY_ACTIVE(1.9,"Hoạt động rất cao (vận động viên , lao động nặng")
-;
+    ;
     private final double multiplier;
     private final String description;
 

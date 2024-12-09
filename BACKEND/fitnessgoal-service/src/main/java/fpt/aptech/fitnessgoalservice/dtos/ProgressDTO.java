@@ -1,6 +1,5 @@
 package fpt.aptech.fitnessgoalservice.dtos;
 
-import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.models.MetricName;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

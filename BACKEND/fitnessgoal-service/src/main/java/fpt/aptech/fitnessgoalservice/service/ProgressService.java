@@ -233,7 +233,6 @@ public class ProgressService {
             message = compareWithGoal(muscleMassChange, goal);
             notifyService.sendAnalyticsNotification(existingUser, goal, message);
         }
-
         // Trả về tất cả các thông báo
         return message;
 
@@ -285,8 +284,4 @@ public class ProgressService {
 
         return result;
     }
-
-
-
-
 }

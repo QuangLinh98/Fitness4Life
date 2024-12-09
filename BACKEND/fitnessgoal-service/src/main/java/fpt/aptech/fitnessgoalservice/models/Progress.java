@@ -1,6 +1,7 @@
 package fpt.aptech.fitnessgoalservice.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import fpt.aptech.fitnessgoalservice.models.Goal;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
