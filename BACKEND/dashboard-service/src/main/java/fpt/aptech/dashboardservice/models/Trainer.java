@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "trainers")
 @Builder
-public class    Trainer {
+public class  Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -37,9 +37,8 @@ public class    Trainer {
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "branch_id", nullable = false)
-    @JsonIgnore
     private Branch branch;
 
     @OneToMany(mappedBy = "trainer",cascade = CascadeType.ALL)

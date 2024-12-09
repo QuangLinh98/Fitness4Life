@@ -1,5 +1,6 @@
 package fpt.aptech.dashboardservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -38,6 +39,7 @@ public class Branch {
     private LocalDateTime updateAt;
 
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Trainer> trainers;
 
 
