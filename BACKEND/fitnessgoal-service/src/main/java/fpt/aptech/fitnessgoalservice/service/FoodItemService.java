@@ -30,9 +30,9 @@ public class FoodItemService {
 
     //Handel add a new foodItem
     public FoodItem createFoodItem(FoodItemDTO foodItemDTO) {
-        DietPlan existingDietPlan = dietPlanRepository.findById(foodItemDTO.getDietPlan()).orElseThrow(() -> new RuntimeException("Diet plan not found"));
+       // DietPlan existingDietPlan = dietPlanRepository.findById(foodItemDTO.getDietPlan()).orElseThrow(() -> new RuntimeException("Diet plan not found"));
         FoodItem newFoodItem = new FoodItem().builder()
-                .dietPlan(existingDietPlan)
+               // .dietPlan(existingDietPlan)
                 .foodName(foodItemDTO.getFoodName())
                 .quantity(foodItemDTO.getQuantity())
                 .calories(foodItemDTO.getCalories())

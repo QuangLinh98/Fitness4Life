@@ -50,28 +50,40 @@ public class DietPlanService {
 
     //Phương thức tạo DietPlan cho các bữa ăn khác nhau
     private DietPlan createDietPlanForMeal(Goal goal, MealType mealType, List<FoodItem> foodItems, double totalCaloriesPerMeal) {
-        // Chuyển chuỗi mealType thành enum MealType
-//        MealType mealTypeEnum = MealType.valueOf(mealType);
-
         // Tính toán tỷ lệ dinh dưỡng dựa trên goalType
         double[] nutritionRatios = calculateNutritionRatios(String.valueOf(goal.getGoalType()));
         double proteinRatio = nutritionRatios[0];
         double carbsRatio = nutritionRatios[1];
         double fatRatio = nutritionRatios[2];
 
+        // Điều chỉnh lại lượng calo của các FoodItem nếu cần
+        adjustFoodItemsCalories(foodItems, totalCaloriesPerMeal);
+
+        //Tính toán tổng calo thực tế từ các FoodItem
+        double totalFoodItemCalories = foodItems.stream()
+                .mapToDouble(FoodItem::getCalories)
+                .sum();
+
         //Tạo Diet Plan
         DietPlan newDietPlan = new DietPlan().builder()
                 .goal(goal)
                 .mealType(mealType)
                 .mealDescription("Plan for " + mealType)
-                .totalCalories(totalCaloriesPerMeal)
+                .totalCalories(totalFoodItemCalories)
                 .protein_ratio(proteinRatio)
                 .carbs_ratio(carbsRatio)
                 .fat_ratio(fatRatio)
                 .foodItems(foodItems)
                 .createAt(LocalDateTime.now())
                 .build();
-        return dietPlanRepository.save(newDietPlan);
+
+        dietPlanRepository.save(newDietPlan);
+        // Gán các FoodItem vào DietPlan
+        for (FoodItem foodItem : foodItems) {
+            foodItem.setDietPlan(newDietPlan);  // Gán DietPlan vào FoodItem
+            foodItemRepository.save(foodItem);
+        }
+        return newDietPlan;
     }
 
     //Tính toán tỷ lệ dinh dưỡng dựa trên loại mục tiêu.
@@ -123,19 +135,49 @@ public class DietPlanService {
     //Phương thức lấy danh sách FoodItem cho bữa ăn dựa trên lượng calo
     private List<FoodItem> getFoodItemsForMeal(double mealCalories, MealType mealType) {
         List<FoodItem> foodItemList = foodItemRepository.findByDietPlan_MealType(mealType);
-        List<FoodItem> foodItems = new ArrayList<>();
+        List<FoodItem> selectedFoodItems = new ArrayList<>();
         double currentCalories = 0.0;
-        //Duyệt qua các món ăn và chọn món sao cho tổng calo gần bằng mealCalories
+
+        //Duyệt qua các foodItem và chọn foodItem sao cho tổng calo gần bằng mealCalories
         for (FoodItem foodItem : foodItemList) {
             if (currentCalories + foodItem.getCalories() <= mealCalories) {
-                foodItems.add(foodItem);  // Thêm món ăn vào danh sách
+                selectedFoodItems.add(foodItem);  // Thêm foodItem vào danh sách
                 currentCalories += foodItem.getCalories();  // Cập nhật tổng calo đã chọn
             }
             if (currentCalories >= mealCalories) {
                 break; //Dừng khi đã đủ tổng lượng calo cho bữa ăn và break;
             }
         }
-        return foodItems;
+        // Điều chỉnh lại lượng calo của các FoodItem nếu cần
+        adjustFoodItemsCalories(selectedFoodItems, mealCalories);
+
+        return selectedFoodItems;
+    }
+
+    // Phương thức tính toán và điều chỉnh lượng calo của FoodItem
+    private void adjustFoodItemsCalories(List<FoodItem> foodItems, double targetCalories) {
+        double totalCalories = foodItems.stream().mapToDouble(FoodItem::getCalories).sum();
+        double remainingCalories = targetCalories - totalCalories;
+
+        if (remainingCalories > 0) {
+            // Nếu thiếu calo, thêm hoặc điều chỉnh FoodItem
+            for (FoodItem foodItem : foodItems) {
+                if (foodItem.getCalories() <= remainingCalories) {
+                    foodItems.add(foodItem);
+                    remainingCalories -= foodItem.getCalories();
+                }
+                if (remainingCalories <= 0) break;
+            }
+        } else if (remainingCalories < 0) {
+            // Nếu thừa calo, giảm khẩu phần của một FoodItem
+            for (FoodItem foodItem : foodItems) {
+                double adjustedCalories = foodItem.getCalories() + remainingCalories;
+                if (adjustedCalories >= 0) {
+                    foodItem.setCalories(adjustedCalories);
+                    foodItem.setQuantity((int) (foodItem.getQuantity() * (adjustedCalories / foodItem.getCalories())));  // Cập nhật khẩu phần
+                    break;
+                }
+            }        }
     }
 
     //Handle edit a dietPlan

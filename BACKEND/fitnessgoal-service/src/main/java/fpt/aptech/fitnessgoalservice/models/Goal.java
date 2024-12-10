@@ -41,13 +41,13 @@ public class Goal {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "goal")
+    @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GoalMetric>goalMetrics;
 
-    @OneToMany(mappedBy = "goal")
+    @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Progress>progresses;
 
-    @OneToMany(mappedBy = "goal")
+    @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DietPlan>dietPlans;
 
 //    @OneToMany(mappedBy = "goal")

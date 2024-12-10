@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class FoodItemDTO {
-    private int dietPlan;
+    //private int dietPlan;
 
     private String foodName;
     private int quantity;
