@@ -1,9 +1,5 @@
 package fpt.aptech.fitnessgoalservice.dtos;
 
-import fpt.aptech.fitnessgoalservice.models.Goal;
-import fpt.aptech.fitnessgoalservice.models.MealType;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,8 +8,7 @@ import java.time.LocalDateTime;
 public class DietPlanDTO {
     private int goal;
 
-    @Enumerated(EnumType.STRING)
-    private MealType mealType;
+    private String mealType;
     private String mealDescription;
    // private double totalCalories;
     private double protein_ratio;   //Tỷ lệ protein trong chế độ ăn (%)

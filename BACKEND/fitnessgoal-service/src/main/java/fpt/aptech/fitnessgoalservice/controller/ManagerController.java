@@ -4,14 +4,11 @@ import fpt.aptech.fitnessgoalservice.dtos.*;
 import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
 import fpt.aptech.fitnessgoalservice.kafka.NotifyProducer;
-import fpt.aptech.fitnessgoalservice.models.DietPlan;
-import fpt.aptech.fitnessgoalservice.models.FoodItem;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.dtos.NotifyDTO;
 import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.notification.NotifyService;
-import fpt.aptech.fitnessgoalservice.service.DietPlanService;
-import fpt.aptech.fitnessgoalservice.service.FoodItemService;
+import fpt.aptech.fitnessgoalservice.service.ExerciseDietSuggestionsService;
 import fpt.aptech.fitnessgoalservice.service.GoalService;
 import fpt.aptech.fitnessgoalservice.service.ProgressService;
 import jakarta.validation.Valid;
@@ -21,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/goal")
@@ -30,8 +26,7 @@ public class ManagerController {
     private final GoalService goalService;
     private final NotifyProducer notifyProducer;
     private final ProgressService progressService;
-    private final DietPlanService dietPlanService;
-    private final FoodItemService foodItemService;
+    private final ExerciseDietSuggestionsService dietPlanService;
     private final UserEurekaClient userEurekaClient;
     private final NotifyService notifyService;
 
@@ -125,14 +120,14 @@ public class ManagerController {
     }
 
     @GetMapping("/compare-progress")
-    public ResponseEntity<?> compareProgress(@RequestParam int userId, @RequestParam String startDate, @RequestParam String endDate) {
+    public ResponseEntity<?> compareProgress(@RequestParam int userId,@RequestParam int goalId, @RequestParam String startDate, @RequestParam String endDate) {
         try {
             //Chuyển đổi chuỗi thành LocalDate
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
             //Phân tích tiến trình người dùng
-            String result = progressService.analyzeProgress(userId, start, end);
+            String result = progressService.analyzeProgress(userId, goalId,start, end);
             return ResponseEntity.status(200).body(ApiResponse.success(result, "Get progress data successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
@@ -150,57 +145,23 @@ public class ManagerController {
 //        }
 //    }
 
-    @PutMapping("/dietPlan/update/{id}")
-    public ResponseEntity<?> UpdateDietPlan(@Valid @PathVariable int id, @RequestBody UpdateDietPlanDTO dietPlanDTO, BindingResult bindingResult) {
-        try {
-            if (bindingResult.hasErrors()) {
-                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
-            }
-            DietPlan updateDietPlan = dietPlanService.updateDietPlan(id, dietPlanDTO);
-            return ResponseEntity.ok(updateDietPlan);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
-        }
-    }
+//    @PutMapping("/dietPlan/update/{id}")
+//    public ResponseEntity<?> UpdateDietPlan(@Valid @PathVariable int id, @RequestBody UpdateDietPlanDTO dietPlanDTO, BindingResult bindingResult) {
+//        try {
+//            if (bindingResult.hasErrors()) {
+//                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+//            }
+//            DietPlan updateDietPlan = dietPlanService.updateDietPlan(id, dietPlanDTO);
+//            return ResponseEntity.ok(updateDietPlan);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
+//        }
+//    }
 
     @DeleteMapping("/dietPlan/delete/{id}")
     public ResponseEntity<?> DeleteDietPlan(@PathVariable int id) {
         try {
             dietPlanService.deleteDietPlan(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
-        }
-    }
-
-    //============================ Food item ===========================
-    @PostMapping("/foodItem/add")
-    public ResponseEntity<?> AddFoodItem(@RequestBody FoodItemDTO foodItemDTO) {
-        try {
-            FoodItem foodItem = foodItemService.createFoodItem(foodItemDTO);
-            return ResponseEntity.status(201).body(ApiResponse.created(foodItem, "Create food item successfully"));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
-        }
-    }
-
-    @PutMapping("/foodItem/update/{id}")
-    public ResponseEntity<?> UpdateFoodItem(@Valid @PathVariable int id, @RequestBody UpdateFoodItemDTO foodItemDTO, BindingResult bindingResult) {
-        try {
-            if (bindingResult.hasErrors()) {
-                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
-            }
-            FoodItem updateFoodItem = foodItemService.updateFoodItem(id, foodItemDTO);
-            return ResponseEntity.status(200).body(ApiResponse.success(updateFoodItem, "Update food item successfully"));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/foodItem/delete/{id}")
-    public ResponseEntity<?> DeleteFoodItem(@PathVariable int id) {
-        try {
-            foodItemService.deleteFoodItem(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());

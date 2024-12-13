@@ -48,10 +48,6 @@ public class Goal {
     private List<Progress>progresses;
 
     @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DietPlan>dietPlans;
-
-//    @OneToMany(mappedBy = "goal")
-//    private List<ExercisePlan>exercisePlans;
-
+    private List<ExerciseDietSuggestions>dietPlans;
 
 }

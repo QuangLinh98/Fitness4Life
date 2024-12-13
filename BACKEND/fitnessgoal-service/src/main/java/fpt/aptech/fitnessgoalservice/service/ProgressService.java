@@ -89,8 +89,8 @@ public class ProgressService {
                 //Duy trì cân nặng thì không cần cập nhật currentValue
                 break;
         }
-        //Kiểm tra trạng thái của goal nếu currentValue >= targetValue thì hoàn thành mục tiêu và hiển thị message
-        if (existingGoal.getCurrentValue() >= existingGoal.getTargetValue()) {
+        //Kiểm tra trạng thái của goal nếu currentValue = targetValue thì hoàn thành mục tiêu và hiển thị message
+        if (existingGoal.getCurrentValue().equals(existingGoal.getTargetValue())) {
             existingGoal.setGoalStatus(GoalStatus.COMPLETED);
             if (existingGoal.getGoalStatus() == GoalStatus.COMPLETED) {
                 newProgress.setMessage(newProgress.getMessage() + " Muc tieu cua ban da hoan thanh.Xin chuc mung.");
@@ -172,8 +172,8 @@ public class ProgressService {
     }
 
     //Lấy chỉ số sức khỏe trong khoảng thời gian khi người dùng thực hiện so sánh các chỉ số sức khỏe so với ban đầu
-    public List<Progress> getProgressData(int userId, LocalDate startDate, LocalDate endDate) {
-        List<Progress> progressList = progressRepository.findByUserIdAndTrackingDateBetween(userId, startDate, endDate);
+    public List<Progress> getProgressData( int userId, int goalId, LocalDate startDate, LocalDate endDate) {
+        List<Progress> progressList = progressRepository.findByUserIdAndGoalIdAndTrackingDateBetween(userId, goalId,startDate, endDate);
         return progressList;
     }
 
@@ -199,43 +199,50 @@ public class ProgressService {
     }
 
     //Phân tích các chỉ số tiến trình tập luyện trong khoảng thời gian và gửi thông báo
-    public String analyzeProgress(int userId, LocalDate startDate, LocalDate endDate) {
+    public String analyzeProgress(int userId ,int goalId ,LocalDate startDate, LocalDate endDate) {
         // lấy dữ liệu cân nặng , mỡ cơ thể , cơ , calo tiêu thụ
-        List<Progress> progressList = getProgressData(userId, startDate, endDate);
+        List<Progress> progressList = getProgressData(userId,goalId ,startDate, endDate);
         if (progressList.isEmpty()) {
             return "There is no data for this time period.";
         }
 
         //Lấy mục tiêu của người dùng (targetValue)
-        Goal goal = goalRepository.findGoalByUserId(userId);
-        if (goal == null) {
+        List<Goal> goals = goalRepository.findGoalByUserId(userId);
+        if (goals == null) {
             throw new RuntimeException("No goal found for user");
         }
-        // Tính sự thay đổi và so sánh với mục tiêu
-        double weightChange = calculateChangeOverPeriod(progressList, MetricName.WEIGHT, goal.getTargetValue());
-        double bodyFatChange = calculateChangeOverPeriod(progressList, MetricName.BODY_FAT, goal.getTargetValue());
-        double muscleMassChange = calculateChangeOverPeriod(progressList, MetricName.MUSCLEMASS, goal.getTargetValue());
+        StringBuilder messageBuilder = new StringBuilder();
 
-        // So sánh và in thông báo theo metricName
-        String message = "";
+        // Phân tích tiến trình cho từng mục tiêu của người dùng
+        for (Goal goal : goals) {
+            // Tính sự thay đổi và so sánh với mục tiêu
+            double weightChange = calculateChangeOverPeriod(progressList, MetricName.WEIGHT, goal.getTargetValue());
+            double bodyFatChange = calculateChangeOverPeriod(progressList, MetricName.BODY_FAT, goal.getTargetValue());
+            double muscleMassChange = calculateChangeOverPeriod(progressList, MetricName.MUSCLEMASS, goal.getTargetValue());
+            System.out.println("Weight change: " + weightChange);
+            System.out.println("bodyFat change: " + bodyFatChange);
+            System.out.println("muscleMass change: " + muscleMassChange);
+            // So sánh và in thông báo theo metricName
+            String message = "";
 
-        UserDTO existingUser = userEurekaClient.getUserById(userId);
-        // Gửi thông báo chỉ khi change có sự thay đổi
-        if (weightChange != 0) {
-            message = compareWithGoal(weightChange, goal);
-            notifyService.sendAnalyticsNotification(existingUser, goal, message);
+            UserDTO existingUser = userEurekaClient.getUserById(userId);
+            // Gửi thông báo chỉ khi change có sự thay đổi
+            if (weightChange != 0) {
+                message = compareWithGoal(weightChange, goal);
+                notifyService.sendAnalyticsNotification(existingUser, goal, message);
+            }
+            if (bodyFatChange != 0) {
+                message = compareWithGoal(bodyFatChange, goal);
+                notifyService.sendAnalyticsNotification(existingUser, goal, message);
+            }
+            if (muscleMassChange != 0) {
+                message = compareWithGoal(muscleMassChange, goal);
+                notifyService.sendAnalyticsNotification(existingUser, goal, message);
+            }
+            return message;
         }
-        if (bodyFatChange != 0) {
-            message = compareWithGoal(bodyFatChange, goal);
-            notifyService.sendAnalyticsNotification(existingUser, goal, message);
-        }
-        if (muscleMassChange != 0) {
-            message = compareWithGoal(muscleMassChange, goal);
-            notifyService.sendAnalyticsNotification(existingUser, goal, message);
-        }
-        // Trả về tất cả các thông báo
-        return message;
-
+            // Trả về tất cả các thông báo
+            return null;
     }
 
     //So sánh với mục tiêu của người dùng

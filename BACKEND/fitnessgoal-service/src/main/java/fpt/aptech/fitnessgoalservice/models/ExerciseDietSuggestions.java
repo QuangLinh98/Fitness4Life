@@ -8,29 +8,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "food_items")
+@Table(name = "suggestions")
 @Builder
-public class FoodItem {
+public class ExerciseDietSuggestions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "diet_id",nullable = false)
+    @JoinColumn(name = "goal_id", nullable = false)
     @JsonIgnore
-    private DietPlan dietPlan;
+    private Goal goal;
 
-    private String foodName;
-    private int quantity;
-    private double calories;   //Số calo trong thực phẩm
-    private double protein;    //Lượng protein trong thực phẩm
-    private double carbs;
-    private double fat;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    @Column(name = "diet_plan", columnDefinition = "TEXT")
+    private String dietPlan;
+    @Column(name = "workout_plan", columnDefinition = "TEXT")
+    private String workoutPlan;
 }

@@ -21,7 +21,7 @@ import java.util.List;
 public class GoalService {
     private final GoalRepository goalRepository;
     private final CalculationService calculationService;
-    private final DietPlanService dietPlanService;
+    private final ExerciseDietSuggestionsService exerciseDietSuggestionsService;
     private final UserEurekaClient userEurekaClient;
 
     //Handle get all data
@@ -86,10 +86,10 @@ public class GoalService {
                 .targetCalories(targetCalories)
                 .createdAt(LocalDateTime.now())
                 .build();
-        Goal saveGoal = goalRepository.save(goal);
+        Goal savedGoal = goalRepository.save(goal);
         //Sau khi tạo goal hệ thống sẽ gợi ý chế độ ăn bằng cách gọi lại hàm
-        dietPlanService.createDietPlanForUser(saveGoal);
-        return saveGoal;
+        exerciseDietSuggestionsService.generateDietPlan(existingUser, savedGoal);
+        return savedGoal;
     }
 
     //Handle update Goal

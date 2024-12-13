@@ -1,12 +1,10 @@
 package fpt.aptech.fitnessgoalservice.controller;
 
 import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
-import fpt.aptech.fitnessgoalservice.models.DietPlan;
-import fpt.aptech.fitnessgoalservice.models.FoodItem;
+import fpt.aptech.fitnessgoalservice.models.ExerciseDietSuggestions;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.models.Progress;
-import fpt.aptech.fitnessgoalservice.service.DietPlanService;
-import fpt.aptech.fitnessgoalservice.service.FoodItemService;
+import fpt.aptech.fitnessgoalservice.service.ExerciseDietSuggestionsService;
 import fpt.aptech.fitnessgoalservice.service.GoalService;
 import fpt.aptech.fitnessgoalservice.service.ProgressService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +19,7 @@ import java.util.List;
 public class PublicController {
     private final GoalService goalService;
     private final ProgressService progressService;
-    private final DietPlanService dietPlanService;
-    private final FoodItemService foodItemService;
+    private final ExerciseDietSuggestionsService dietPlanService;
     //private final CalculationService calculationService;
 
     @GetMapping("/all")
@@ -75,7 +72,7 @@ public class PublicController {
     @GetMapping("/dietPlan/all")
     public ResponseEntity<?>GetAllDietPlans() {
         try {
-            List<DietPlan> dietPlans = dietPlanService.getAll();
+            List<ExerciseDietSuggestions> dietPlans = dietPlanService.getAll();
             return ResponseEntity.status(200).body(ApiResponse.success(dietPlans,"Get All diet plan successfully"));
         }
         catch(Exception e) {
@@ -86,7 +83,7 @@ public class PublicController {
     @GetMapping("/dietPlan/{id}")
     public ResponseEntity<?>GetOneDietPlan(@PathVariable int id) {
         try {
-            DietPlan dietPlan = dietPlanService.getById(id);
+            ExerciseDietSuggestions dietPlan = dietPlanService.getById(id);
             return ResponseEntity.status(200).body(ApiResponse.success(dietPlan,"Get diet plan successfully"));
         }
         catch (Exception e) {
@@ -94,26 +91,4 @@ public class PublicController {
         }
     }
 
-    //============================ Food Item ===========================
-    @GetMapping("/foodItem/all")
-    public ResponseEntity<?>GetAllFoodItems() {
-        try {
-            List<FoodItem> foodItems = foodItemService.findAll();
-            return ResponseEntity.status(200).body(ApiResponse.success(foodItems,"Get All food item successfully"));
-        }
-        catch(Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
-        }
-    }
-
-    @GetMapping("/foodItem/{id}")
-    public ResponseEntity<?>GetOneFoodItem(@PathVariable int id) {
-        try {
-            FoodItem foodItem = foodItemService.findById(id);
-            return ResponseEntity.status(200).body(ApiResponse.success(foodItem,"Get food item successfully"));
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
-        }
-    }
 }

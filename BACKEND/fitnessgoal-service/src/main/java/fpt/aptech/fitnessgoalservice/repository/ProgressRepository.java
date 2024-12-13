@@ -1,5 +1,6 @@
 package fpt.aptech.fitnessgoalservice.repository;
 
+import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.models.Progress;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,5 +12,6 @@ public interface ProgressRepository extends JpaRepository<Progress, Integer> {
     //tìm weight mới nhất mà người dùng cập nhật
     Optional<Progress> findTopByUserIdAndMetricNameOrderByTrackingDateDesc(long useId, String metricName);
     List<Progress> findByUserId(long userId);
-    List<Progress> findByUserIdAndTrackingDateBetween(int userId , LocalDate startDate, LocalDate endDate);
+    // Truy vấn lấy tiến trình của người dùng theo goalId và khoảng thời gian
+    List<Progress> findByUserIdAndGoalIdAndTrackingDateBetween(int userId, int goalId, LocalDate startDate, LocalDate endDate);
 }

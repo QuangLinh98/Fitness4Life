@@ -102,7 +102,16 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>3.3.5</version>
         </dependency>
+
+<!--        Thư viện này chịu trách nhiệm chuyển đổi (serialize/deserialize) giữa các đối tượng Java và dữ liệu JSON.-->
+        <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
     </dependencies>
+
+
+
 
     <build>
         <plugins>
