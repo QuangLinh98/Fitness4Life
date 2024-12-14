@@ -16,6 +16,8 @@ public class User {
     @Id
     @GeneratedValue
     private long id;
+    @Column(name = "workout_package_id")
+    private int workoutPackageId;
 
     @Column(nullable = false)
     private String fullName;

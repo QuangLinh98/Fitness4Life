@@ -14,6 +14,7 @@ public class UserResponseDTO {
 
     @Column(nullable = false)
     private String fullName;
+    private int workoutPackageId;
 
     @Column(unique=true, nullable = false)
     private String email;

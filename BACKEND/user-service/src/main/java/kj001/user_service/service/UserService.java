@@ -71,6 +71,11 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional // Đảm bảo cập nhật được thực thi trong một transaction
+    public void assignPackageToUser(Long userId, Integer packageId) {
+        userRepository.updateUserPackageId(userId, packageId);
+    }
+
     public UserDTO getUserById(Long id) {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isEmpty()) {
@@ -159,7 +164,7 @@ public class UserService {
         String templatePath = "templates/otp_email_template.html";
         String emailTemplate = new String(Files.readAllBytes(Paths.get(templatePath)));
         String emailContent = emailTemplate.replace("[EMAIL]", createUserDTO.getEmail())
-                                           .replace("[OTP_CODE]", otpCode);
+                .replace("[OTP_CODE]", otpCode);
         MailEntity mailEntity = new MailEntity();
         mailEntity.setEmail(createUserDTO.getEmail());
         mailEntity.setSubject("Verify Account");

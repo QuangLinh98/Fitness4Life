@@ -1,6 +1,7 @@
 package kj001.user_service.controllers;
 
 import kj001.user_service.dtos.UserAndProfileUpdateDTO;
+import kj001.user_service.dtos.UserDTO;
 import kj001.user_service.dtos.UserResponseDTO;
 import kj001.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,20 @@ public class UserController {
             return ResponseEntity.ok("delete User successfully...");
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with id : "+id);
+        }
+    }
+
+    @PutMapping("/{userId}/workout-package")
+    public ResponseEntity<UserDTO> assignWorkoutPackage(
+            @PathVariable("userId") Long userId,
+            @RequestParam("packageId") Integer packageId) {
+        try {
+            userService.assignPackageToUser(userId, packageId);
+            // Tạo đối tượng UserDTO để trả về
+            UserDTO userDTO = userService.getUserById(userId);
+            return ResponseEntity.ok(userDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

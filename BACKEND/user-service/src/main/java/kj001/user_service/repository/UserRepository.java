@@ -39,6 +39,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("DELETE FROM User u WHERE u.email = :email AND u.isActive = false AND u.id <> :currentUserId")    //<> : ký hiệu là != id hiện tại
     void deleteInactiveUsersByEmail(@Param("email") String email, @Param("currentUserId") Long currentUserId);
 
-//    @Query("SELECT u FROM User u JOIN FETCH u.profile WHERE u.id = :id")
-//    Optional<User> findByIdWithProfile(@Param("id") Long id);
+    @Modifying
+    @Query("UPDATE User u SET u.workoutPackageId = :packageId WHERE u.id = :userId")
+    void updateUserPackageId(@Param("userId") Long userId, @Param("packageId") Integer packageId);
+
 }
