@@ -21,6 +21,7 @@ public class ManagerController {
     private final BranchService branchService;
     private final TrainerService trainerService;
     private final RoomService roomService;
+    private final WorkoutPackageClassService packageClassService;
 
     //======================= CLUB ============================
     @PostMapping("/club/add")
@@ -324,5 +325,24 @@ public class ManagerController {
         }
     }
 
+    //======================= WORKOUT PACKAGE ROOM ============================
+    @PostMapping("/packages/{packageId}/rooms/{roomId}")
+    public ResponseEntity<?> addClassToPackage(@PathVariable int packageId, @PathVariable int roomId) {
+        try {
+              WorkoutPackageRoom packageRoom = packageClassService.addRoomToPackage(packageId,roomId);
+              return ResponseEntity.status(201).body(ApiResponse.success(packageRoom, "Add Class to Package successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/packages/{packageId}/rooms/{roomId}")
+    public ResponseEntity<String> removeClassFromPackage(
+            @PathVariable int packageId,
+            @PathVariable int roomId) {
+        packageClassService.removeRoomFromPackage(packageId, roomId);
+        return ResponseEntity.ok("Class removed from workout package successfully.");
+    }
 
 }

@@ -20,6 +20,6 @@ public interface WorkoutPackageRoomRepository extends JpaRepository<WorkoutPacka
     boolean existsByWorkoutPackageIdAndRoomId(int workoutPackageId, int classId);
 
    //Xóa quan hệ giữa Room và WorkoutPackage
-    void deleteByWorkoutPackageIdAndClassId(int workoutPackageId, int classId);
+    void deleteByWorkoutPackageIdAndRoomId(int workoutPackageId, int classId);
 
 }

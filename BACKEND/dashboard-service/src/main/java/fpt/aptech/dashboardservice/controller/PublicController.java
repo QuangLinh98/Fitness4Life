@@ -22,6 +22,7 @@ public class PublicController {
     private final BranchService branchService;
     private final TrainerService trainerService;
     private final RoomService roomService;
+    private final WorkoutPackageClassService packageClassService;
 
 
     //======================= CLUB ============================
@@ -133,6 +134,11 @@ public class PublicController {
         }
     }
 
-
+    //======================= WORKOUT PACKAGE ROOM ============================
+    @GetMapping("/packages/{packageId}/rooms")
+    public ResponseEntity<?> getClassesByWorkoutPackage(@PathVariable int packageId) {
+        List<Room> rooms = packageClassService.getRoomsByWorkoutPackage(packageId);
+        return ResponseEntity.ok(rooms);
+    }
 
 }
