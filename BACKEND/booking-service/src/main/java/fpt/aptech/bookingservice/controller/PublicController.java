@@ -1,5 +1,6 @@
 package fpt.aptech.bookingservice.controller;
 
+import fpt.aptech.bookingservice.dtos.WorkoutPackageDTO;
 import fpt.aptech.bookingservice.helpers.ApiResponse;
 import fpt.aptech.bookingservice.models.BookingRoom;
 import fpt.aptech.bookingservice.models.WorkoutPackage;
@@ -7,10 +8,7 @@ import fpt.aptech.bookingservice.service.BookingRoomService;
 import fpt.aptech.bookingservice.service.WorkoutPackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,7 +34,7 @@ public class PublicController {
     @GetMapping("/package/{id}")
     public ResponseEntity<?> getPackageById(@PathVariable int id) {
         try {
-            WorkoutPackage wPackage = workoutPackageService.getWorkoutPackageById(id);
+            WorkoutPackageDTO wPackage = workoutPackageService.getWorkoutPackageById(id);
             return ResponseEntity.status(200).body(ApiResponse.success(wPackage, "Get package successfully"));
         }
         catch (Exception e) {
@@ -47,7 +45,19 @@ public class PublicController {
         }
     }
 
-    //======================= WORKOUT PACKAGE ============================
+    @PostMapping("/package/{ids}")
+    public ResponseEntity<?> addPackage(@PathVariable List<Integer> ids) {
+        try {
+            List<WorkoutPackageDTO> workoutPackageDTOS = workoutPackageService.getWorkoutPackagesByIds(ids);
+            return ResponseEntity.status(200).body(ApiResponse.success(workoutPackageDTOS, "Get package successfully"));
+
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+        }
+    }
+
+    //======================= BOOKING ROOM ============================
     @GetMapping("/bookingRooms")
     public ResponseEntity<?> getAllBookingRoom() {
         try {

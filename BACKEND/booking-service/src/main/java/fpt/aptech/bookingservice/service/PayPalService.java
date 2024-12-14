@@ -49,6 +49,9 @@ public class PayPalService {
             throw new PayPalRESTException("User not found");
         }
 
+        WorkoutPackage packageExisting = workoutPackageRepository.findById(subscriptionDTO.getPackageId())
+                .orElseThrow(() -> new RuntimeException("Workout package not found"));
+
         // Tạo đối tượng Amount và thiết lập tiền tệ và tổng số tiền
         Amount amount = new Amount();
         amount.setCurrency(subscriptionDTO.getCurrency());
@@ -125,6 +128,8 @@ public class PayPalService {
         if (paymentMembership != null) {
             paymentMembership.setPayerId(payerId);
             paymentMembership.setPayStatusType(PayStatusType.valueOf(PayStatusType.COMPLETED.toString()));
+            // Cập nhật gói tập (packageId) cho user
+            userEurekaClient.assignWorkoutPackage(paymentMembership.getUserId(), paymentMembership.getPackageId());
             membershipRepository.save(paymentMembership);
         }
         return executedPayment;

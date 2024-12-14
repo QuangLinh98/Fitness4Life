@@ -1,13 +1,16 @@
 package fpt.aptech.bookingservice.service;
 
 
+import fpt.aptech.bookingservice.dtos.WorkoutPackageDTO;
 import fpt.aptech.bookingservice.models.WorkoutPackage;
 import fpt.aptech.bookingservice.repository.WorkoutPackageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +23,28 @@ public class WorkoutPackageService {
     }
 
     //Handle get a package
-    public WorkoutPackage getWorkoutPackageById(int id) {
-        return workoutPackageRepository.findById(id).orElseThrow(() -> new RuntimeException("PackageNotFound"));
+    public WorkoutPackageDTO getWorkoutPackageById(int id) {
+         Optional<WorkoutPackage> existingPackage = workoutPackageRepository.findById(id);
+         if (existingPackage.isPresent()) {
+             WorkoutPackageDTO workoutPackageDTO = new WorkoutPackageDTO();
+             workoutPackageDTO.setWorkoutPackageId(existingPackage.get().getId());
+             workoutPackageDTO.setPackageName(String.valueOf(existingPackage.get().getPackageName()));
+             return workoutPackageDTO;
+         }
+        return null;
+    }
+
+    //Handle get many package
+    public List<WorkoutPackageDTO> getWorkoutPackagesByIds(List<Integer> ids) {
+        List<WorkoutPackage> workoutPackages = workoutPackageRepository.findAllById(ids);
+        List<WorkoutPackageDTO> workoutPackageDTOS = new ArrayList<>();
+        for (WorkoutPackage workoutPackage : workoutPackages) {
+            WorkoutPackageDTO workoutPackageDTO = new WorkoutPackageDTO();
+            workoutPackageDTO.setWorkoutPackageId(workoutPackage.getId());
+            workoutPackageDTO.setPackageName(String.valueOf(workoutPackage.getPackageName()));
+            workoutPackageDTOS.add(workoutPackageDTO);
+        }
+        return workoutPackageDTOS;
     }
 
     //Handle create a package
