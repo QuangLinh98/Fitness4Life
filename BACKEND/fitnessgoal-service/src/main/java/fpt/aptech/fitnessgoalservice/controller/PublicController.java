@@ -33,7 +33,18 @@ public class PublicController {
         }
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{id}")
+    public ResponseEntity<?>GetGoalById(@PathVariable int id) {
+        try {
+            Goal goal = goalService.getGoalById(id);
+            return ResponseEntity.ok(goal);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{userId}")
     public ResponseEntity<?>GetAllGoalById(@PathVariable int userId) {
         try {
             List<Goal> goals = goalService.getGoalByUserId(userId);

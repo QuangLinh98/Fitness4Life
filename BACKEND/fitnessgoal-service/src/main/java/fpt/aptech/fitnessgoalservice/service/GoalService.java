@@ -42,6 +42,11 @@ public class GoalService {
         return userGoals;
     }
 
+    //Handle get one goal by id
+    public Goal getGoalById(int id) {
+        return goalRepository.findById(id).orElseThrow(() -> new RuntimeException("Goal not found"));
+    }
+
     //Handle create Goal
     public Goal createGoal(GoalDTO goalDTO) {
         UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
