@@ -29,9 +29,17 @@ public class GoalService {
         return goalRepository.findAll();
     }
 
-    //Handle get one goal by id
-    public Goal getGoalById(int id) {
-        return goalRepository.findById(id).get();
+    //Handle get list goal by userId
+    public List<Goal> getGoalByUserId(int userId) {
+        UserDTO existingUser = userEurekaClient.getUserById(userId);
+        if (existingUser == null) {
+            throw new RuntimeException("User not found");
+        }
+        List<Goal> userGoals = goalRepository.findGoalByUserId(userId);
+        if (userGoals.isEmpty()) {
+            throw new RuntimeException("No goals found for the user");
+        }
+        return userGoals;
     }
 
     //Handle create Goal

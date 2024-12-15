@@ -33,6 +33,17 @@ public class PublicController {
         }
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<?>GetAllGoalById(@PathVariable int userId) {
+        try {
+            List<Goal> goals = goalService.getGoalByUserId(userId);
+            return ResponseEntity.ok(goals);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+        }
+    }
+
     //============================ PROGRESS ===========================
     @GetMapping("/progress/all")
     public ResponseEntity<?>GetAllProcessGoal() {
