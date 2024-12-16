@@ -68,4 +68,16 @@ public class PublicController {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
         }
     }
+
+    //======================= QR CODE ============================
+//    @GetMapping("/qrCode/{qrCodeId}")
+//    public ResponseEntity<?> getBookingByQRCode(@PathVariable int qrCodeId) {
+//        try {
+//            BookingRoom bookings =  bookingRoomService.getAllBookingRoom();
+//            return ResponseEntity.status(200).body(ApiResponse.success(bookings, "Get All booking successfully"));
+//        }
+//        catch (Exception e) {
+//            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+//        }
+//    }
 }

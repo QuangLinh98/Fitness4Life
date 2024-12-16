@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class BooKingRoomDTO {
     @NotNull(message = "UserId is required")
     private int userId;
+    private int qrCodeId;
     private String userName;
 
     @NotNull(message = "RoomId is required")
@@ -19,7 +20,6 @@ public class BooKingRoomDTO {
     private String roomName;
 
     private LocalDateTime bookingDate;
-    private String checkInQRCode;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;  //Trạng thái Pending , Confirmed , Cancel

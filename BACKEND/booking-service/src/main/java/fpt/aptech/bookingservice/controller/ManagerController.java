@@ -6,6 +6,7 @@ import fpt.aptech.bookingservice.helpers.ApiResponse;
 import fpt.aptech.bookingservice.models.BookingRoom;
 import fpt.aptech.bookingservice.models.WorkoutPackage;
 import fpt.aptech.bookingservice.service.BookingRoomService;
+import fpt.aptech.bookingservice.service.QRService;
 import fpt.aptech.bookingservice.service.WorkoutPackageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class ManagerController {
     private final WorkoutPackageService workoutPackageService;
     private final BookingRoomService bookingRoomService;
+    private final QRService qrService;
 
     //======================= WORKOUT PACKAGE ============================
     @PostMapping("/package/add")
@@ -72,9 +74,10 @@ public class ManagerController {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
             BookingRoom newBooking = bookingRoomService.saveBookRoom(booKingRoomDTO);
+            qrService.createBookingWithQRCode(newBooking);
             // Chuyển đổi thành BookingRoomQRCodeDTO
-            BookingRoomQRCodeDTO responseDTO = new BookingRoomQRCodeDTO(newBooking.getId(), newBooking.getCheckInQRCode());
-            return ResponseEntity.status(201).body(ApiResponse.success(responseDTO, "Booking room successfully"));
+            //BookingRoomQRCodeDTO responseDTO = new BookingRoomQRCodeDTO(newBooking.getId(), newBooking.getCheckInQRCode());
+            return ResponseEntity.status(201).body(ApiResponse.success(newBooking, "Booking room successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server: " + e.getMessage()));
         }
@@ -100,6 +103,30 @@ public class ManagerController {
                 return ResponseEntity.status(404).body(ApiResponse.notfound("Booking not found"));
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/qrCode")
+    public ResponseEntity<?> createQrCodeWithBookingRoom(@RequestBody BookingRoom bookingRoomRequest) {
+           try {
+               // Lưu thông tin booking và tạo mã QR
+               qrService.createBookingWithQRCode(bookingRoomRequest);
+               return ResponseEntity.status(201).body(ApiResponse.success(null, "QR Code created successfully"));
+           }
+           catch (Exception e) {
+               return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+           }
+
+    }
+
+    @PostMapping("/qrCode/validate/{qrCodeId}")
+    public ResponseEntity<?> validateQrCode(@PathVariable int qrCodeId) {
+        try {
+            qrService.validateQRCode(qrCodeId);
+            return ResponseEntity.status(201).body(ApiResponse.success(null, "QR Code validation successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
         }
     }
 }

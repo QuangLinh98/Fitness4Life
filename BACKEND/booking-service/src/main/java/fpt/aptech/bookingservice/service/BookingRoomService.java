@@ -85,35 +85,36 @@ public class BookingRoomService {
         roomEurekaClient.updateRoom(roomExiting.getId(), roomExiting);
 
         // Sinh mã check-in code (UUID để đảm bảo duy nhất)
-        String checkInCode = UUID.randomUUID().toString();
-        newBooking.setCheckInQRCode(checkInCode);
+//        String checkInCode = UUID.randomUUID().toString();
+//        newBooking.setCheckInQRCode(checkInCode);
+//        bookingRoomRepository.save(newBooking);
+//
+//        // Tạo thông tin booking thành chuỗi JSON để lưu vào mã QR
+//        String bookingInfoJson = String.format(
+//                "{\"userId\": %d, \n \"userName\": '%s', \n \"roomName\": '%s', \n \"bookingDate\": '%s'}",
+//                newBooking.getUserId(),
+//                newBooking.getUserName(),
+//                newBooking.getRoomName(),
+//                newBooking.getBookingDate().toString()
+//        );
+//
+//        // Tạo QR code
+//        try {
+//            String qrCodePath = "src/main/resources/static/qrcodes/" + checkInCode + ".png";
+//            QRCodeGenerator.generateQRCodeImage(bookingInfoJson, qrCodePath);
+//
+//            // Tạo URL cho file QR code
+//            String qrCodeURL = "http://localhost:8082/qrcodes/" + checkInCode + ".png";
+//
+//            // Tạo đối tượng phản hồi
+//            BookingRoomQRCodeDTO roomQRCodeDTO = new BookingRoomQRCodeDTO();
+//            roomQRCodeDTO.setId(newBooking.getId());
+//            roomQRCodeDTO.setQrCodeUrl(qrCodeURL);
+//
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to generate QR code", e);
+//        }
         bookingRoomRepository.save(newBooking);
-
-        // Tạo thông tin booking thành chuỗi JSON để lưu vào mã QR
-        String bookingInfoJson = String.format(
-                "{\"userId\": %d, \n \"userName\": '%s', \n \"roomName\": '%s', \n \"bookingDate\": '%s'}",
-                newBooking.getUserId(),
-                newBooking.getUserName(),
-                newBooking.getRoomName(),
-                newBooking.getBookingDate().toString()
-        );
-
-        // Tạo QR code
-        try {
-            String qrCodePath = "src/main/resources/static/qrcodes/" + checkInCode + ".png";
-            QRCodeGenerator.generateQRCodeImage(bookingInfoJson, qrCodePath);
-
-            // Tạo URL cho file QR code
-            String qrCodeURL = "http://localhost:8082/qrcodes/" + checkInCode + ".png";
-
-            // Tạo đối tượng phản hồi
-            BookingRoomQRCodeDTO roomQRCodeDTO = new BookingRoomQRCodeDTO();
-            roomQRCodeDTO.setId(newBooking.getId());
-            roomQRCodeDTO.setQrCodeUrl(qrCodeURL);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate QR code", e);
-        }
 
         return newBooking;
     }
