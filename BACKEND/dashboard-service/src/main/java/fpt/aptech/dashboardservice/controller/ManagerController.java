@@ -326,7 +326,7 @@ public class ManagerController {
     }
 
     //======================= WORKOUT PACKAGE ROOM ============================
-    @PostMapping("/packages/{packageId}/rooms/{roomId}")
+    @PostMapping("/packages/{roomId}/rooms/{packageId}")
     public ResponseEntity<?> addClassToPackage(@PathVariable int packageId, @PathVariable int roomId) {
         try {
               WorkoutPackageRoom packageRoom = packageClassService.addRoomToPackage(packageId,roomId);
@@ -337,12 +337,11 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/packages/{packageId}/rooms/{roomId}")
+    @DeleteMapping("/packages/{roomId}/rooms/{packageId}")
     public ResponseEntity<String> removeClassFromPackage(
             @PathVariable int packageId,
             @PathVariable int roomId) {
         packageClassService.removeRoomFromPackage(packageId, roomId);
         return ResponseEntity.ok("Class removed from workout package successfully.");
     }
-
 }
