@@ -149,13 +149,32 @@ public class ProgressService {
                     //Duy trì cân nặng thì không cần cập nhật currentValue
                     break;
             }
-            //Kiểm tra trạng thái của goal nếu currentValue >= targetValue thì hoàn thành mục tiêu và hiển thị message
-            if (goal.getCurrentValue() >= goal.getTargetValue()) {
-                goal.setGoalStatus(GoalStatus.COMPLETED);
-                if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
-                    existingProgress.setMessage(existingProgress.getMessage() + " Muc tieu cua ban da hoan thanh.Xin chuc mung.");
+            //Kiểm tra trạng thái của goal với từng goalType nếu currentValue >= targetValue thì hoàn thành mục tiêu và hiển thị message
+            if (goal.getGoalType() == GoalType.MUSCLE_GAIN || goal.getGoalType() == GoalType.WEIGHT_GAIN) {
+                if (goal.getCurrentValue() >= goal.getTargetValue()) {
+                    //Kiểm tra nếu currentValue vượt quá targetValue quá nhiều
+                    if (goal.getCurrentValue() - goal.getTargetCalories() > 4) {
+                        existingProgress.setMessage(existingProgress.getMessage() + "Luu y : Ban da vuot qua muc tieu qua nhieu ("+(goal.getCurrentValue() - goal.getTargetCalories())+").Hay dieu chinh lai ke hoach");
+                    }
+                    goal.setGoalStatus(GoalStatus.COMPLETED);
+                    if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
+                        existingProgress.setMessage(existingProgress.getMessage() + " Muc tieu cua ban da hoan thanh.Xin chuc mung.");
+                    }
                 }
             }
+            if (goal.getGoalType() == GoalType.WEIGHT_LOSS || goal.getGoalType() == GoalType.FAT_LOSS) {
+                if (goal.getCurrentValue() <= goal.getTargetValue()) {
+                    //Kiểm tra nếu targetValue vượt quá currentValue quá nhiều
+                    if (goal.getTargetValue() - goal.getCurrentValue() > 4) {
+                        existingProgress.setMessage(existingProgress.getMessage() + " Luu y: Ban da giam qua nhieu (hơn " + (goal.getTargetValue() - goal.getCurrentValue()) + "). Hay xem xet lai ke hoach.");
+                    }
+                    goal.setGoalStatus(GoalStatus.COMPLETED);
+                    if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
+                        existingProgress.setMessage(existingProgress.getMessage() + " Muc tieu cua ban da hoan thanh.Xin chuc mung.");
+                    }
+                }
+            }
+
             // Lưu lại cập nhật vào bảng Goal
             goalRepository.save(goal);
             return progressRepository.save(existingProgress);
@@ -273,6 +292,8 @@ public class ProgressService {
                 result = "Ban can tang them " + Math.abs(change) + "% cơ, dat muc tieu tang co len " + goal.getTargetValue() + "% co";
             } else if (change > 0) {
                 result = "Ban da mat " + change + "% cơ, can tang them % cơ de dat muc tieu tang co.";
+            } else {
+                result = "Ban da dat muc tieu tang co.";
             }
         }
 
