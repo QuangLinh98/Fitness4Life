@@ -1,5 +1,6 @@
 package fpt.aptech.bookingservice.repository;
 
+import fpt.aptech.bookingservice.dtos.ResponseQRCodeByBookingDTO;
 import fpt.aptech.bookingservice.models.QRCode;
 import fpt.aptech.bookingservice.models.QRCodeStatus;
 import jakarta.transaction.Transactional;
@@ -16,4 +17,9 @@ public interface QRRepository extends JpaRepository<QRCode, Integer> {
     @Transactional
     @Query("DELETE FROM QRCode q WHERE q.qrCodeStatus = :status AND q.createdAt < :beforeTime")
     void deleteByQrCodeStatusAndCreatedAtBefore(@Param("status") QRCodeStatus status, @Param("beforeTime") LocalDateTime beforeTime);
+
+    @Query("SELECT new fpt.aptech.bookingservice.dtos.ResponseQRCodeByBookingDTO(q.bookingRoom.id, q.qrCodeUrl) " +
+            "FROM QRCode q WHERE q.bookingRoom.id = :bookingRoomId")
+    ResponseQRCodeByBookingDTO findQRCodeByBookingRoomId(@Param("bookingRoomId") int bookingRoomId);
+
 }

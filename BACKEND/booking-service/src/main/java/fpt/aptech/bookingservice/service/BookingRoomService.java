@@ -33,6 +33,21 @@ public class BookingRoomService {
         return bookingRoomRepository.findById(id).get();
     }
 
+    //Handle get BookRoom By UserId
+    public List <BookingRoom> getBookRoomByUserId(int userId)
+    {
+        //Kiểm tra userId có tồn tại hay không
+        UserDTO existingUser = userEurekaClient.getUserById(userId);
+        if (existingUser == null) {
+            throw new RuntimeException("User not found");
+        }
+         List<BookingRoom> bookingRooms = bookingRoomRepository.findByUserId(userId);
+        if (bookingRooms.isEmpty()) {
+            throw new RuntimeException("Booking room not found for user " + userId);
+        }
+        return bookingRooms;
+    }
+
     //Handle booking room
     public BookingRoom saveBookRoom(BooKingRoomDTO booKRoomDTO) {
         //Kiểm tra room có tồn tại hay không
@@ -83,39 +98,7 @@ public class BookingRoomService {
         //Update số lượng ghế khả dụng trong Room
         roomExiting.setAvailableSeats(roomExiting.getAvailableSeats() + 1);
         roomEurekaClient.updateRoom(roomExiting.getId(), roomExiting);
-
-        // Sinh mã check-in code (UUID để đảm bảo duy nhất)
-//        String checkInCode = UUID.randomUUID().toString();
-//        newBooking.setCheckInQRCode(checkInCode);
-//        bookingRoomRepository.save(newBooking);
-//
-//        // Tạo thông tin booking thành chuỗi JSON để lưu vào mã QR
-//        String bookingInfoJson = String.format(
-//                "{\"userId\": %d, \n \"userName\": '%s', \n \"roomName\": '%s', \n \"bookingDate\": '%s'}",
-//                newBooking.getUserId(),
-//                newBooking.getUserName(),
-//                newBooking.getRoomName(),
-//                newBooking.getBookingDate().toString()
-//        );
-//
-//        // Tạo QR code
-//        try {
-//            String qrCodePath = "src/main/resources/static/qrcodes/" + checkInCode + ".png";
-//            QRCodeGenerator.generateQRCodeImage(bookingInfoJson, qrCodePath);
-//
-//            // Tạo URL cho file QR code
-//            String qrCodeURL = "http://localhost:8082/qrcodes/" + checkInCode + ".png";
-//
-//            // Tạo đối tượng phản hồi
-//            BookingRoomQRCodeDTO roomQRCodeDTO = new BookingRoomQRCodeDTO();
-//            roomQRCodeDTO.setId(newBooking.getId());
-//            roomQRCodeDTO.setQrCodeUrl(qrCodeURL);
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to generate QR code", e);
-//        }
         bookingRoomRepository.save(newBooking);
-
         return newBooking;
     }
 

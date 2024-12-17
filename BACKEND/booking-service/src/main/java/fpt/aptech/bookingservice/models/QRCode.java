@@ -20,7 +20,7 @@ public class QRCode {
     private int id;
 
     @OneToOne
-    @JoinColumn(name="booking_room_id", nullable=false)
+    @JoinColumn(name="booking_room_id", referencedColumnName = "id")
     private BookingRoom bookingRoom;
 
     private String qrCodeUrl;

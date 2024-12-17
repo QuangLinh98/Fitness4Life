@@ -4,6 +4,7 @@ import fpt.aptech.bookingservice.dtos.BooKingRoomDTO;
 import fpt.aptech.bookingservice.dtos.BookingRoomQRCodeDTO;
 import fpt.aptech.bookingservice.helpers.ApiResponse;
 import fpt.aptech.bookingservice.models.BookingRoom;
+import fpt.aptech.bookingservice.models.QRCode;
 import fpt.aptech.bookingservice.models.WorkoutPackage;
 import fpt.aptech.bookingservice.service.BookingRoomService;
 import fpt.aptech.bookingservice.service.QRService;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -110,11 +113,11 @@ public class ManagerController {
     public ResponseEntity<?> createQrCodeWithBookingRoom(@RequestBody BookingRoom bookingRoomRequest) {
            try {
                // Lưu thông tin booking và tạo mã QR
-               qrService.createBookingWithQRCode(bookingRoomRequest);
-               return ResponseEntity.status(201).body(ApiResponse.success(null, "QR Code created successfully"));
+             QRCode qrCode = qrService.createBookingWithQRCode(bookingRoomRequest);
+               return ResponseEntity.status(201).body(ApiResponse.created(qrCode, "QR Code created successfully"));
            }
            catch (Exception e) {
-               return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+               return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : " + e.getMessage()));
            }
 
     }
@@ -122,11 +125,11 @@ public class ManagerController {
     @PostMapping("/qrCode/validate/{qrCodeId}")
     public ResponseEntity<?> validateQrCode(@PathVariable int qrCodeId) {
         try {
-            qrService.validateQRCode(qrCodeId);
-            return ResponseEntity.status(201).body(ApiResponse.success(null, "QR Code validation successfully"));
+          Map<String,Object> response =  qrService.validateQRCodeAndFetchBookingDetails(qrCodeId);
+            return ResponseEntity.status(200).body(ApiResponse.success(response, "QR Code validation successfully"));
         }
         catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : " + e.getMessage()));
         }
     }
 }
