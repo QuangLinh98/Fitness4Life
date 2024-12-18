@@ -122,8 +122,8 @@ public class ManagerController {
 
     }
 
-    @PostMapping("/qrCode/validate/{qrCodeId}")
-    public ResponseEntity<?> validateQrCode(@PathVariable int qrCodeId) {
+    @GetMapping("/qrCode/validate")
+    public ResponseEntity<?> validateQrCode(@RequestParam int qrCodeId) {
         try {
           Map<String,Object> response =  qrService.validateQRCodeAndFetchBookingDetails(qrCodeId);
             return ResponseEntity.status(200).body(ApiResponse.success(response, "QR Code validation successfully"));

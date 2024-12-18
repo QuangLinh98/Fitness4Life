@@ -49,49 +49,42 @@ public class QRService {
             throw new RuntimeException("Room not found with ID: " + bookingRoom.getRoomId());
         }
 
-        // Kiểm tra StartTime và EndTime
-        if (existingRoom.getStartTime() == null || existingRoom.getEndTime() == null) {
-            throw new RuntimeException("StartTime or EndTime is not available for Room ID: " + bookingRoom.getRoomId());
-        }
         BookingRoom savedBooking = bookingRoomRepository.save(bookingRoom);
 
         try {
-            //Tạo mã RANDOM cho QR
+            // Tạo mã RANDOM cho QR
             String checkInCode = UUID.randomUUID().toString();
-            //Đường dẫn lưu file QR Code
-            String qrFilePath = QR_CODE_DIRECTORY + checkInCode + ".jpg";
 
-            // Tạo nội dung JSON theo table-like structure
-            Map<String, Object> qrData = new HashMap<>();
-            qrData.put("UserName", savedBooking.getUserName());
-            qrData.put("RoomName", savedBooking.getRoomName());
-            qrData.put("StartTime", existingRoom.getStartTime().toString());
-            qrData.put("EndTime", existingRoom.getEndTime().toString());
-            qrData.put("BookingDate", savedBooking.getBookingDate().toString());
-
-            // Chuyển Map thành JSON string
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-            String bookingInfoJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(qrData);
-
-            //Gọi hàm tạo mã QR
-            QRCodeGenerator.generateQRCodeImage(bookingInfoJson, qrFilePath);
-
-            //Tạo QR Code cho booking và lưu vào database
+            // Tạo đối tượng QRCode trước để lấy qrId
             QRCode qrCode = QRCode.builder()
                     .qrCodeUrl("http://localhost:8082/qrcodes/" + checkInCode + ".jpg")
                     .qrCodeStatus(QRCodeStatus.VALID)
                     .bookingRoom(savedBooking)
                     .build();
-            //Cập nhật Booking Room với QR Code đã tạo
-            savedBooking.setQrCode(qrCode);
+
+            // Lưu QRCode vào database để lấy qrId
             qrRepository.save(qrCode);
+
+            // Tạo URL API chứa qrId
+            String apiUrl = "http://192.168.1.28:8082/api/booking/qrCode/validate?qrCodeId=" + qrCode.getId();
+
+            // Gọi hàm tạo mã QR với URL API
+            String qrFilePath = QR_CODE_DIRECTORY + checkInCode + ".jpg";
+            QRCodeGenerator.generateQRCodeImage(apiUrl, qrFilePath);
+
+            // Cập nhật đường dẫn vào QRCode và BookingRoom
+            qrCode.setQrCodeUrl("http://localhost:8082/qrcodes/" + checkInCode + ".jpg");
+            qrRepository.save(qrCode);
+            savedBooking.setQrCode(qrCode);
             bookingRoomRepository.save(savedBooking);
+
             return qrCode;
+
         } catch (IOException | WriterException e) {
             throw new RuntimeException("Failed to generate QR Code", e);
         }
     }
+
 
     //Xác thực mã QR
     @Transactional(noRollbackFor = RuntimeException.class)
