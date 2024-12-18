@@ -25,7 +25,6 @@ public class NotifyConsumer {
             System.out.println("Test nhận dữ liệu : " + notifyDTO);
 
             Notify notify = objectMapper.convertValue(notifyDTO, Notify.class);
-            System.out.println("Test chuyển đổi dữ liệu : " + notify.toString());
             notifyService.addNotify(notify);
         }
         catch (Exception e) {
