@@ -11,6 +11,7 @@ import fpt.aptech.fitnessgoalservice.notification.NotifyService;
 import fpt.aptech.fitnessgoalservice.service.ExerciseDietSuggestionsService;
 import fpt.aptech.fitnessgoalservice.service.GoalService;
 import fpt.aptech.fitnessgoalservice.service.ProgressService;
+import fpt.aptech.fitnessgoalservice.service.UserPointService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +40,14 @@ public class ManagerController {
             System.out.println("Có nhận đươc user không : " + existingUser);
 
             //Send notification to user . When user add a goal successfully
-            NotifyDTO notifyDTO = new NotifyDTO();
-            notifyDTO.setItemId(newGoal.getId());
-            notifyDTO.setUserId(goalDTO.getUserId());
-            notifyService.sendCreatedNotification(existingUser, notifyDTO, goalDTO);
+            try {
+                NotifyDTO notifyDTO = new NotifyDTO();
+                notifyDTO.setItemId(newGoal.getId());
+                notifyDTO.setUserId(goalDTO.getUserId());
+                notifyService.sendCreatedNotification(existingUser, notifyDTO, goalDTO);
+            }catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
 
             return ResponseEntity.status(201).body(ApiResponse.created(newGoal, "Create goal successfully"));
         } catch (Exception e) {
@@ -134,30 +139,6 @@ public class ManagerController {
         }
     }
 
-    //============================ Diet Plan ===========================
-//    @PostMapping("/dietPlan/add")
-//    public ResponseEntity<?> AddDietPlan(@RequestBody DietPlanDTO dietPlanDTO) {
-//        try {
-//            List<DietPlan> dietPlans = dietPlanService.createDietPlanForUser(dietPlanDTO);
-//            return ResponseEntity.status(201).body(ApiResponse.created(dietPlans, "Create list diet plan successfully"));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
-//        }
-//    }
-
-//    @PutMapping("/dietPlan/update/{id}")
-//    public ResponseEntity<?> UpdateDietPlan(@Valid @PathVariable int id, @RequestBody UpdateDietPlanDTO dietPlanDTO, BindingResult bindingResult) {
-//        try {
-//            if (bindingResult.hasErrors()) {
-//                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
-//            }
-//            DietPlan updateDietPlan = dietPlanService.updateDietPlan(id, dietPlanDTO);
-//            return ResponseEntity.ok(updateDietPlan);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
-//        }
-//    }
-
     @DeleteMapping("/dietPlan/delete/{id}")
     public ResponseEntity<?> DeleteDietPlan(@PathVariable int id) {
         try {
@@ -167,4 +148,6 @@ public class ManagerController {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
         }
     }
+
+
 }

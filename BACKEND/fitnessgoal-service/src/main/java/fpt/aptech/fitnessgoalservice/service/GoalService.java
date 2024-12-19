@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
+    private final UserPointService pointService;
     private final CalculationService calculationService;
     private final ExerciseDietSuggestionsService exerciseDietSuggestionsService;
     private final UserEurekaClient userEurekaClient;
@@ -163,7 +164,6 @@ public class GoalService {
         // Lưu mục tiêu đã được cập nhật vào cơ sở dữ liệu
         return goalRepository.save(existingGoal);
     }
-
 
     //Handle update goal status
     public Goal changeGoalStatusById(int id, ChangeGoalStatusDTO goalStatusDTO) {

@@ -23,6 +23,7 @@ public class ProgressService {
     private final GoalRepository goalRepository;
     private final UserEurekaClient userEurekaClient;
     private final NotifyService notifyService;
+    private final UserPointService pointService;
 
     //Handle get all progress data
     public List<Progress> getAllProgress() {
@@ -89,15 +90,18 @@ public class ProgressService {
                 //Duy trì cân nặng thì không cần cập nhật currentValue
                 break;
         }
-        //Kiểm tra trạng thái của goal nếu currentValue = targetValue thì hoàn thành mục tiêu và hiển thị message
-        if (existingGoal.getCurrentValue().equals(existingGoal.getTargetValue())) {
-            existingGoal.setGoalStatus(GoalStatus.COMPLETED);
-            if (existingGoal.getGoalStatus() == GoalStatus.COMPLETED) {
-                newProgress.setMessage(newProgress.getMessage() + " Muc tieu cua ban da hoan thanh.Xin chuc mung.");
-            }
-        }
+        //Kiểm tra trạng thái của goal nếu currentValue = targetValue thì hoàn thành mục tiêu và hiển thị message, và công điểm
+        int pointsToAdd = checkAndUpdateGoalStatus(existingGoal, newProgress);
+
         // Lưu lại cập nhật vào bảng Goal
         goalRepository.save(existingGoal);
+
+        // Gửi thông báo nếu có điểm được cộng
+        if (pointsToAdd > 0) {
+            String resultMessage = "Ban da hoan thanh mot moc quan trong cho muc tieu "+existingGoal.getGoalType()+". Ban đuoc cong " + pointsToAdd + " điem.";
+            notifyService.sendPointNotification(existingUser, existingGoal, resultMessage, pointsToAdd);
+        }
+
         return progressRepository.save(newProgress);
     }
 
@@ -150,36 +154,61 @@ public class ProgressService {
                     break;
             }
             //Kiểm tra trạng thái của goal với từng goalType nếu currentValue >= targetValue thì hoàn thành mục tiêu và hiển thị message
-            if (goal.getGoalType() == GoalType.MUSCLE_GAIN || goal.getGoalType() == GoalType.WEIGHT_GAIN) {
-                if (goal.getCurrentValue() >= goal.getTargetValue()) {
-                    //Kiểm tra nếu currentValue vượt quá targetValue quá nhiều
-                    if (goal.getCurrentValue() - goal.getTargetCalories() > 4) {
-                        existingProgress.setMessage(existingProgress.getMessage() + "Luu y : Ban da vuot qua muc tieu qua nhieu ("+(goal.getCurrentValue() - goal.getTargetCalories())+").Hay dieu chinh lai ke hoach");
-                    }
-                    goal.setGoalStatus(GoalStatus.COMPLETED);
-                    if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
-                        existingProgress.setMessage(existingProgress.getMessage() + " Muc tieu cua ban da hoan thanh.Xin chuc mung.");
-                    }
-                }
-            }
-            if (goal.getGoalType() == GoalType.WEIGHT_LOSS || goal.getGoalType() == GoalType.FAT_LOSS) {
-                if (goal.getCurrentValue() <= goal.getTargetValue()) {
-                    //Kiểm tra nếu targetValue vượt quá currentValue quá nhiều
-                    if (goal.getTargetValue() - goal.getCurrentValue() > 4) {
-                        existingProgress.setMessage(existingProgress.getMessage() + " Luu y: Ban da giam qua nhieu (hơn " + (goal.getTargetValue() - goal.getCurrentValue()) + "). Hay xem xet lai ke hoach.");
-                    }
-                    goal.setGoalStatus(GoalStatus.COMPLETED);
-                    if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
-                        existingProgress.setMessage(existingProgress.getMessage() + " Muc tieu cua ban da hoan thanh.Xin chuc mung.");
-                    }
-                }
-            }
+            checkAndUpdateGoalStatus(goal, existingProgress);
 
             // Lưu lại cập nhật vào bảng Goal
             goalRepository.save(goal);
             return progressRepository.save(existingProgress);
         }
         throw new RuntimeException("Progress not found");
+    }
+
+    //Phương thức xử lý kiểm tra và cập nhật goal status
+    private int checkAndUpdateGoalStatus(Goal goal, Progress progress) {
+        double currentValue = goal.getCurrentValue();
+        double targetValue = goal.getTargetValue();
+        int pointsToAdd = 0; // Biến lưu điểm thưởng
+
+        // Kiểm tra nếu đạt 50% mục tiêu
+        boolean isHalfCompleted = progressRepository.existsByGoalIdAndMessageContaining(goal.getId(), "đạt 50%");
+        if (!isHalfCompleted && goal.getGoalStatus().equals(GoalStatus.IN_PROGRESS) && currentValue >= targetValue * 0.5 ){
+            //Thưởng điểm khi đạt 50% mục tiêu
+            pointsToAdd += 50;
+        }
+
+        if (goal.getGoalType() == GoalType.MUSCLE_GAIN || goal.getGoalType() == GoalType.WEIGHT_GAIN) {
+            if (goal.getCurrentValue() >= goal.getTargetValue()) {
+                // Check if currentValue exceeds targetValue significantly
+                if (goal.getCurrentValue() - goal.getTargetCalories() > 4) {
+                    progress.setMessage(progress.getMessage() + " Luu y: Ban da vuot qua muc tieu qua nhieu (" + (goal.getCurrentValue() - goal.getTargetCalories()) + "). Hay dieu chinh lai ke hoach.");
+                }
+                goal.setGoalStatus(GoalStatus.COMPLETED);
+                if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
+                    progress.setMessage(progress.getMessage() + " Muc tieu cua ban da hoan thanh. Xin chuc mung.");
+                    //Cộng điểm nếu mục tiêu hoàn thành
+                    pointsToAdd += 500;
+                }
+            }
+        }
+        if (goal.getGoalType() == GoalType.WEIGHT_LOSS || goal.getGoalType() == GoalType.FAT_LOSS) {
+            if (goal.getCurrentValue() <= goal.getTargetValue()) {
+                // Check if targetValue significantly exceeds currentValue
+                if (goal.getTargetValue() - goal.getCurrentValue() > 4) {
+                    progress.setMessage(progress.getMessage() + " Luu y: Ban da giam qua nhieu (hơn " + (goal.getTargetValue() - goal.getCurrentValue()) + "). Hay xem xet lai ke hoach.");
+                }
+                goal.setGoalStatus(GoalStatus.COMPLETED);
+                if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
+                    progress.setMessage(progress.getMessage() + " Muc tieu cua ban da hoan thanh. Xin chuc mung.");
+                    // Thưởng điểm khi hoàn thành mục tiêu
+                    pointsToAdd += 500;
+                }
+            }
+        }
+        // Thực hiện cộng điểm nếu có
+        if (pointsToAdd > 0) {
+            pointService.addPoint(goal.getUserId(), pointsToAdd);
+        }
+        return pointsToAdd;
     }
 
     //Handle delete progress

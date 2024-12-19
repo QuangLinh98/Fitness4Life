@@ -14,4 +14,6 @@ public interface ProgressRepository extends JpaRepository<Progress, Integer> {
     List<Progress> findByUserId(long userId);
     // Truy vấn lấy tiến trình của người dùng theo goalId và khoảng thời gian
     List<Progress> findByUserIdAndGoalIdAndTrackingDateBetween(int userId, int goalId, LocalDate startDate, LocalDate endDate);
+
+    boolean existsByGoalIdAndMessageContaining(int goalId, String message);
 }

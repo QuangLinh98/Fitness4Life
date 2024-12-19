@@ -4,9 +4,11 @@ import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
 import fpt.aptech.fitnessgoalservice.models.ExerciseDietSuggestions;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.models.Progress;
+import fpt.aptech.fitnessgoalservice.models.UserPoint;
 import fpt.aptech.fitnessgoalservice.service.ExerciseDietSuggestionsService;
 import fpt.aptech.fitnessgoalservice.service.GoalService;
 import fpt.aptech.fitnessgoalservice.service.ProgressService;
+import fpt.aptech.fitnessgoalservice.service.UserPointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ public class PublicController {
     private final GoalService goalService;
     private final ProgressService progressService;
     private final ExerciseDietSuggestionsService dietPlanService;
+    private final UserPointService pointService;
     //private final CalculationService calculationService;
 
     @GetMapping("/all")
@@ -110,6 +113,19 @@ public class PublicController {
         }
         catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+        }
+    }
+
+    //============================ User Point ===========================
+    @GetMapping("/userPoint/{userId}")
+    public ResponseEntity<?> getUserPoints(@PathVariable long userId) {
+        try {
+            int points = pointService.getPoints(userId);
+            return ResponseEntity.status(200).body(ApiResponse.success(points,"Get user points successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
+
         }
     }
 

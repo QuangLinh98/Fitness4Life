@@ -38,4 +38,17 @@ public class NotifyService {
         // Gửi thông báo thông qua NotifyProducer
         notifyProducer.sendNotify(notifyDTO);
     }
+
+    public void sendPointNotification(UserDTO existingUser, Goal goal, String resultMessage, int point) {
+        //Thiết lập thông báo
+        NotifyDTO notifyDTO = NotifyDTO.builder()
+                .itemId(goal.getId())
+                .userId(goal.getUserId())
+                .fullName(existingUser.getFullName())
+                .title("Thong bao cong diem thuong" )
+                .content(resultMessage)
+                .build();
+        // Gửi thông báo thông qua NotifyProducer
+        notifyProducer.sendNotify(notifyDTO);
+    }
 }
