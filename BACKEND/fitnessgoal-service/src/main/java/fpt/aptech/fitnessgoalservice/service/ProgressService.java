@@ -90,15 +90,15 @@ public class ProgressService {
                 //Duy trì cân nặng thì không cần cập nhật currentValue
                 break;
         }
-        //Kiểm tra trạng thái của goal nếu currentValue = targetValue thì hoàn thành mục tiêu và hiển thị message, và công điểm
+        //Gọi phương thức cập nhật Goal Status
         int pointsToAdd = checkAndUpdateGoalStatus(existingGoal, newProgress);
 
         // Lưu lại cập nhật vào bảng Goal
         goalRepository.save(existingGoal);
 
-        // Gửi thông báo nếu có điểm được cộng
+        // Gửi thông báo nếu có điểm được cộng qua notifi-service
         if (pointsToAdd > 0) {
-            String resultMessage = "Ban da hoan thanh mot moc quan trong cho muc tieu "+existingGoal.getGoalType()+". Ban đuoc cong " + pointsToAdd + " điem.";
+            String resultMessage = "Ban da hoan thanh mot moc quan trong cho muc tieu " + existingGoal.getGoalType() + ". Ban đuoc cong " + pointsToAdd + " điem.";
             notifyService.sendPointNotification(existingUser, existingGoal, resultMessage, pointsToAdd);
         }
 
@@ -153,7 +153,7 @@ public class ProgressService {
                     //Duy trì cân nặng thì không cần cập nhật currentValue
                     break;
             }
-            //Kiểm tra trạng thái của goal với từng goalType nếu currentValue >= targetValue thì hoàn thành mục tiêu và hiển thị message
+            //Gọi phương thức cập nhật Goal Status
             checkAndUpdateGoalStatus(goal, existingProgress);
 
             // Lưu lại cập nhật vào bảng Goal
@@ -171,7 +171,7 @@ public class ProgressService {
 
         // Kiểm tra nếu đạt 50% mục tiêu
         boolean isHalfCompleted = progressRepository.existsByGoalIdAndMessageContaining(goal.getId(), "đạt 50%");
-        if (!isHalfCompleted && goal.getGoalStatus().equals(GoalStatus.IN_PROGRESS) && currentValue >= targetValue * 0.5 ){
+        if (!isHalfCompleted && goal.getGoalStatus().equals(GoalStatus.IN_PROGRESS) && currentValue >= targetValue * 0.5) {
             //Thưởng điểm khi đạt 50% mục tiêu
             pointsToAdd += 50;
         }
@@ -204,6 +204,7 @@ public class ProgressService {
                 }
             }
         }
+
         // Thực hiện cộng điểm nếu có
         if (pointsToAdd > 0) {
             pointService.addPoint(goal.getUserId(), pointsToAdd);
@@ -220,8 +221,8 @@ public class ProgressService {
     }
 
     //Lấy chỉ số sức khỏe trong khoảng thời gian khi người dùng thực hiện so sánh các chỉ số sức khỏe so với ban đầu
-    public List<Progress> getProgressData( int userId, int goalId, LocalDate startDate, LocalDate endDate) {
-        List<Progress> progressList = progressRepository.findByUserIdAndGoalIdAndTrackingDateBetween(userId, goalId,startDate, endDate);
+    public List<Progress> getProgressData(int userId, int goalId, LocalDate startDate, LocalDate endDate) {
+        List<Progress> progressList = progressRepository.findByUserIdAndGoalIdAndTrackingDateBetween(userId, goalId, startDate, endDate);
         return progressList;
     }
 
@@ -243,13 +244,13 @@ public class ProgressService {
         }
         System.out.println("Change value " + (endValue - targetValue));
         // So sánh endValue với targetValue và tính sự thay đổi
-        return  endValue - targetValue ;
+        return endValue - targetValue;
     }
 
     //Phân tích các chỉ số tiến trình tập luyện trong khoảng thời gian và gửi thông báo
-    public String analyzeProgress(int userId ,int goalId ,LocalDate startDate, LocalDate endDate) {
+    public String analyzeProgress(int userId, int goalId, LocalDate startDate, LocalDate endDate) {
         // lấy dữ liệu cân nặng , mỡ cơ thể , cơ , calo tiêu thụ
-        List<Progress> progressList = getProgressData(userId,goalId ,startDate, endDate);
+        List<Progress> progressList = getProgressData(userId, goalId, startDate, endDate);
         if (progressList.isEmpty()) {
             return "There is no data for this time period.";
         }
@@ -289,8 +290,8 @@ public class ProgressService {
             }
             return message;
         }
-            // Trả về tất cả các thông báo
-            return null;
+        // Trả về tất cả các thông báo
+        return null;
     }
 
     //So sánh với mục tiêu của người dùng
@@ -300,7 +301,7 @@ public class ProgressService {
         // Kiểm tra mục tiêu giảm cân (WEIGHT_LOSS)
         if (goal.getGoalType() == GoalType.WEIGHT_LOSS) {
             if (change > 0) {
-                result = "Ban can giam them " + Math.abs(change) + "kg,de dat muc tieu giam can ve " + goal.getTargetValue()+ "kg";
+                result = "Ban can giam them " + Math.abs(change) + "kg,de dat muc tieu giam can ve " + goal.getTargetValue() + "kg";
             } else {
                 result = "Ban da giam " + change + "kg de dat muc tieu giam can.";
             }
@@ -310,8 +311,8 @@ public class ProgressService {
         else if (goal.getGoalType() == GoalType.WEIGHT_GAIN) {
             if (change > 0) {
                 result = "Ban da tang " + change + "kg, dat muc tieu tang can.";
-            } else if (change < 0){
-                result = "Ban can tang them " + Math.abs(change) + "kg de dat muc tieu tang can len " + goal.getTargetValue()+ "kg";
+            } else if (change < 0) {
+                result = "Ban can tang them " + Math.abs(change) + "kg de dat muc tieu tang can len " + goal.getTargetValue() + "kg";
             }
         }
 

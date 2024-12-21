@@ -25,6 +25,41 @@ public class NotifyService {
         // Gửi thông báo thông qua NotifyProducer
         notifyProducer.sendNotify(notifyDTO);
     }
+    //Gửi thông báo nhắc nhở về thời gian kết thúc goal
+    public void sendGoalNotification(UserDTO existingUser, Goal goal) {
+        String content = String.format(
+                "Muc tieu '%s' cua ban se het han vao ngay %s. Hay kiem tra va cap nhat tien đo nhe!",
+                goal.getGoalType(),
+                goal.getEndDate()
+        );
+        NotifyDTO notifyDTO = NotifyDTO.builder()
+                .itemId(goal.getId())
+                .userId(goal.getUserId())
+                .fullName(existingUser.getFullName())
+                .title("Nhac nho muc tieu sap den han")
+                .content(content)
+                .build();
+        // Gửi thông báo thông qua NotifyProducer
+        notifyProducer.sendNotify(notifyDTO);
+    }
+
+    //Gửi thông báo nhắc xác nhận gia hạn thời gian cho mục tiêu
+    public void sendGoalExtendNotification(UserDTO existingUser, Goal goal) {
+        String content = String.format(
+                "Muc tieu '%s' cua ban se het han vao ngay %s.Tien do hien tai : "+ goal.getProgresses() +". Ban co muon gia han them thoi gian hay khong !",
+                goal.getGoalType(),
+                goal.getEndDate()
+        );
+        NotifyDTO notifyDTO = NotifyDTO.builder()
+                .itemId(goal.getId())
+                .userId(goal.getUserId())
+                .fullName(existingUser.getFullName())
+                .title("Thong bao nhac nho gia han muc tieu")
+                .content(content)
+                .build();
+        // Gửi thông báo thông qua NotifyProducer
+        notifyProducer.sendNotify(notifyDTO);
+    }
 
     public void sendAnalyticsNotification(UserDTO existingUser, Goal goal, String resultMessage) {
         //Thiết lập thông báo
@@ -51,4 +86,6 @@ public class NotifyService {
         // Gửi thông báo thông qua NotifyProducer
         notifyProducer.sendNotify(notifyDTO);
     }
+
+
 }

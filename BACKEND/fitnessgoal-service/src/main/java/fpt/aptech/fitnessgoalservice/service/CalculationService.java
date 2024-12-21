@@ -3,6 +3,7 @@ package fpt.aptech.fitnessgoalservice.service;
 import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
 import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.models.Gender;
+import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.repository.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,28 +11,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CalculationService {
-    private final ProgressRepository progressRepository;
-    //private final GoalService goalService;
-    private final UserEurekaClient userEurekaClient;
 
     //Handle get last weight from user was updated
-    public Double calculateTdee(double weight,UserDTO userDTO,String activityLevel) {
+    public Double calculateTdee(double weight, UserDTO userDTO, String activityLevel) {
 
-        //Lấy cân nặng mới nhất
-//        Progress weightProgress = progressRepository.findTopByUserIdAndMetricNameOrderByTrackingDateDesc(userId, "weight")
-//                .orElseThrow(() -> new RuntimeException("Weight data not found"));
-//
-//        Double weight = weightProgress.getWeight();
         int height = userDTO.getProfileUserDTO().getHeightValue();
         int age = userDTO.getProfileUserDTO().getAge();
         Gender gender = userDTO.getGender();
-
-         //Lấy thông tin goal
-//        Goal goal = goalService.getGoalById(goalId);
-//        if (goal == null) {
-//            throw new RuntimeException("Goal not found");
-//        }
-//        String activityLevel = goal.getActivityLevel().name();
 
         //Tính BMR
         Double bmr = 0.0;
@@ -66,5 +52,39 @@ public class CalculationService {
         return bmr * multiplier;
     }
 
+    //Phương thức tính toán tỷ lệ % hoàn thành mục tiêu của user
+    public double calulateGoalProgress(Goal goal) {
+        double progress = 0;
 
+        //Tính toán tỷ lệ tiến độ dựa trên các chỉ số mục tiêu
+        switch (goal.getGoalType()) {
+            case WEIGHT_LOSS:
+                if (goal.getTargetValue() != null && goal.getCurrentValue() != null) {
+                    progress = ((goal.getWeight() - goal.getCurrentValue()) / (goal.getWeight() - goal.getTargetValue())) * 100;
+                    System.out.println("Progress weight loss completed %: " + progress);
+                }
+                break;
+            case WEIGHT_GAIN:
+                if (goal.getTargetValue() != null && goal.getCurrentValue() != null) {
+                    progress = ((goal.getCurrentValue() - goal.getWeight()) / (goal.getTargetValue() - goal.getWeight())) * 100;
+                    System.out.println("Progress weight gain completed %: " + progress);
+                }
+                break;
+            case MUSCLE_GAIN:
+                if (goal.getTargetValue() != null && goal.getCurrentValue() != null) {
+                    progress = (goal.getCurrentValue() / goal.getTargetValue()) * 100;
+                    System.out.println("Progress muscle gain completed %: " + progress);
+                }
+                break;
+            case FAT_LOSS:
+                if (goal.getTargetValue() != null && goal.getCurrentValue() != null) {
+                    progress = ((goal.getTargetValue() - goal.getCurrentValue()) / (goal.getTargetValue())) * 100;
+                    System.out.println("Progress fat loss completed %: " + progress);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid goal type.");
+        }
+        return progress;
+    }
 }

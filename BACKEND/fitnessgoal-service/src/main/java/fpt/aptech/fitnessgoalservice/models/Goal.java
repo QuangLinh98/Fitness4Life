@@ -41,13 +41,15 @@ public class Goal {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GoalMetric>goalMetrics;
+    // Liên kết với bảng GoalExtension để lưu lịch sử gia hạn
+    @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<GoalExtension>goalExtensions;
 
+    // Liên kết với bảng Progress để theo dõi tiến trình
     @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Progress>progresses;
 
+    // Liên kết với bảng ExerciseDietSuggestions để quản lý chế độ tập luyện và dinh dưỡng
     @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExerciseDietSuggestions>dietPlans;
-
 }

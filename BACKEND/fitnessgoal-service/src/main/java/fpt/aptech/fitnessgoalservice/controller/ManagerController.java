@@ -6,12 +6,10 @@ import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
 import fpt.aptech.fitnessgoalservice.kafka.NotifyProducer;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.dtos.NotifyDTO;
+import fpt.aptech.fitnessgoalservice.models.GoalExtension;
 import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.notification.NotifyService;
-import fpt.aptech.fitnessgoalservice.service.ExerciseDietSuggestionsService;
-import fpt.aptech.fitnessgoalservice.service.GoalService;
-import fpt.aptech.fitnessgoalservice.service.ProgressService;
-import fpt.aptech.fitnessgoalservice.service.UserPointService;
+import fpt.aptech.fitnessgoalservice.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +17,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/goal")
 @RequiredArgsConstructor
 public class ManagerController {
     private final GoalService goalService;
+    private final GoalExtentionService goalExtensionService;
     private final NotifyProducer notifyProducer;
     private final ProgressService progressService;
     private final ExerciseDietSuggestionsService dietPlanService;
@@ -89,6 +89,28 @@ public class ManagerController {
         }
     }
 
+    @PostMapping("/reminder")
+    public ResponseEntity<?> sendReminderNotifications() {
+        try {
+            goalService.checkAndNotifyUnfinishedGoals();
+            return ResponseEntity.ok("Reminders sent successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("Error while sending reminders: " + e.getMessage());
+        }
+    }
+
+    //================================== GOAL EXTENTION ==============================
+    @PostMapping("/goalExtention/{goalId}")
+    public ResponseEntity<?>ExtentionGoalDealine(@PathVariable int goalId , @RequestParam boolean userResponse){
+        try {
+            GoalExtension goalExtension = goalExtensionService.extendGoalDeadline(goalId , userResponse);
+            return ResponseEntity.status(201).body(ApiResponse.created(goalExtension,"Time extension successful"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
+        }
+    }
 
     //================================== PROGRESS ==============================
     @PostMapping("/progress/add")
