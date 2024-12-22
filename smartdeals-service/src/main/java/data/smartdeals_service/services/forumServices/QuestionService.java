@@ -4,30 +4,31 @@ import data.smartdeals_service.dto.forum.QuestionDTO;
 import data.smartdeals_service.dto.forum.QuestionResponseDTO;
 import data.smartdeals_service.helpers.FileUploadAvata;
 import data.smartdeals_service.helpers.GlobalConstant;
-import data.smartdeals_service.models.blog.BlogImage;
-import data.smartdeals_service.models.forum.CategoryForum;
-import data.smartdeals_service.models.forum.Question;
-import data.smartdeals_service.models.forum.QuestionImage;
+import data.smartdeals_service.models.forum.*;
 import data.smartdeals_service.repository.forumRepositories.QuestionImageRepository;
 import data.smartdeals_service.repository.forumRepositories.QuestionRepository;
+import data.smartdeals_service.repository.forumRepositories.QuestionViewRepository;
+import data.smartdeals_service.repository.forumRepositories.QuestionVoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionImageRepository questionImageRepository;
+    private final QuestionVoteRepository questionVoteRepository;
+    private final QuestionViewRepository questionViewRepository;
     private final FileUploadAvata fileUploadAvata;
     private String subFolder = "QuestionsImage";
     private String urlImage = GlobalConstant.rootUrl
@@ -41,27 +42,38 @@ public class QuestionService {
         question.setContent(questionDTO.getContent());
         question.setTopic(questionDTO.getTopic());
         question.setTag(questionDTO.getTag());
+        question.setRolePost(questionDTO.getRolePost());
+
         if (questionDTO.getCategory() != null) {
-            question.setCategory(CategoryForum.valueOf(questionDTO.getCategory()));
+            List<CategoryForum> categories = questionDTO.getCategory().stream()
+                    .map(CategoryForum::valueOf)
+                    .toList();
+            question.setCategory(categories);
         }
         question.setCreatedAt(LocalDateTime.now());
-        Question saveQuestion = questionRepository.save(question);
-        List<QuestionImage> questionImages = new ArrayList<>();
-        for (MultipartFile image : questionDTO.getImageQuestionUrl()) {
-            String imageName = fileUploadAvata.storeImage(subFolder, image);
-            String exactImageUrl = urlImage + File.separator + imageName;
-            QuestionImage questionImage = new QuestionImage();
-            questionImage.setImageUrl(exactImageUrl.replace("\\", "/"));
-            questionImage.setQuestion(saveQuestion);
-            questionImages.add(questionImage);
+        Question savedQuestion = questionRepository.save(question);
+
+        // Lưu hình ảnh
+        if (questionDTO.getImageQuestionUrl() != null && !questionDTO.getImageQuestionUrl().isEmpty()) {
+            List<QuestionImage> questionImages = new ArrayList<>();
+            for (MultipartFile image : questionDTO.getImageQuestionUrl()) {
+                if (image != null && !image.isEmpty()) { // Kiểm tra file không null hoặc trống
+                    String imageName = fileUploadAvata.storeImage(subFolder, image);
+                    String exactImageUrl = urlImage + File.separator + imageName;
+                    QuestionImage questionImage = new QuestionImage();
+                    questionImage.setImageUrl(exactImageUrl.replace("\\", "/"));
+                    questionImage.setQuestion(savedQuestion);
+                    questionImages.add(questionImage);
+                }
+            }
+            if (!questionImages.isEmpty()) {
+                questionImageRepository.saveAll(questionImages);
+                question.setQuestionImage(questionImages);
+            }
         }
-        question.setQuestionImage(questionImages);
-        questionImageRepository.saveAll(questionImages);
-        return saveQuestion;
+        return savedQuestion;
     }
-//    public List<Question> findAll() {
-//        return questionRepository.findAll();
-//    }
+
 public List<QuestionResponseDTO> findAllQuestions() {
     List<Question> questions = questionRepository.findAll();
     return questions.stream()
@@ -110,5 +122,75 @@ public List<QuestionResponseDTO> findAllQuestions() {
         questionRepository.deleteById(id);
     }
 
+    @Transactional
+    public void handleVote(Long questionId, Long userId, VoteType newVoteType) {
+        // Lấy thông tin câu hỏi
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+
+        // Kiểm tra user đã vote chưa
+        Optional<QuestionVote> existingVote = questionVoteRepository.findByQuestionIdAndUserId(questionId, userId);
+
+        if (existingVote.isPresent()) {
+            QuestionVote vote = existingVote.get();
+
+            // Nếu user đã vote cùng loại thì bỏ vote (toggle off)
+            if (vote.getVoteType() == newVoteType) {
+                questionVoteRepository.delete(vote);
+                if (newVoteType == VoteType.UPVOTE) {
+                    question.setUpvote(question.getUpvote() - 1);
+                } else if (newVoteType == VoteType.DOWNVOTE) {
+                    question.setDownVote(question.getDownVote() - 1);
+                }
+            } else {
+                // Nếu user đã vote khác loại thì chuyển đổi
+                if (vote.getVoteType() == VoteType.UPVOTE) {
+                    question.setUpvote(question.getUpvote() - 1);
+                    question.setDownVote(question.getDownVote() + 1);
+                } else if (vote.getVoteType() == VoteType.DOWNVOTE) {
+                    question.setDownVote(question.getDownVote() - 1);
+                    question.setUpvote(question.getUpvote() + 1);
+                }
+                vote.setVoteType(newVoteType);
+                questionVoteRepository.save(vote);
+            }
+        } else {
+            // Nếu user chưa vote thì tạo vote mới
+            QuestionVote newVote = new QuestionVote();
+            newVote.setQuestion(question);
+            newVote.setUserId(userId);
+            newVote.setVoteType(newVoteType);
+            questionVoteRepository.save(newVote);
+
+            if (newVoteType == VoteType.UPVOTE) {
+                question.setUpvote(question.getUpvote() + 1);
+            } else if (newVoteType == VoteType.DOWNVOTE) {
+                question.setDownVote(question.getDownVote() + 1);
+            }
+        }
+
+        // Cập nhật lại question trong database
+        questionRepository.save(question);
+    }
+
+    public void incrementViewCount(Long questionId, Long userId) {
+        Optional<QuestionView> existingView = questionViewRepository.findByQuestionIdAndUserId(questionId, userId);
+
+        if (existingView.isEmpty()) {
+            // User chưa xem bài viết, tăng viewCount
+            Question question = questionRepository.findById(questionId)
+                    .orElseThrow(() -> new RuntimeException("Question not found"));
+            question.setViewCount(question.getViewCount() + 1);
+
+            // Lưu lại thông tin lượt xem
+            QuestionView questionView = new QuestionView();
+            questionView.setQuestion(question);
+            questionView.setUserId(userId);
+
+            questionViewRepository.save(questionView);
+            questionRepository.save(question);
+        }
+        // Nếu đã xem, không làm gì thêm
+    }
 
 }

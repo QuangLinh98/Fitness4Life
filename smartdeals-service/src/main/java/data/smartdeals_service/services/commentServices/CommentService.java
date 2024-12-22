@@ -3,6 +3,7 @@ package data.smartdeals_service.services.commentServices;
 
 import data.smartdeals_service.dto.comment.ChangeStatusCommentDTO;
 import data.smartdeals_service.dto.comment.CommentDTO;
+import data.smartdeals_service.dto.comment.GetCommentDTO;
 import data.smartdeals_service.helpers.EmojiUtils;
 import data.smartdeals_service.models.blog.Blog;
 import data.smartdeals_service.models.comment.Comment;
@@ -281,11 +282,20 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public List<Comment> getCommentsByBlogId(Long blogId) {
-        return commentRepository.findCommentsByBlogId(blogId);
-    }
+//    public List<Comment> getCommentsByBlogId(Long blogId) {
+//        return commentRepository.findCommentsByBlogId(blogId);
+//    }
+//
+//    public List<Comment> getCommentsByQuestionId(Long questionId) {
+//        return commentRepository.findCommentsByQuestionId(questionId);
+//    }
+public List<GetCommentDTO> getCommentsByBlogId(Long blogId) {
+    List<Comment> comments = commentRepository.findCommentsByBlogId(blogId);
+    return comments.stream().map(GetCommentDTO::new).collect(Collectors.toList());
+}
 
-    public List<Comment> getCommentsByQuestionId(Long questionId) {
-        return commentRepository.findCommentsByQuestionId(questionId);
+    public List<GetCommentDTO> getCommentsByQuestionId(Long questionId) {
+        List<Comment> comments = commentRepository.findCommentsByQuestionId(questionId);
+        return comments.stream().map(GetCommentDTO::new).collect(Collectors.toList());
     }
 }

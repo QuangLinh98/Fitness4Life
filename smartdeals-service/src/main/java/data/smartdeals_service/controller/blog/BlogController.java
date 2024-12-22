@@ -220,6 +220,7 @@ import data.smartdeals_service.dto.blog.CreateBlogDTO;
 import data.smartdeals_service.dto.blog.UpdateBlogDTO;
 import data.smartdeals_service.dto.comment.ChangeStatusCommentDTO;
 import data.smartdeals_service.dto.comment.CommentDTO;
+import data.smartdeals_service.dto.comment.GetCommentDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.blog.Blog;
 import data.smartdeals_service.models.comment.Comment;
@@ -360,9 +361,9 @@ public class BlogController {
             if (spamFilterService.isSpam(comment.getContent(), detectedLanguage)) {
                 return ResponseEntity.badRequest().body("Your comment contains spam words and cannot be accepted.");
             }
-            Comment createdComment = commentService.createCommentBlog(comment);
+//            Comment createdComment = commentService.createCommentBlog(comment);
             commentProducer.sendComment(comment);
-            return ResponseEntity.ok(ApiResponse.success(createdComment, "Create comment successfully"));
+            return ResponseEntity.ok(ApiResponse.success(null, "Create comment successfully"));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
@@ -407,8 +408,9 @@ public class BlogController {
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
     }
-    @GetMapping("/blog/{blogId}")
-    public ResponseEntity<List<Comment>> getCommentsByBlog(@PathVariable Long blogId) {
-        return ResponseEntity.ok(commentService.getCommentsByBlogId(blogId));
+    @GetMapping("/blog/{blogId}/comment")
+    public ResponseEntity<List<GetCommentDTO>> getCommentsByBlog(@PathVariable Long blogId) {
+        List<GetCommentDTO> comments = commentService.getCommentsByBlogId(blogId);
+        return ResponseEntity.ok(comments);
     }
 }
