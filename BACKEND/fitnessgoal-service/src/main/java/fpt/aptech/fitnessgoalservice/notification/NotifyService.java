@@ -5,13 +5,18 @@ import fpt.aptech.fitnessgoalservice.dtos.NotifyDTO;
 import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
 import fpt.aptech.fitnessgoalservice.kafka.NotifyProducer;
 import fpt.aptech.fitnessgoalservice.models.Goal;
+import fpt.aptech.fitnessgoalservice.models.Progress;
+import fpt.aptech.fitnessgoalservice.service.CalculationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class NotifyService {
     private final NotifyProducer notifyProducer;
+    private final CalculationService calculationService;
 
     public void sendCreatedNotification(UserDTO existingUser, NotifyDTO notifyDTO , GoalDTO goalDTO) {
         //Thiết lập thông báo
@@ -45,10 +50,14 @@ public class NotifyService {
 
     //Gửi thông báo nhắc xác nhận gia hạn thời gian cho mục tiêu
     public void sendGoalExtendNotification(UserDTO existingUser, Goal goal) {
+        // Tính tiến độ lớn nhất
+        double progressPercentage = calculateGoalProgress(goal);
+
         String content = String.format(
-                "Muc tieu '%s' cua ban se het han vao ngay %s.Tien do hien tai : "+ goal.getProgresses() +". Ban co muon gia han them thoi gian hay khong !",
+                "Muc tieu '%s' cua ban se het han vao ngay %s.Tien do hien tai dat duoc :%.2f%% . Ban co muon gia han them thoi gian de hoan thanh muc tieu hay khong !",
                 goal.getGoalType(),
-                goal.getEndDate()
+                goal.getEndDate(),
+                progressPercentage
         );
         NotifyDTO notifyDTO = NotifyDTO.builder()
                 .itemId(goal.getId())
@@ -59,6 +68,19 @@ public class NotifyService {
                 .build();
         // Gửi thông báo thông qua NotifyProducer
         notifyProducer.sendNotify(notifyDTO);
+    }
+
+    private double calculateGoalProgress(Goal goal) {
+        switch (goal.getGoalType()) {
+            case WEIGHT_LOSS:
+                return ((goal.getWeight() - goal.getCurrentValue()) / (goal.getWeight() - goal.getTargetValue())) * 100;
+            case WEIGHT_GAIN:
+                return ((goal.getCurrentValue() - goal.getWeight()) / (goal.getTargetValue() - goal.getWeight())) * 100;
+            case MUSCLE_GAIN:
+                return (goal.getCurrentValue() / goal.getTargetValue()) * 100;
+            default:
+                throw new IllegalArgumentException("Unknown goal type: " + goal.getGoalType());
+        }
     }
 
     public void sendAnalyticsNotification(UserDTO existingUser, Goal goal, String resultMessage) {

@@ -42,7 +42,7 @@ public class Goal {
     private LocalDateTime createdAt;
 
     // Liên kết với bảng GoalExtension để lưu lịch sử gia hạn
-    @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "goal",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<GoalExtension>goalExtensions;
 
     // Liên kết với bảng Progress để theo dõi tiến trình

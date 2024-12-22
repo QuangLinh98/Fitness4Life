@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -113,37 +114,45 @@ public class GoalService {
     //PHương thức kiểm tra tất cả những mục tiêu có endDate <= currentDate và chưa hoàn thành mục tiêu sẽ gửi thông báo
     @Scheduled(cron = "0 0 0 * * ?")
     public void checkAndNotifyUnfinishedGoals() {
-         // Lấy tất cả các mục tiêu có endDate <= hôm nay và chưa hoàn thành
+        // Lấy tất cả các mục tiêu có endDate <= hôm nay và chưa hoàn thành
         List<Goal> unfinishedGoals = goalRepository.findByEndDateBeforeAndProgressLessThan(
                 LocalDate.now().plusDays(4), 100);  //Gửi cảnh báo trước 3 ngày
         for (Goal goal : unfinishedGoals) {
             UserDTO user = userEurekaClient.getUserById(goal.getUserId());
             // Gửi thông báo đến user
-            notifyService.sendGoalNotification(user,goal);
+            notifyService.sendGoalNotification(user, goal);
         }
     }
 
     //Phương thức gửi thông báo xác nhận gia hạn mục tiêu
     @Transactional
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 7 * * ?") // Chạy mỗi ngày lúc 7 giờ sáng
     public void checkGoalsOnEndDate() {
         try {
             // Lấy ngày hiện tại
             LocalDate today = LocalDate.now();
+            System.out.println("Today : " + today);
 
             // Truy vấn các mục tiêu hết hạn hôm nay và chưa hoàn thành
-            List<Goal> goalsToNotify = goalRepository.findByEndDateAndProgressLessThan(today, 100.0);
-            for (Goal goal : goalsToNotify) {
-                try {
-                    // Lấy thông tin người dùng
-                    UserDTO user = userEurekaClient.getUserById(goal.getUserId());
+            List<Goal> goals  = goalRepository.findByEndDateAndProgressLessThan(today);
+            System.out.println("Found " + goals.size() + " goals with endDate = " + today);
+            List<Goal> goalsToNotify = goals.parallelStream()
+                    .peek(goal -> System.out.println("Calculating progress for Goal ID: " + goal.getId()))
+                    .filter(goal -> calculationService.calulateGoalProgress(goal) < 100)
+                    .peek(goal -> System.out.println("Goal ID: " + goal.getId() + " - Progress: " + calculationService.calulateGoalProgress(goal)))
+                    .toList();
 
-                    // Gửi thông báo
-                    notifyService.sendGoalExtendNotification(user, goal);
-                } catch (Exception e) {
-                    System.err.println("Error processing Goal ID: " + goal.getId());
-                    e.printStackTrace();
-                }
+            System.out.println("Goals to notify: " + goalsToNotify.size());
+
+            for (Goal goal : goalsToNotify) {
+                // Lấy thông tin người dùng
+                UserDTO user = userEurekaClient.getUserById(goal.getUserId());
+                System.out.println("Fetching user information for Goal ID: " + goal.getId());
+                System.out.println("User : " + user);
+
+                // Gửi thông báo
+                notifyService.sendGoalExtendNotification(user, goal);
+                System.out.println("Notification sent for Goal ID: " + goal.getId());
             }
         } catch (Exception e) {
             System.err.println("Error in checkGoalsOnEndDate: ");

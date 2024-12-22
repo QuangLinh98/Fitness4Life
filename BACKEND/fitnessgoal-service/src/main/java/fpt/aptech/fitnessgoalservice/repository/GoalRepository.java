@@ -18,11 +18,7 @@ public interface GoalRepository extends JpaRepository<Goal, Integer> {
     List<Goal> findByEndDateBeforeAndProgressLessThan(LocalDate endDate, double progress);
 
     // Lấy các mục tiêu hết hạn hôm nay và chưa hoàn thành
-    @Query("SELECT g FROM Goal g WHERE g.endDate = :endDate AND (" +
-            "(g.goalType = 'WEIGHT_LOSS' AND ((g.weight - g.currentValue) / (g.weight - g.targetValue)) * 100 < :progress) " +
-            "OR (g.goalType = 'WEIGHT_GAIN' AND ((g.currentValue - g.weight) / (g.targetValue - g.weight)) * 100 < :progress) " +
-            "OR (g.goalType = 'MUSCLE_GAIN' AND (g.currentValue / g.targetValue) * 100 < :progress))")
-    List<Goal> findByEndDateAndProgressLessThan(
-            @Param("endDate") LocalDate endDate,
-            @Param("progress") double progress);
+    @Query("SELECT g FROM Goal g LEFT JOIN FETCH g.progresses WHERE g.endDate = :endDate")
+    List<Goal> findByEndDateAndProgressLessThan(@Param("endDate") LocalDate endDate);
+
 }
