@@ -1,7 +1,9 @@
 package data.smartdeals_service.dto.forum;
 
+import data.smartdeals_service.models.forum.CategoryForum;
 import data.smartdeals_service.models.forum.Question;
 import data.smartdeals_service.models.forum.QuestionImage;
+import data.smartdeals_service.models.forum.RolePost;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
@@ -16,10 +18,11 @@ public class QuestionResponseDTO {
     private String content;
     private String topic;
     private String tag;
-    private String category; // Tên mô tả thay vì mã enum
+    private List<String> category; // Danh sách mô tả danh mục
     private Integer viewCount;
     private Integer upvote;
     private Integer downVote;
+    private RolePost rolePost;
     private List<QuestionImage> questionImage;
     private LocalDateTime createdAt;
 
@@ -30,12 +33,16 @@ public class QuestionResponseDTO {
         this.content = question.getContent();
         this.topic = question.getTopic();
         this.tag = question.getTag();
-        this.category = question.getCategory() != null ? question.getCategory().getDescription() : null;
+        this.category = question.getCategory() != null
+                ? question.getCategory().stream().map(CategoryForum::getDescription).toList()
+                : null;
         this.viewCount = question.getViewCount();
         this.upvote = question.getUpvote();
         this.downVote = question.getDownVote();
         this.createdAt = question.getCreatedAt();
         this.questionImage = question.getQuestionImage();
+        this.rolePost = question.getRolePost();
     }
 }
+
 

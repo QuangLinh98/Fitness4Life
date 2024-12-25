@@ -2,11 +2,13 @@ package data.smartdeals_service.controller.forum;
 
 import data.smartdeals_service.dto.comment.ChangeStatusCommentDTO;
 import data.smartdeals_service.dto.comment.CommentDTO;
+import data.smartdeals_service.dto.comment.GetCommentDTO;
 import data.smartdeals_service.dto.forum.QuestionDTO;
 import data.smartdeals_service.dto.forum.QuestionResponseDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.comment.Comment;
 import data.smartdeals_service.models.forum.Question;
+import data.smartdeals_service.models.forum.VoteType;
 import data.smartdeals_service.services.kafkaServices.CommentProducer;
 import data.smartdeals_service.services.commentServices.CommentService;
 import data.smartdeals_service.services.forumServices.QuestionService;
@@ -29,17 +31,24 @@ public class ForumController {
     private final CommentProducer commentProducer;
     private final SpamFilterService spamFilterService;
 
+    @PostMapping("/{questionId}/vote")
+    public ResponseEntity<?> vote(@PathVariable Long questionId,
+                                  @RequestParam Long userId,
+                                  @RequestParam VoteType voteType) {
+        questionService.handleVote(questionId, userId, voteType);
+        return ResponseEntity.ok("Vote successfully handled");
+    }
+
+    @GetMapping("/{id}/view")
+    public ResponseEntity<?> incrementViewCount(@PathVariable Long id, @RequestParam Long userId) {
+        try {
+            questionService.incrementViewCount(id, userId);
+            return ResponseEntity.ok("View count updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating view count");
+        }
+    }
     // Lấy tất cả câu hỏi
-//    @GetMapping("/questions")
-//    public ResponseEntity<?> getAllQuestions() {
-//        try {
-//            List<Question> questions = questionService.findAll();
-//            return ResponseEntity.ok(ApiResponse.success(questions, "Get all questions successfully"));
-//        } catch (Exception ex) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
-//        }
-//    }
     @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestions() {
         try {
@@ -122,41 +131,31 @@ public class ForumController {
             if (spamFilterService.isSpam(commentDTO.getContent(), detectedLanguage)) {
                 return ResponseEntity.badRequest().body("Comment contains spam and cannot be accepted.");
             }
-            Comment savedComment = commentService.createCommentForum(commentDTO);
             commentProducer.sendComment(commentDTO); // Gửi bình luận tới Kafka
-            return ResponseEntity.ok(ApiResponse.created(savedComment, "Create comment successfully"));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
-        }
-    }
-    @GetMapping("/question/{questionId}")
-    public ResponseEntity<List<Comment>> getCommentsByQuestionId(@PathVariable Long questionId) {
-        return ResponseEntity.ok(commentService.getCommentsByQuestionId(questionId));
-    }
-    // Lấy bình luận theo câu hỏi
-    @GetMapping("/comments/question/{questionId}")
-    public ResponseEntity<?> getCommentsByQuestion(@PathVariable Long questionId) {
-        try {
-            List<CommentDTO> comments = commentService.getCommentsByQuestion(questionId);
-            return ResponseEntity.ok(ApiResponse.success(comments, "Get comments by question successfully"));
+            return ResponseEntity.ok(ApiResponse.created(null, "Create comment successfully"));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
     }
 
-    // Lấy phản hồi của bình luận
-    @GetMapping("/comments/replies/{parentCommentId}")
-    public ResponseEntity<?> getReplies(@PathVariable Long parentCommentId) {
-        try {
-            List<CommentDTO> replies = commentService.getReplies(parentCommentId);
-            return ResponseEntity.ok(ApiResponse.success(replies, "Get replies successfully"));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
-        }
+    @GetMapping("/question/{questionId}/comment")
+    public ResponseEntity<List<GetCommentDTO>> getCommentsByQuestionId(@PathVariable Long questionId) {
+        List<GetCommentDTO> comments = commentService.getCommentsByQuestionId(questionId);
+        return ResponseEntity.ok(comments);
     }
+
+//    // Lấy phản hồi của bình luận
+//    @GetMapping("/comments/replies/{parentCommentId}")
+//    public ResponseEntity<?> getReplies(@PathVariable Long parentCommentId) {
+//        try {
+//            List<CommentDTO> replies = commentService.getReplies(parentCommentId);
+//            return ResponseEntity.ok(ApiResponse.success(replies, "Get replies successfully"));
+//        } catch (Exception ex) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
+//        }
+//    }
 
     // Cập nhật bình luận
     @PutMapping("/comments/update/{id}")

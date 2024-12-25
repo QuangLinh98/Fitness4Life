@@ -7,4 +7,6 @@ public enum DiscountType {
     COMBO,         // Gói combo
     REFERRAL       // Giới thiệu bạn bè
 
+
+
 }
