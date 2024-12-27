@@ -14,6 +14,7 @@ import java.util.List;
 public class QuestionResponseDTO {
     private Long id;
     private String author;
+    private Long authorId;
     private String title;
     private String content;
     private String topic;
@@ -29,6 +30,7 @@ public class QuestionResponseDTO {
     public QuestionResponseDTO(Question question) {
         this.id = question.getId();
         this.author = question.getAuthor();
+        this.authorId = question.getAuthorId();
         this.title = question.getTitle();
         this.content = question.getContent();
         this.topic = question.getTopic();

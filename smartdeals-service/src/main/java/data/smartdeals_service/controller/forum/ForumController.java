@@ -5,6 +5,7 @@ import data.smartdeals_service.dto.comment.CommentDTO;
 import data.smartdeals_service.dto.comment.GetCommentDTO;
 import data.smartdeals_service.dto.forum.QuestionDTO;
 import data.smartdeals_service.dto.forum.QuestionResponseDTO;
+import data.smartdeals_service.dto.forum.UpdateQuestionDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.comment.Comment;
 import data.smartdeals_service.models.forum.Question;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 @RestController
@@ -94,19 +96,24 @@ public class ForumController {
     }
 
     // Cập nhật câu hỏi
-//    @PutMapping("/questions/update/{id}")
-//    public ResponseEntity<?> updateQuestion(@PathVariable Long id, @RequestBody @Valid QuestionDTO questionDTO, BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
-//        }
-//        try {
-//            Question updatedQuestion = questionService.updateQuestion(id, questionDTO);
-//            return ResponseEntity.ok(ApiResponse.success(updatedQuestion, "Update question successfully"));
-//        } catch (Exception ex) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
-//        }
-//    }
+    @PutMapping("/questions/update/{id}")
+    public ResponseEntity<?> updateQuestion(@PathVariable Long id, @ModelAttribute UpdateQuestionDTO updateQuestionDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+        }
+        try {
+            Question updatedQuestion = questionService.updateQuestion(id,updateQuestionDTO);
+            return  ResponseEntity.status(HttpStatus.OK).body(ApiResponse
+                    .success(updatedQuestion, "Update question successfully"));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server" + e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server" + e.getMessage()));
+        }
+    }
 
     // Xóa câu hỏi
     @DeleteMapping("/questions/delete/{id}")
@@ -138,24 +145,12 @@ public class ForumController {
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
     }
-
+    // get commemt flow question id
     @GetMapping("/question/{questionId}/comment")
     public ResponseEntity<List<GetCommentDTO>> getCommentsByQuestionId(@PathVariable Long questionId) {
         List<GetCommentDTO> comments = commentService.getCommentsByQuestionId(questionId);
         return ResponseEntity.ok(comments);
     }
-
-//    // Lấy phản hồi của bình luận
-//    @GetMapping("/comments/replies/{parentCommentId}")
-//    public ResponseEntity<?> getReplies(@PathVariable Long parentCommentId) {
-//        try {
-//            List<CommentDTO> replies = commentService.getReplies(parentCommentId);
-//            return ResponseEntity.ok(ApiResponse.success(replies, "Get replies successfully"));
-//        } catch (Exception ex) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
-//        }
-//    }
 
     // Cập nhật bình luận
     @PutMapping("/comments/update/{id}")

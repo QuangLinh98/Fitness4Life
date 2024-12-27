@@ -2,6 +2,7 @@ package data.smartdeals_service.services.forumServices;
 
 import data.smartdeals_service.dto.forum.QuestionDTO;
 import data.smartdeals_service.dto.forum.QuestionResponseDTO;
+import data.smartdeals_service.dto.forum.UpdateQuestionDTO;
 import data.smartdeals_service.helpers.FileUploadAvata;
 import data.smartdeals_service.helpers.GlobalConstant;
 import data.smartdeals_service.models.forum.*;
@@ -18,8 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -84,31 +87,61 @@ public List<QuestionResponseDTO> findAllQuestions() {
     public Optional<Question> findById(Long id) {
         return questionRepository.findById(id);
     }
+    @Transactional
+    public Question updateQuestion(Long id, UpdateQuestionDTO updateQuestionDTO) throws IOException {
+        Question questionById = questionRepository.findById(id).orElse(null);
+        if (questionById == null) {
+            throw new IllegalArgumentException("Question not found with id: " + id);
+        }
+        questionById.setTitle(updateQuestionDTO.getTitle());
+        questionById.setContent(updateQuestionDTO.getContent());
+        questionById.setTopic(updateQuestionDTO.getTopic());
+        questionById.setTag(updateQuestionDTO.getTag());
+        questionById.setUpdatedAt(LocalDateTime.now());
 
-//    public Question updateQuestion(Long id, QuestionDTO questionDTO) {
-//        Question questionById = questionRepository.findById(id).orElse(null);
-//        questionById.setTitle(questionDTO.getTitle());
-//        questionById.setContent(questionDTO.getContent());
-//        questionById.setAuthor(questionDTO.getAuthor());
-//        questionById.setUpdatedAt(LocalDateTime.now());
-//        return questionRepository.save(questionById);
-//    }
-//
-//    private List<QuestionImage> saveImagesForQuestion(MultipartFile[] images) throws IOException {
-//        return Arrays.stream(images)
-//                .map(image -> {
-//                    try {
-//                        String storedFileName = fileUploadAvata.storeImage(subFolder, image);
-//                        QuestionImage questionImage = new QuestionImage();
-//                        questionImage.setImageUrl(GlobalConstant.rootUrl + GlobalConstant.uploadFolder
-//                                + "/" + subFolder + "/" + storedFileName);
-//                        return questionImage;
-//                    } catch (IOException e) {
-//                        throw new RuntimeException("Failed to store image", e);
-//                    }
-//                })
-//                .collect(Collectors.toList());
-//    }
+        if(updateQuestionDTO.getDeleteImageUrl() != null && !updateQuestionDTO.getDeleteImageUrl().isEmpty()) {
+
+            List<QuestionImage> imagesToDelete = questionById.getQuestionImage().stream()
+
+                    .filter(image -> updateQuestionDTO.getDeleteImageUrl()
+                            .contains(image.getId()))
+                    .collect(Collectors.toList());
+
+            for (QuestionImage image : imagesToDelete) {
+                fileUploadAvata.deleteImage(image.getImageUrl().substring(GlobalConstant.rootUrl.length()));
+                questionById.getQuestionImage().remove(image);
+                questionImageRepository.delete(image);
+            }
+        }
+        if (updateQuestionDTO.getImageQuestionUrl() != null) {
+            List<MultipartFile> nonEmptyFiles = Arrays.stream(updateQuestionDTO.getImageQuestionUrl())
+                    .filter(file -> file != null && !file.isEmpty())
+                    .collect(Collectors.toList());
+            if (!nonEmptyFiles.isEmpty()) {
+                List<QuestionImage> savedImages = saveImagesForQuestion
+                        (nonEmptyFiles.toArray(new MultipartFile[0]));
+                savedImages.forEach(image -> image.setQuestion(questionById));
+                questionById.getQuestionImage().addAll(savedImages);
+            }
+        }
+        return questionRepository.save(questionById);
+    }
+
+    private List<QuestionImage> saveImagesForQuestion(MultipartFile[] images) throws IOException {
+        return Arrays.stream(images)
+                .map(image -> {
+                    try {
+                        String storedFileName = fileUploadAvata.storeImage(subFolder, image);
+                        QuestionImage questionImage = new QuestionImage();
+                        questionImage.setImageUrl(GlobalConstant.rootUrl + GlobalConstant.uploadFolder
+                                + "/" + subFolder + "/" + storedFileName);
+                        return questionImage;
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to store image", e);
+                    }
+                })
+                .collect(Collectors.toList());
+    }
 
     public void deleteQuestion(Long id) {
         Optional<Question> questionById = questionRepository.findById(id);
@@ -122,7 +155,7 @@ public List<QuestionResponseDTO> findAllQuestions() {
         questionRepository.deleteById(id);
     }
 
-    @Transactional
+
     public void handleVote(Long questionId, Long userId, VoteType newVoteType) {
         // Lấy thông tin câu hỏi
         Question question = questionRepository.findById(questionId)
