@@ -10,7 +10,6 @@ public class UpdateQuestionDTO {
     private Long id;
     private String title;
     private String content;
-    private String topic;
     private String tag;
     private MultipartFile[] imageQuestionUrl;
     private List<Long> deleteImageUrl;

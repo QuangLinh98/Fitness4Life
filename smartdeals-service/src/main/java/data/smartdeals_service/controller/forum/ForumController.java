@@ -5,6 +5,7 @@ import data.smartdeals_service.dto.comment.CommentDTO;
 import data.smartdeals_service.dto.comment.GetCommentDTO;
 import data.smartdeals_service.dto.forum.QuestionDTO;
 import data.smartdeals_service.dto.forum.QuestionResponseDTO;
+import data.smartdeals_service.dto.forum.QuestionStatusDTO;
 import data.smartdeals_service.dto.forum.UpdateQuestionDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.comment.Comment;
@@ -127,6 +128,22 @@ public class ForumController {
         }
     }
 
+    @PutMapping("/Questions/changePublished/{id}")
+    public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody QuestionStatusDTO status,
+                                             BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Question changePublished = questionService.closeQuestionStatus(id,status);
+            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
+                    .created(changePublished,"change Published successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
+    }
+
     // Tạo bình luận
     @PostMapping("/comments/create")
     public ResponseEntity<?> createComment(@RequestBody @Valid CommentDTO commentDTO, BindingResult bindingResult) {
@@ -136,11 +153,17 @@ public class ForumController {
         try {
             String detectedLanguage = spamFilterService.detectLanguage(commentDTO.getContent());
             if (spamFilterService.isSpam(commentDTO.getContent(), detectedLanguage)) {
-                return ResponseEntity.badRequest().body("Comment contains spam and cannot be accepted.");
+                return ResponseEntity.status(402).body("Comment contains spam and cannot be accepted.");
             }
             commentProducer.sendComment(commentDTO); // Gửi bình luận tới Kafka
             return ResponseEntity.ok(ApiResponse.created(null, "Create comment successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("QuestionNotFound")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("question not found"));
+            }
+            if (ex.getMessage().contains("ParentCommentNotFound")) {
+                return ResponseEntity.status(401).body(ApiResponse.badRequest("Parent Comment Not Found"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
@@ -159,9 +182,23 @@ public class ForumController {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
         }
         try {
+            String detectedLanguage = spamFilterService.detectLanguage(commentDTO.getContent());
+            if (spamFilterService.isSpam(commentDTO.getContent(), detectedLanguage)) {
+                return ResponseEntity.status(403).body("Comment contains spam and cannot be accepted.");
+            }
+
             Comment updatedComment = commentService.updateCommentForum(id, commentDTO);
             return ResponseEntity.ok(ApiResponse.success(updatedComment, "Update comment successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("QuestionNotFound")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("question not found"));
+            }
+            if (ex.getMessage().contains("ParentCommentNotFound")) {
+                return ResponseEntity.status(401).body(ApiResponse.badRequest("Parent Comment Not Found"));
+            }
+            if (ex.getMessage().contains("CommentCannotBeUpdatedAfter24Hours")) {
+                return ResponseEntity.status(402).body(ApiResponse.badRequest("Comment Cannot Be Updated After 24 Hours"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
@@ -174,6 +211,12 @@ public class ForumController {
             commentService.deleteCommentForum(id);
             return ResponseEntity.ok(ApiResponse.success(null, "Delete comment successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("CommentNotFound")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("comment not found"));
+            }
+            if (ex.getMessage().contains("CommentCannotBeDeleteAfter24Hours")) {
+                return ResponseEntity.status(401).body(ApiResponse.badRequest("Comment Cannot Be Delete After 24 Hours"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
@@ -189,6 +232,9 @@ public class ForumController {
             Comment updatedComment = commentService.changeStatusCMF(id, statusDTO);
             return ResponseEntity.ok(ApiResponse.success(updatedComment, "Change comment status successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("CommentNotFoundWithId")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("Comment Not Found With Id : " + id));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
