@@ -11,6 +11,7 @@ import kj001.user_service.models.User;
 import kj001.user_service.repository.OtpRepository;
 import kj001.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -128,7 +129,7 @@ public class UserService {
         //Kiểm tra nếu có bất kỳ user nào với email đang acive
         List<User> existingActiveUsers = userRepository.findByEmailAndIsActiveTrue(createUserDTO.getEmail());
         if (!existingActiveUsers.isEmpty()) {
-            throw new RuntimeException("UserActiveExists");
+            throw new RuntimeException("User active exists");
         }
         //Lấy thời gian hiện tại
         LocalDateTime now = LocalDateTime.now();
@@ -140,14 +141,14 @@ public class UserService {
                 .findByEmailAndRegistrationDateBetween(createUserDTO.getEmail(), startDay, endDay);
         //Kiểm tra với email đó trong ngày đã đăng ký mấy lần
         if (existingUserToday.size() >= 3) {
-            throw new RuntimeException("EmailAlready3TimeOfDay");
+            throw new RuntimeException("Email already 3 time of day");
         }
         //Xóa những bản ghi cũ cho email đã đăng ký ngày trước hôm nay mà chưa active
         userRepository.deleteByEmailAndRegistrationDateBeforeAndIsActiveFalse(createUserDTO.getEmail(), startDay);
 
         //Kiểm tra newPass và ConfirmPass có trùng nhau hay không
         if (!createUserDTO.getPassword().equals(createUserDTO.getConfirmPassword())) {
-            throw new RuntimeException("ConfirmEqualNewPassword");
+            throw new RuntimeException("Confirm equal new password");
         }
         User user = objectMapper.convertValue(createUserDTO, User.class);  //Chuyển đổi đối tượng createUserDTO<dữ liệu người dùng nhập vào> sang User để lưu vào dữ liệu . Điều này có nghĩa là dữ liệu createUserDTO sẽ được sao chép vào User và lưu vào database vì DTO sẽ không trực tiếp lưu vào DB
         user.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));  //Mã hóa password trước khi lưu vào DB
@@ -174,27 +175,26 @@ public class UserService {
     }
 
     //VerifyAccount
-    public boolean verifyAccount(String email, String code) {
-        Optional<User> user = userRepository.findByEmailAndOtpCode(email, code);
-        if (user.isPresent()) {
-            //Nếu đã verify mà user tiếp tục verify thì báo lỗi
-            if (user.get().isActive()) {
-                throw new RuntimeException("OTPVERIFIED");
-            }
-            //Kiểm tra OTP đã hết hạn chưa
-            if (user.get().getExpiryTime().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("OTPHasExpired");
-            }
-            user.get().setActive(true);    //KHi user đã xác thực thì đặt trạng thái isActive = true
-            userRepository.save(user.get());
-
-            // Xóa các bản ghi khác có cùng email nhưng không được kích hoạt
-            userRepository.deleteInactiveUsersByEmail(email, user.get().getId());
-            return true;
-        }
-        return false;
-
-    }
+//    public boolean verifyAccount(String email, String code) {
+//        Optional<User> user = userRepository.findByEmailAndOtpCode(email, code);
+//        if (user.isPresent()) {
+//            //Nếu đã verify mà user tiếp tục verify thì báo lỗi
+//            if (user.get().isActive()) {
+//                throw new RuntimeException("OTPVERIFIED");
+//            }
+//            //Kiểm tra OTP đã hết hạn chưa
+//            if (user.get().getExpiryTime().isBefore(LocalDateTime.now())) {
+//                throw new RuntimeException("OTPHasExpired");
+//            }
+//            user.get().setActive(true);    //KHi user đã xác thực thì đặt trạng thái isActive = true
+//            userRepository.save(user.get());
+//
+//            // Xóa các bản ghi khác có cùng email nhưng không được kích hoạt
+//            userRepository.deleteInactiveUsersByEmail(email, user.get().getId());
+//            return true;
+//        }
+//        return false;
+//    }
 
     //Phương thức Login
     public Optional<UserResponseDTO> login(LoginRequestDTO loginRequestDTO) {
@@ -278,7 +278,11 @@ public class UserService {
 
     //Phương thức Change Password
     public boolean changePassword(ChangePasswordRequestDTO changePasswordRequestDTO) {
-        User user = userRepository.findByEmail(changePasswordRequestDTO.getEmail()).orElseThrow(() -> new RuntimeException("UserNotFound"));
+        //Lấy email từ SecurityContext (đã xác thực)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Tìm người dùng theo email
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("UserNotFound"));
 
         //Kiểm tra xem oldPassword có khớp hay không
         if (!passwordEncoder.matches(changePasswordRequestDTO.getOldPassword(), user.getPassword())) {

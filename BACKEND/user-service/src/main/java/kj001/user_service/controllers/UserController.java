@@ -13,12 +13,12 @@ import java.io.IOException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/users/")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @PutMapping("/update/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<?> updateOneUser(@PathVariable Long id, @ModelAttribute UserAndProfileUpdateDTO userAndProfileUpdateDTO) throws IOException {
         Optional<UserResponseDTO> updateUser = userService.updateUser(id,userAndProfileUpdateDTO);
         if(updateUser.isPresent()){
@@ -27,7 +27,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or password mismatch.");
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<?> deleteOneUser(@PathVariable long id)  {
         UserResponseDTO deleteUser = userService.deleteUser(id);
         if (deleteUser != null) {
@@ -37,7 +37,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{userId}/workout-package")
+    @PutMapping("{userId}/workout-package")
     public ResponseEntity<UserDTO> assignWorkoutPackage(
             @PathVariable("userId") Long userId,
             @RequestParam("packageId") Integer packageId) {

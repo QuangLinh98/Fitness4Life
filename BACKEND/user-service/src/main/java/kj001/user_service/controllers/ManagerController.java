@@ -8,6 +8,7 @@ import kj001.user_service.repository.UserRepository;
 import kj001.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +24,14 @@ public class ManagerController {
     private final UserRepository userRepository;
 
     @GetMapping("manager/all")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllUser(){
         List<UserResponseDTO> users =  userService.getAllUser();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("manager/users/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getUserById(@PathVariable long id){
         UserDTO userDTO = userService.getUserById(id);
         return ResponseEntity.ok(userDTO);
