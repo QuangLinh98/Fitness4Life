@@ -1,5 +1,7 @@
 package fpt.aptech.fitnessgoalservice.service;
 
+
+import lombok.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,7 @@ public class GoogleApiClient {
 
     //Gửi yêu cầu tới API Google và nhận chế độ ăn
     public String getDietPlanFromGoogle(String content) {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDxNd1o4cxyoZyQYMIcglVpKASWXoZy5Qg";
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBcq8pKpZThqnHat9FCkkkG3UPK1WzWmXg";
 
         //Gửi yêu cầu POST đến Google API
         HttpHeaders headers = new HttpHeaders();

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/goal")
+@RequestMapping("/api/goal/")
 @RequiredArgsConstructor
 public class PublicController {
     private final GoalService goalService;
@@ -20,7 +20,7 @@ public class PublicController {
     private final UserPointService pointService;
     //private final CalculationService calculationService;
 
-    @GetMapping("/all")
+    @GetMapping("all")
     public ResponseEntity<?>GetAllGoal() {
         try {
             List<Goal> goals = goalService.getAllGoals();
@@ -31,7 +31,7 @@ public class PublicController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<?>GetGoalById(@PathVariable int id) {
         try {
             Goal goal = goalService.getGoalById(id);
@@ -42,7 +42,7 @@ public class PublicController {
         }
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("user/{userId}")
     public ResponseEntity<?>GetAllGoalById(@PathVariable int userId) {
         try {
             List<Goal> goals = goalService.getGoalByUserId(userId);
@@ -54,7 +54,7 @@ public class PublicController {
     }
 
     //================================== GOAL EXTENTION ==============================
-    @GetMapping("/goalExtention/{goalId}")
+    @GetMapping("goalExtention/{goalId}")
     public ResponseEntity<?>getGoalExtensions(@PathVariable int goalId) {
         try {
            List<GoalExtension> goalExtensions = goalExtentionService.getGoalExtensions(goalId);
@@ -66,7 +66,7 @@ public class PublicController {
     }
 
     //============================ PROGRESS ===========================
-    @GetMapping("/progress/all")
+    @GetMapping("progress/all")
     public ResponseEntity<?>GetAllProcessGoal() {
         try {
             List<Progress> progresses = progressService.getAllProgress();
@@ -77,7 +77,7 @@ public class PublicController {
         }
     }
 
-    @GetMapping("/process/{id}")
+    @GetMapping("process/{id}")
     public ResponseEntity<?>GetOneProcessGoal(@PathVariable int id) {
         try {
             Progress progress = progressService.getProgressById(id);
@@ -101,7 +101,7 @@ public class PublicController {
 //    }
 
     //============================ Diet Plan ===========================
-    @GetMapping("/dietPlan/all")
+    @GetMapping("dietPlan/all")
     public ResponseEntity<?>GetAllDietPlans() {
         try {
             List<ExerciseDietSuggestions> dietPlans = dietPlanService.getAll();
@@ -112,7 +112,7 @@ public class PublicController {
         }
     }
 
-    @GetMapping("/dietPlan/{id}")
+    @GetMapping("dietPlan/{id}")
     public ResponseEntity<?>GetOneDietPlan(@PathVariable int id) {
         try {
             ExerciseDietSuggestions dietPlan = dietPlanService.getById(id);
@@ -124,7 +124,7 @@ public class PublicController {
     }
 
     //============================ User Point ===========================
-    @GetMapping("/userPoint/{userId}")
+    @GetMapping("userPoint/{userId}")
     public ResponseEntity<?> getUserPoints(@PathVariable long userId) {
         try {
             int points = pointService.getPoints(userId);

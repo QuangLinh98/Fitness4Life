@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/goal")
+@RequestMapping("/api/goal/")
 @RequiredArgsConstructor
 public class ManagerController {
     private final GoalService goalService;
@@ -31,7 +31,7 @@ public class ManagerController {
     private final UserEurekaClient userEurekaClient;
     private final NotifyService notifyService;
 
-    @PostMapping("/add")
+    @PostMapping("add")
     public ResponseEntity<?> AddGoal(@RequestBody GoalDTO goalDTO) {
         try {
             Goal newGoal = goalService.createGoal(goalDTO);
@@ -55,7 +55,7 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<?> UpdateGoal(@Valid @PathVariable int id, @RequestBody UpdateGoalDTO goalDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -68,7 +68,7 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/changeStatus/{id}")
+    @PutMapping("changeStatus/{id}")
     public ResponseEntity<?> ChangeGoalStatus(@PathVariable int id, @RequestBody ChangeGoalStatusDTO statusDTO) {
         try {
 
@@ -79,7 +79,7 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<?> DeleteGoal(@PathVariable int id) {
         try {
             goalService.deleteGoal(id);
@@ -89,7 +89,7 @@ public class ManagerController {
         }
     }
 
-    @PostMapping("/reminder")
+    @PostMapping("reminder")
     public ResponseEntity<?> sendReminderNotifications() {
         try {
             goalService.checkAndNotifyUnfinishedGoals();
@@ -101,7 +101,7 @@ public class ManagerController {
     }
 
     //================================== GOAL EXTENTION ==============================
-    @PostMapping("/goalExtention/{goalId}")
+    @PostMapping("goalExtention/{goalId}")
     public ResponseEntity<?>ExtentionGoalDealine(@PathVariable int goalId , @RequestParam boolean userResponse){
         try {
             GoalExtension goalExtension = goalExtensionService.extendGoalDeadline(goalId , userResponse);
@@ -113,7 +113,7 @@ public class ManagerController {
     }
 
     //================================== PROGRESS ==============================
-    @PostMapping("/progress/add")
+    @PostMapping("progress/add")
     public ResponseEntity<?> AddProgress(@RequestBody ProgressDTO progressDTO) {
         try {
             Progress newProgress = progressService.createProgress(progressDTO);
@@ -123,7 +123,7 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/progress/update/{id}")
+    @PutMapping("progress/update/{id}")
     public ResponseEntity<?> UpdateProgress(@Valid @PathVariable int id, @RequestBody UpdateProgressDTO progressDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -136,7 +136,7 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/progress/delete/{id}")
+    @DeleteMapping("progress/delete/{id}")
     public ResponseEntity<?> DeleteProgress(@PathVariable int id) {
         try {
             progressService.deleteProgress(id);
@@ -146,7 +146,7 @@ public class ManagerController {
         }
     }
 
-    @GetMapping("/compare-progress")
+    @GetMapping("compare-progress")
     public ResponseEntity<?> compareProgress(@RequestParam int userId,@RequestParam int goalId, @RequestParam String startDate, @RequestParam String endDate) {
         try {
             //Chuyển đổi chuỗi thành LocalDate
@@ -161,7 +161,7 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/dietPlan/delete/{id}")
+    @DeleteMapping("dietPlan/delete/{id}")
     public ResponseEntity<?> DeleteDietPlan(@PathVariable int id) {
         try {
             dietPlanService.deleteDietPlan(id);
