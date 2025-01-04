@@ -14,6 +14,7 @@ import fpt.aptech.bookingservice.repository.BookingRoomRepository;
 import fpt.aptech.bookingservice.repository.QRRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class QRService {
     @Transactional(readOnly = true)
     public ResponseQRCodeByBookingDTO getQRByBookingId(int bookingId) {
         BookingRoom bookingRoom = bookingRoomRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking room not found"));
+                .orElseThrow(() -> new RuntimeException(" Booking room not found"));
         System.out.println("Booking ROom result: " + bookingRoom.getId());
         ResponseQRCodeByBookingDTO qrCode = qrRepository.findQRCodeByBookingRoomId(bookingId);
         System.out.println("QR Code result: " + qrCode);
@@ -44,6 +45,7 @@ public class QRService {
     //Handle create qrCode when booking successfully
     @Transactional
     public QRCode createBookingWithQRCode(BookingRoom bookingRoom) {
+
         RoomDTO existingRoom = roomEurekaClient.getRoomById(bookingRoom.getRoomId());
         if (existingRoom == null) {
             throw new RuntimeException("Room not found with ID: " + bookingRoom.getRoomId());
@@ -66,7 +68,7 @@ public class QRService {
             qrRepository.save(qrCode);
 
             // Tạo URL API chứa qrId
-            String apiUrl = "http://192.168.1.28:8082/api/booking/qrCode/validate?qrCodeId=" + qrCode.getId();
+            String apiUrl = "http://192.168.1.21:9000/api/booking/qrCode/validate?qrCodeId=" + qrCode.getId();
 
             // Gọi hàm tạo mã QR với URL API
             String qrFilePath = QR_CODE_DIRECTORY + checkInCode + ".jpg";
@@ -76,6 +78,7 @@ public class QRService {
             qrCode.setQrCodeUrl("http://localhost:8082/qrcodes/" + checkInCode + ".jpg");
             qrRepository.save(qrCode);
             savedBooking.setQrCode(qrCode);
+
             bookingRoomRepository.save(savedBooking);
 
             return qrCode;

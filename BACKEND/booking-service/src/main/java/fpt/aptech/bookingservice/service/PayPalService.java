@@ -13,6 +13,8 @@ import fpt.aptech.bookingservice.models.WorkoutPackage;
 import fpt.aptech.bookingservice.repository.MembershipSubscriptionRepository;
 import fpt.aptech.bookingservice.repository.WorkoutPackageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,6 +45,7 @@ public class PayPalService {
      * @throws PayPalRESTException Nếu có lỗi trong quá trình tương tác với PayPal
      */
     public Payment createPayment(MembershipSubscriptionDTO subscriptionDTO) throws PayPalRESTException {
+
         //Kiểm tra sự tôn tại của userId có hợp lệ hay không
         UserDTO userExisting = userEurekaClient.getUserById(subscriptionDTO.getUserId());
         if (userExisting == null) {
@@ -115,6 +118,7 @@ public class PayPalService {
      * @throws PayPalRESTException Nếu có lỗi trong quá trình tương tác với PayPal
      */
     public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
+
         // Tạo đối tượng Payment với ID thanh toán
         Payment payment = new Payment();
         payment.setId(paymentId);

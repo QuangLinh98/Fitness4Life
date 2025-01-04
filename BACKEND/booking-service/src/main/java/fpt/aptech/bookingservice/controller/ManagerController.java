@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,7 +48,7 @@ public class ManagerController {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
             }
             WorkoutPackage updatePackage = workoutPackageService.updateWorkoutPackage(id, workoutPackage);
-            return ResponseEntity.status(201).body(ApiResponse.success(updatePackage, "Update Package successfully"));
+            return ResponseEntity.status(200).body(ApiResponse.success(updatePackage, "Update Package successfully"));
         } catch (Exception e) {
             if (e.getMessage().contains("WorkoutPackageNotFound")) {
                 return ResponseEntity.status(404).body(ApiResponse.notfound("Package not found"));
@@ -71,7 +72,9 @@ public class ManagerController {
 
     //======================= WORKOUT PACKAGE ============================
     @PostMapping("/bookingRoom/add")
-    public ResponseEntity<?> addBookingRoom(@Valid @RequestBody BooKingRoomDTO booKingRoomDTO, BindingResult bindingResult) {
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public ResponseEntity<?> addBookingRoom(@Valid @RequestBody BooKingRoomDTO booKingRoomDTO,
+                                            BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));

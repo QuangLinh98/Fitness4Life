@@ -7,14 +7,16 @@ import fpt.aptech.bookingservice.dtos.MembershipSubscriptionDTO;
 import fpt.aptech.bookingservice.service.PayPalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/paypal")
+@RequestMapping("/api/paypal/")
 @RequiredArgsConstructor
 public class PaymentController {
     private final PayPalService payPalService;
-    @PostMapping("/pay")
+    @PostMapping("pay")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<?> pay(@RequestBody MembershipSubscriptionDTO subscriptionDTO) {
         try {
             Payment payment = payPalService.createPayment(subscriptionDTO);
@@ -30,7 +32,8 @@ public class PaymentController {
         return ResponseEntity.badRequest().body("Error occurred");
     }
 
-    @PostMapping("/success")
+    @PostMapping("success")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<?> successPay(@RequestParam("paymentId") String paymentId,
                                         @RequestParam("PayerID") String payerID) {
         try {
