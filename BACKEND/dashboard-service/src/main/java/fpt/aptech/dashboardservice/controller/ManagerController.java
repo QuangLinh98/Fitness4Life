@@ -8,13 +8,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/dashboard")
+@RequestMapping("/api/dashboard/")
 @RequiredArgsConstructor
 public class ManagerController {
     private final ClubService clubService;
@@ -24,7 +25,8 @@ public class ManagerController {
     private final WorkoutPackageClassService packageClassService;
 
     //======================= CLUB ============================
-    @PostMapping("/club/add")
+    @PostMapping("club/add")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> saveClub(@Valid @RequestBody ClubDTO clubDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -40,7 +42,8 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/club/update/{id}")
+    @PutMapping("club/update/{id}")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> updateClub(@PathVariable int id, @Valid @RequestBody ClubDTO clubDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -59,7 +62,8 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/club/delete/{id}")
+    @DeleteMapping("club/delete/{id}")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> deleteClub(@PathVariable int id) {
         try {
             clubService.deleteClubById(id);
@@ -73,7 +77,8 @@ public class ManagerController {
     }
 
     //======================= CLUB IMAGE ============================
-    @PostMapping("/clubImage/add")
+    @PostMapping("clubImage/add")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> saveClubImage(@Valid @ModelAttribute ClubImageDTO clubImageDTO, BindingResult bindingResult) {
         try {
             Club clubExisting = clubService.getClubById(clubImageDTO.getClubId());
@@ -97,7 +102,8 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/clubImage/update/{id}")
+    @PutMapping("clubImage/update/{id}")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> updateImageClub(@PathVariable int id,
                                              @Valid @ModelAttribute ClubImageDTO clubImageDTO,
                                              BindingResult bindingResult) {
@@ -121,7 +127,8 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/clubImage/delete/{id}")
+    @DeleteMapping("clubImage/delete/{id}")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> deleteImageClub(@PathVariable int id) {
         try {
             Optional<ClubImages> clubImageExisting = clubService.findClubImageById(id);
@@ -136,7 +143,8 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/clubImage/primary/{id}")
+    @PutMapping("clubImage/primary/{id}")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> updateImagePrimaryClub(@PathVariable int id) {
         try {
             Optional<ClubImages> clubImageExisting = clubService.findClubImageById(id);
@@ -152,7 +160,8 @@ public class ManagerController {
     }
 
     //======================= BRANCH ============================
-    @PostMapping("/branch/add")
+    @PostMapping("branch/add")
+    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> addBranch(@Valid @RequestBody BranchDTO branchDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -165,7 +174,8 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/branch/update/{id}")
+    @PutMapping("branch/update/{id}")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> updateBranch(@PathVariable int id, @Valid @RequestBody BranchDTO branchDTO, BindingResult bindingResult) {
         try {
             Branch branchExisting = branchService.getBranchById(id);
@@ -182,7 +192,8 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/branch/delete/{id}")
+    @DeleteMapping("branch/delete/{id}")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> deleteBranch(@PathVariable int id) {
         try {
             Branch branchExisting = branchService.getBranchById(id);
@@ -197,7 +208,8 @@ public class ManagerController {
     }
 
     //======================= TRAINER ============================
-    @PostMapping("/trainer/add")
+    @PostMapping("trainer/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> addTrainer(@Valid @ModelAttribute TrainerDTO trainerDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -214,7 +226,8 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/trainer/update/{id}")
+    @PutMapping("trainer/update/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> updateTrainer(@PathVariable int id, @Valid @ModelAttribute TrainerDTO trainerDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -237,7 +250,8 @@ public class ManagerController {
     }
 
 
-    @DeleteMapping("/trainer/delete/{id}")
+    @DeleteMapping("trainer/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteTrainer(@PathVariable int id) {
         try {
             Trainer trainerExisting = trainerService.getTrainerById(id);
@@ -252,7 +266,8 @@ public class ManagerController {
     }
 
     //======================= ROOM ============================
-    @PostMapping("/room/add")
+    @PostMapping("room/add")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> addRoom(@Valid @RequestBody RoomDTO roomDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -272,7 +287,8 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/room/update/{id}")
+    @PutMapping("room/update/{id}")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> editRoom(@PathVariable int id, @Valid @RequestBody RoomDTO roomDTO, BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -292,7 +308,8 @@ public class ManagerController {
         }
     }
 
-    @PutMapping("/availableSeats/update/{id}")
+    @PutMapping("availableSeats/update/{id}")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> editAvailableSeatsRoom(@PathVariable int id,  @RequestBody AvailableSeatsRoomUpdateDTO availableSeatsRoomUpdateDTO) {
         try {
 
@@ -311,7 +328,8 @@ public class ManagerController {
     }
 
 
-    @DeleteMapping("/room/delete/{id}")
+    @DeleteMapping("room/delete/{id}")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> deleteRoom(@PathVariable int id) {
         try {
             roomService.deleteRoom(id);
@@ -326,10 +344,11 @@ public class ManagerController {
     }
 
     //======================= WORKOUT PACKAGE ROOM ============================
-    @PostMapping("/packages/{roomId}/rooms/{packageId}")
-    public ResponseEntity<?> addClassToPackage(@PathVariable int packageId, @PathVariable int roomId) {
+    @PostMapping("packages/{roomId}/rooms/{packageId}")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    public ResponseEntity<?> addClassToPackage(@PathVariable int packageId, @PathVariable int roomId ,@RequestHeader("Authorization") String token) {
         try {
-              WorkoutPackageRoom packageRoom = packageClassService.addRoomToPackage(packageId,roomId);
+              WorkoutPackageRoom packageRoom = packageClassService.addRoomToPackage(packageId,roomId, token);
               return ResponseEntity.status(201).body(ApiResponse.success(packageRoom, "Add Class to Package successfully"));
         }
         catch (Exception e) {
@@ -337,7 +356,8 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("/packages/{roomId}/rooms/{packageId}")
+    @DeleteMapping("packages/{roomId}/rooms/{packageId}")
+     @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<String> removeClassFromPackage(
             @PathVariable int packageId,
             @PathVariable int roomId) {

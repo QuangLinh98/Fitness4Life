@@ -19,11 +19,11 @@ public class WorkoutPackageClassService {
     private final WorkoutPackageEurekaClient packageEurekaClient;
     private final RoomRepository roomRepository;
 
-    //Handle add a new Room into WorkoutPackage
+    //Handle add a new Room into WorkoutPackage , token được truyền vào trong header để gửi đến booking service
     @Transactional
-    public WorkoutPackageRoom addRoomToPackage(int roomId, int workoutPackageId) {
+    public WorkoutPackageRoom addRoomToPackage(int roomId, int workoutPackageId , String token) {
         //Kiểm tra workout package có tồn tại hay không
-        WorkoutPackageDTO existingPackage = packageEurekaClient.getWorkoutPackageById(workoutPackageId);
+        WorkoutPackageDTO existingPackage = packageEurekaClient.getWorkoutPackageById(workoutPackageId, token);
         if (existingPackage == null) {
             throw new RuntimeException(" Workout package not found");
         }
@@ -48,9 +48,9 @@ public class WorkoutPackageClassService {
 
     //Handle get all Room by workoutPackageId
     @Transactional(readOnly = true)
-    public List<Room> getRoomsByWorkoutPackage(int workoutPackageId) {
+    public List<Room> getRoomsByWorkoutPackage(int workoutPackageId, String token) {
         //Kiểm tra workout package có tồn tại hay không
-        WorkoutPackageDTO existingPackage = packageEurekaClient.getWorkoutPackageById(workoutPackageId);
+        WorkoutPackageDTO existingPackage = packageEurekaClient.getWorkoutPackageById(workoutPackageId, token);
         if (existingPackage == null) {
             throw new RuntimeException("Workout package not found");
         }
