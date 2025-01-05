@@ -49,6 +49,7 @@ public class PromotionController {
     public void deletePromotion(@PathVariable Long id) {
         promotionService.deletePromotion(id);
     }
+
     @PutMapping("/changePublished/{id}")
     public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody PromotionStatusDTO promotionStatusDTO,
                                              BindingResult bindingResult) {
