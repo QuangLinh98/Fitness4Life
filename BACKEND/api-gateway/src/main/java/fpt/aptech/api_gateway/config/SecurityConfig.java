@@ -57,7 +57,9 @@ public class SecurityConfig {
                                 .pathMatchers("/api/paypal/**").hasAnyAuthority("USER","ADMIN")
                                 .pathMatchers("/api/dashboard/**").hasAnyAuthority("ADMIN", "MANAGER")
                                 .pathMatchers("/api/goal/**").hasAnyAuthority("ADMIN", "USER")
-                                .anyExchange().authenticated() // Các yêu cầu khác cần xác thực
+                                .pathMatchers("/api/deal/**").hasAnyAuthority("ADMIN", "USER")
+                                .anyExchange()
+                                .authenticated() // Các yêu cầu khác cần xác thực
                 ).addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((exchange, e) -> {
