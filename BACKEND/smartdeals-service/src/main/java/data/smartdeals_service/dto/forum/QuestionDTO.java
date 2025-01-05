@@ -1,5 +1,6 @@
 package data.smartdeals_service.dto.forum;
 
+import data.smartdeals_service.models.forum.PostStatus;
 import data.smartdeals_service.models.forum.RolePost;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,8 +18,8 @@ public class QuestionDTO {
     private String author;
     private String title;
     private String content;
-    private String topic;
     private String tag;
+    private PostStatus status;
     private List<String> category; // Danh sách mã enum
     private RolePost rolePost;
     private List<MultipartFile> imageQuestionUrl;

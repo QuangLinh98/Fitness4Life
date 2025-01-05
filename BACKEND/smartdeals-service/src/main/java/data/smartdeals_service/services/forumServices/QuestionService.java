@@ -2,9 +2,15 @@ package data.smartdeals_service.services.forumServices;
 
 import data.smartdeals_service.dto.forum.QuestionDTO;
 import data.smartdeals_service.dto.forum.QuestionResponseDTO;
+import data.smartdeals_service.dto.forum.QuestionStatusDTO;
+import data.smartdeals_service.dto.forum.UpdateQuestionDTO;
+import data.smartdeals_service.dto.promotion.PromotionStatusDTO;
 import data.smartdeals_service.helpers.FileUploadAvata;
 import data.smartdeals_service.helpers.GlobalConstant;
+import data.smartdeals_service.models.comment.Comment;
 import data.smartdeals_service.models.forum.*;
+import data.smartdeals_service.models.promotion.Promotion;
+import data.smartdeals_service.repository.commentRepositories.CommentRepository;
 import data.smartdeals_service.repository.forumRepositories.QuestionImageRepository;
 import data.smartdeals_service.repository.forumRepositories.QuestionRepository;
 import data.smartdeals_service.repository.forumRepositories.QuestionViewRepository;
@@ -18,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -29,6 +37,7 @@ public class QuestionService {
     private final QuestionImageRepository questionImageRepository;
     private final QuestionVoteRepository questionVoteRepository;
     private final QuestionViewRepository questionViewRepository;
+    private final CommentRepository commentRepository;
     private final FileUploadAvata fileUploadAvata;
     private String subFolder = "QuestionsImage";
     private String urlImage = GlobalConstant.rootUrl
@@ -40,9 +49,9 @@ public class QuestionService {
         question.setAuthor(questionDTO.getAuthor());
         question.setTitle(questionDTO.getTitle());
         question.setContent(questionDTO.getContent());
-        question.setTopic(questionDTO.getTopic());
         question.setTag(questionDTO.getTag());
         question.setRolePost(questionDTO.getRolePost());
+        question.setStatus(questionDTO.getStatus());
 
         if (questionDTO.getCategory() != null) {
             List<CategoryForum> categories = questionDTO.getCategory().stream()
@@ -84,45 +93,90 @@ public List<QuestionResponseDTO> findAllQuestions() {
     public Optional<Question> findById(Long id) {
         return questionRepository.findById(id);
     }
+    @Transactional
+    public Question updateQuestion(Long id, UpdateQuestionDTO updateQuestionDTO) throws IOException {
+        Question questionById = questionRepository.findById(id).orElse(null);
+        if (questionById == null) {
+            throw new IllegalArgumentException("Question not found with id: " + id);
+        }
+        questionById.setTitle(updateQuestionDTO.getTitle());
+        questionById.setContent(updateQuestionDTO.getContent());
+        questionById.setTag(updateQuestionDTO.getTag());
+        questionById.setUpdatedAt(LocalDateTime.now());
 
-//    public Question updateQuestion(Long id, QuestionDTO questionDTO) {
-//        Question questionById = questionRepository.findById(id).orElse(null);
-//        questionById.setTitle(questionDTO.getTitle());
-//        questionById.setContent(questionDTO.getContent());
-//        questionById.setAuthor(questionDTO.getAuthor());
-//        questionById.setUpdatedAt(LocalDateTime.now());
-//        return questionRepository.save(questionById);
-//    }
-//
-//    private List<QuestionImage> saveImagesForQuestion(MultipartFile[] images) throws IOException {
-//        return Arrays.stream(images)
-//                .map(image -> {
-//                    try {
-//                        String storedFileName = fileUploadAvata.storeImage(subFolder, image);
-//                        QuestionImage questionImage = new QuestionImage();
-//                        questionImage.setImageUrl(GlobalConstant.rootUrl + GlobalConstant.uploadFolder
-//                                + "/" + subFolder + "/" + storedFileName);
-//                        return questionImage;
-//                    } catch (IOException e) {
-//                        throw new RuntimeException("Failed to store image", e);
-//                    }
-//                })
-//                .collect(Collectors.toList());
-//    }
+        if(updateQuestionDTO.getDeleteImageUrl() != null && !updateQuestionDTO.getDeleteImageUrl().isEmpty()) {
 
-    public void deleteQuestion(Long id) {
-        Optional<Question> questionById = questionRepository.findById(id);
-        List<QuestionImage> imagesDelete = questionById.get().getQuestionImage();
-        if (imagesDelete.size()>0) {
-            for (QuestionImage image : imagesDelete) {
+            List<QuestionImage> imagesToDelete = questionById.getQuestionImage().stream()
+
+                    .filter(image -> updateQuestionDTO.getDeleteImageUrl()
+                            .contains(image.getId()))
+                    .collect(Collectors.toList());
+
+            for (QuestionImage image : imagesToDelete) {
                 fileUploadAvata.deleteImage(image.getImageUrl().substring(GlobalConstant.rootUrl.length()));
+                questionById.getQuestionImage().remove(image);
                 questionImageRepository.delete(image);
             }
         }
-        questionRepository.deleteById(id);
+        if (updateQuestionDTO.getImageQuestionUrl() != null) {
+            List<MultipartFile> nonEmptyFiles = Arrays.stream(updateQuestionDTO.getImageQuestionUrl())
+                    .filter(file -> file != null && !file.isEmpty())
+                    .collect(Collectors.toList());
+            if (!nonEmptyFiles.isEmpty()) {
+                List<QuestionImage> savedImages = saveImagesForQuestion
+                        (nonEmptyFiles.toArray(new MultipartFile[0]));
+                savedImages.forEach(image -> image.setQuestion(questionById));
+                questionById.getQuestionImage().addAll(savedImages);
+            }
+        }
+        return questionRepository.save(questionById);
     }
 
-    @Transactional
+    private List<QuestionImage> saveImagesForQuestion(MultipartFile[] images) throws IOException {
+        return Arrays.stream(images)
+                .map(image -> {
+                    try {
+                        String storedFileName = fileUploadAvata.storeImage(subFolder, image);
+                        QuestionImage questionImage = new QuestionImage();
+                        questionImage.setImageUrl(GlobalConstant.rootUrl + GlobalConstant.uploadFolder
+                                + "/" + subFolder + "/" + storedFileName);
+                        return questionImage;
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to store image", e);
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    public void deleteQuestion(Long id) {
+        Optional<Question> questionById = questionRepository.findById(id);
+
+        // Kiểm tra nếu câu hỏi tồn tại
+        if (questionById.isPresent()) {
+            List<Comment> commentsToDelete = commentRepository.findCommentsByQuestionId(id);
+
+            // Nếu có bình luận, xóa chúng
+            if (!commentsToDelete.isEmpty()) {
+                for (Comment data : commentsToDelete) {
+                    commentRepository.delete(data);  // Xóa bình luận
+                }
+            }
+
+            List<QuestionImage> imagesDelete = questionById.get().getQuestionImage();
+            if (imagesDelete.size() > 0) {
+                for (QuestionImage image : imagesDelete) {
+                    fileUploadAvata.deleteImage(image.getImageUrl().substring(GlobalConstant.rootUrl.length()));
+                    questionImageRepository.delete(image);
+                }
+            }
+            questionRepository.deleteById(id);
+        }else {
+            // Xử lý nếu câu hỏi không tồn tại
+            throw new RuntimeException("Câu hỏi không tồn tại!");
+        }
+    }
+
+
     public void handleVote(Long questionId, Long userId, VoteType newVoteType) {
         // Lấy thông tin câu hỏi
         Question question = questionRepository.findById(questionId)
@@ -193,4 +247,10 @@ public List<QuestionResponseDTO> findAllQuestions() {
         // Nếu đã xem, không làm gì thêm
     }
 
+    public Question closeQuestionStatus(Long id, QuestionStatusDTO status) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("question not found with id: " + id));
+        question.setStatus(status.getStatus());
+        return questionRepository.save(question);
+    }
 }

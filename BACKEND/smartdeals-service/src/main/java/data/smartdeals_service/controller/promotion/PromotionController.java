@@ -67,9 +67,20 @@ public class PromotionController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<String> verifyCode(@RequestParam String code) {
-        String result = promotionService.verifyCode(code);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<?> verifyCode(@RequestParam String code) {
+        try {
+            String result = promotionService.verifyCode(code);
+            return ResponseEntity.ok(ApiResponse.success(result, "used code successfully"));
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("InvalidCode")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("code not found"));
+            }
+            if (ex.getMessage().contains("CodeIsAlreadyInActive")) {
+                return ResponseEntity.status(402).body(ApiResponse.badRequest("Code Is Already In active"));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
+        }
     }
 
     @GetMapping("/active")

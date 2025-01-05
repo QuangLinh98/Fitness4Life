@@ -14,6 +14,7 @@ import data.smartdeals_service.repository.forumRepositories.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -60,40 +61,19 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
-
-//    public Optional<CommentDTO> findCommentById(Long id) {
-//        return commentRepository.findById(id)
-//                .map(comment -> {
-//                    CommentDTO dto = new CommentDTO();
-//                    dto.setId(comment.getId());
-//                    dto.setContent(EmojiUtils.unicodeToEmoji(comment.getContent())); // Chuyển Unicode thành emoji
-//                    dto.setUserName(comment.getUserName());
-//                    dto.setCreatedAt(comment.getCreatedAt());
-//                    dto.setIsPublished(comment.getIsPublished());
-//                    return dto;
-//                });
-//    }
     public Optional<CommentDTO> findCommentById(Long id) {
         return commentRepository.findById(id)
                 .map(this::convertToCommentDTOWithReplies);
     }
-//    public List<CommentDTO> findCommentsByBlog(Long blogId) {
-//        return commentRepository.findByBlogId(blogId).stream()
-//                .map(comment -> {
-//                    CommentDTO dto = new CommentDTO();
-//                    dto.setId(comment.getId());
-//                    dto.setContent(EmojiUtils.unicodeToEmoji(comment.getContent())); // Chuyển Unicode thành emoji
-//                    dto.setUserName(comment.getUserName());
-//                    dto.setCreatedAt(comment.getCreatedAt());
-//                    dto.setIsPublished(comment.getIsPublished());
-//                    return dto;
-//                })
-//                .collect(Collectors.toList());
-//    }
+
     public List<CommentDTO> findCommentsByBlog(Long blogId) {
         return commentRepository.findByBlogId(blogId).stream()
                 .map(this::convertToCommentDTOWithReplies)
                 .collect(Collectors.toList());
+    }
+    public List<GetCommentDTO> getCommentsByBlogId(Long blogId) {
+        List<Comment> comments = commentRepository.findCommentsByBlogId(blogId);
+        return comments.stream().map(GetCommentDTO::new).collect(Collectors.toList());
     }
 
     public Comment createCommentBlog(CommentDTO commentDTO) {
@@ -187,12 +167,12 @@ public class CommentService {
         // kiểm tra câu hỏi có tồn tại ko
         if (commentDTO.getQuestionId() != null) {
             Question question = questionRepository.findById(commentDTO.getQuestionId())
-                    .orElseThrow(() -> new RuntimeException("Question not found"));
+                    .orElseThrow(() -> new RuntimeException("QuestionNotFound"));
             comment.setQuestion(question);
         }
         if (commentDTO.getParentCommentId() != null) {
             Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId())
-                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+                    .orElseThrow(() -> new RuntimeException("ParentCommentNotFound"));
             comment.setParentComment(parentComment);
         }
         return commentRepository.save(comment);
@@ -201,9 +181,14 @@ public class CommentService {
     public Comment updateCommentForum(Long id, CommentDTO commentDTO) {
         Comment commentById = commentRepository.findById(id).orElse(null);
         if (commentById == null) {
-            throw new IllegalArgumentException("Comment not found");
+            throw new RuntimeException("CommentNotFound");
         }
 
+        // Kiểm tra thời gian createdAt so với thời gian hiện tại
+        if (commentById.getCreatedAt() != null &&
+                Duration.between(commentById.getCreatedAt(), LocalDateTime.now()).toHours() > 24) {
+            throw new RuntimeException("CommentCannotBeUpdatedAfter24Hours");
+        }
         commentById.setContent(EmojiUtils.emojiToUnicode(commentDTO.getContent()));
         commentById.setUserId(commentDTO.getUserId());
         commentById.setUserName(commentDTO.getUserName());
@@ -212,13 +197,13 @@ public class CommentService {
         // kiểm tra câu hỏi có tồn tại ko
         if (commentDTO.getQuestionId() != null) {
             Question question = questionRepository.findById(commentDTO.getQuestionId())
-                    .orElseThrow(() -> new RuntimeException("Question not found"));
+                    .orElseThrow(() -> new RuntimeException("QuestionNotFound"));
             commentById.setQuestion(question);
         }
 
         if (commentDTO.getParentCommentId() != null) {
             Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId())
-                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+                    .orElseThrow(() -> new RuntimeException("ParentCommentNotFound"));
             commentById.setParentComment(parentComment);
         }
 
@@ -226,24 +211,32 @@ public class CommentService {
     }
 
     public void deleteCommentForum(Long id) {
+        Comment commentById = commentRepository.findById(id).orElse(null);
+
+        if (commentById == null) {
+            throw new RuntimeException("CommentNotFound");
+        }
+
+        // Kiểm tra thời gian createdAt so với thời gian hiện tại
+        if (commentById.getCreatedAt() != null &&
+                Duration.between(commentById.getCreatedAt(), LocalDateTime.now()).toHours() > 24) {
+            throw new RuntimeException("CommentCannotBeDeleteAfter24Hours");
+        }
+
+        // Lấy tất cả các comment con liên quan
+        List<Comment> childComments = commentRepository.findByParentComment(commentById);
+
+        // Đặt parentComment của các comment con thành null
+        for (Comment child : childComments) {
+            child.setParentComment(null);
+        }
+
+        // Lưu các comment con đã cập nhật
+        commentRepository.saveAll(childComments);
+
         commentRepository.deleteById(id);
     }
 
-//    public List<CommentDTO> getCommentsByQuestion(Long questionId) {
-//        Question question = questionRepository.findById(questionId)
-//                .orElseThrow(() -> new RuntimeException("Question not found"));
-//        return commentRepository.findByQuestionAndParentCommentIsNull(question).stream()
-//                .map(comment -> {
-//                    CommentDTO dto = new CommentDTO();
-//                    dto.setId(comment.getId());
-//                    dto.setContent(EmojiUtils.unicodeToEmoji(comment.getContent())); // Chuyển Unicode thành emoji
-//                    dto.setUserName(comment.getUserName());
-//                    dto.setCreatedAt(comment.getCreatedAt());
-//                    dto.setIsPublished(comment.getIsPublished());
-//                    return dto;
-//                })
-//                .collect(Collectors.toList());
-//    }
     public List<CommentDTO> getCommentsByQuestion(Long questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found"));
@@ -252,21 +245,6 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
-//    public List<CommentDTO> getReplies(Long parentCommentId) {
-//        Comment parentComment = commentRepository.findById(parentCommentId)
-//                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
-//        return commentRepository.findByParentComment(parentComment).stream()
-//                .map(comment -> {
-//                    CommentDTO dto = new CommentDTO();
-//                    dto.setId(comment.getId());
-//                    dto.setContent(EmojiUtils.unicodeToEmoji(comment.getContent())); // Chuyển Unicode thành emoji
-//                    dto.setUserName(comment.getUserName());
-//                    dto.setCreatedAt(comment.getCreatedAt());
-//                    dto.setIsPublished(comment.getIsPublished());
-//                    return dto;
-//                })
-//                .collect(Collectors.toList());
-//    }
     public List<CommentDTO> getReplies(Long parentCommentId) {
         Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new RuntimeException("Parent comment not found"));
@@ -277,25 +255,21 @@ public class CommentService {
 
     public Comment changeStatusCMF(Long id, ChangeStatusCommentDTO status) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("CommentNotFoundWithId"));
         comment.setIsPublished(status.getIsPublished());
         return commentRepository.save(comment);
     }
 
-//    public List<Comment> getCommentsByBlogId(Long blogId) {
-//        return commentRepository.findCommentsByBlogId(blogId);
-//    }
-//
-//    public List<Comment> getCommentsByQuestionId(Long questionId) {
-//        return commentRepository.findCommentsByQuestionId(questionId);
-//    }
-public List<GetCommentDTO> getCommentsByBlogId(Long blogId) {
-    List<Comment> comments = commentRepository.findCommentsByBlogId(blogId);
-    return comments.stream().map(GetCommentDTO::new).collect(Collectors.toList());
-}
-
     public List<GetCommentDTO> getCommentsByQuestionId(Long questionId) {
         List<Comment> comments = commentRepository.findCommentsByQuestionId(questionId);
-        return comments.stream().map(GetCommentDTO::new).collect(Collectors.toList());
+        return comments.stream()
+                .map(comment -> {
+                    GetCommentDTO dto = new GetCommentDTO(comment);
+                    // Chuyển Unicode trong content thành emoji
+                    dto.setContent(EmojiUtils.unicodeToEmoji(comment.getContent()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
+
 }

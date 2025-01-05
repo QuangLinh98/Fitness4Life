@@ -37,7 +37,7 @@ public class PromotionService {
     public String verifyCode(String code) {
         // Tìm promotion bằng code
         Promotion promotion = promotionRepository.findByCode(code)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid code: " + code));
+                .orElseThrow(() -> new RuntimeException("InvalidCode" ));
 
         // Kiểm tra trạng thái của isActive
         if (promotion.getIsActive()) {
@@ -45,7 +45,7 @@ public class PromotionService {
             promotionRepository.save(promotion); // Lưu thay đổi
             return "Code " + code + " has been successfully deactivated.";
         } else {
-            return "Code " + code + " is already inactive.";
+            throw new RuntimeException("CodeIsAlreadyInActive");
         }
     }
     public String createPromotion(PromotionDTO promotionDTO) {

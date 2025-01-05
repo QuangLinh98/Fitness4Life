@@ -28,9 +28,6 @@ public class Question {
     @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String content; // nội dung bài viết
 
-    @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
-    private String topic; // chủ đề của câu hỏi
-
     @Column(nullable = false)
     private String tag; // từ khóa
 
@@ -47,7 +44,8 @@ public class Question {
 
     private Integer answersCount = 0; //sô lượng câu trả lời cho câu hỏi
 
-    private Boolean isPublished = true; // trạng thái của câu hỏi (chỉ admin và author)
+    @Enumerated(EnumType.STRING)
+    private PostStatus status;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt; // ngày tạo question

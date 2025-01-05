@@ -5,6 +5,8 @@ import data.smartdeals_service.dto.comment.CommentDTO;
 import data.smartdeals_service.dto.comment.GetCommentDTO;
 import data.smartdeals_service.dto.forum.QuestionDTO;
 import data.smartdeals_service.dto.forum.QuestionResponseDTO;
+import data.smartdeals_service.dto.forum.QuestionStatusDTO;
+import data.smartdeals_service.dto.forum.UpdateQuestionDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.comment.Comment;
 import data.smartdeals_service.models.forum.Question;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 @RestController
@@ -94,19 +97,24 @@ public class ForumController {
     }
 
     // Cập nhật câu hỏi
-//    @PutMapping("/questions/update/{id}")
-//    public ResponseEntity<?> updateQuestion(@PathVariable Long id, @RequestBody @Valid QuestionDTO questionDTO, BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
-//        }
-//        try {
-//            Question updatedQuestion = questionService.updateQuestion(id, questionDTO);
-//            return ResponseEntity.ok(ApiResponse.success(updatedQuestion, "Update question successfully"));
-//        } catch (Exception ex) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
-//        }
-//    }
+    @PutMapping("/questions/update/{id}")
+    public ResponseEntity<?> updateQuestion(@PathVariable Long id, @ModelAttribute UpdateQuestionDTO updateQuestionDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+        }
+        try {
+            Question updatedQuestion = questionService.updateQuestion(id,updateQuestionDTO);
+            return  ResponseEntity.status(HttpStatus.OK).body(ApiResponse
+                    .success(updatedQuestion, "Update question successfully"));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server" + e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server" + e.getMessage()));
+        }
+    }
 
     // Xóa câu hỏi
     @DeleteMapping("/questions/delete/{id}")
@@ -120,6 +128,22 @@ public class ForumController {
         }
     }
 
+    @PutMapping("/Questions/changePublished/{id}")
+    public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody QuestionStatusDTO status,
+                                             BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
+            }
+            Question changePublished = questionService.closeQuestionStatus(id,status);
+            return  ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse
+                    .created(changePublished,"change Published successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("error server"));
+        }
+    }
+
     // Tạo bình luận
     @PostMapping("/comments/create")
     public ResponseEntity<?> createComment(@RequestBody @Valid CommentDTO commentDTO, BindingResult bindingResult) {
@@ -129,33 +153,27 @@ public class ForumController {
         try {
             String detectedLanguage = spamFilterService.detectLanguage(commentDTO.getContent());
             if (spamFilterService.isSpam(commentDTO.getContent(), detectedLanguage)) {
-                return ResponseEntity.badRequest().body("Comment contains spam and cannot be accepted.");
+                return ResponseEntity.status(402).body("Comment contains spam and cannot be accepted.");
             }
             commentProducer.sendComment(commentDTO); // Gửi bình luận tới Kafka
             return ResponseEntity.ok(ApiResponse.created(null, "Create comment successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("QuestionNotFound")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("question not found"));
+            }
+            if (ex.getMessage().contains("ParentCommentNotFound")) {
+                return ResponseEntity.status(401).body(ApiResponse.badRequest("Parent Comment Not Found"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
     }
-
+    // get commemt flow question id
     @GetMapping("/question/{questionId}/comment")
     public ResponseEntity<List<GetCommentDTO>> getCommentsByQuestionId(@PathVariable Long questionId) {
         List<GetCommentDTO> comments = commentService.getCommentsByQuestionId(questionId);
         return ResponseEntity.ok(comments);
     }
-
-//    // Lấy phản hồi của bình luận
-//    @GetMapping("/comments/replies/{parentCommentId}")
-//    public ResponseEntity<?> getReplies(@PathVariable Long parentCommentId) {
-//        try {
-//            List<CommentDTO> replies = commentService.getReplies(parentCommentId);
-//            return ResponseEntity.ok(ApiResponse.success(replies, "Get replies successfully"));
-//        } catch (Exception ex) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
-//        }
-//    }
 
     // Cập nhật bình luận
     @PutMapping("/comments/update/{id}")
@@ -164,9 +182,23 @@ public class ForumController {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
         }
         try {
+            String detectedLanguage = spamFilterService.detectLanguage(commentDTO.getContent());
+            if (spamFilterService.isSpam(commentDTO.getContent(), detectedLanguage)) {
+                return ResponseEntity.status(403).body("Comment contains spam and cannot be accepted.");
+            }
+
             Comment updatedComment = commentService.updateCommentForum(id, commentDTO);
             return ResponseEntity.ok(ApiResponse.success(updatedComment, "Update comment successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("QuestionNotFound")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("question not found"));
+            }
+            if (ex.getMessage().contains("ParentCommentNotFound")) {
+                return ResponseEntity.status(401).body(ApiResponse.badRequest("Parent Comment Not Found"));
+            }
+            if (ex.getMessage().contains("CommentCannotBeUpdatedAfter24Hours")) {
+                return ResponseEntity.status(402).body(ApiResponse.badRequest("Comment Cannot Be Updated After 24 Hours"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
@@ -179,6 +211,12 @@ public class ForumController {
             commentService.deleteCommentForum(id);
             return ResponseEntity.ok(ApiResponse.success(null, "Delete comment successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("CommentNotFound")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("comment not found"));
+            }
+            if (ex.getMessage().contains("CommentCannotBeDeleteAfter24Hours")) {
+                return ResponseEntity.status(401).body(ApiResponse.badRequest("Comment Cannot Be Delete After 24 Hours"));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
@@ -194,6 +232,9 @@ public class ForumController {
             Comment updatedComment = commentService.changeStatusCMF(id, statusDTO);
             return ResponseEntity.ok(ApiResponse.success(updatedComment, "Change comment status successfully"));
         } catch (Exception ex) {
+            if (ex.getMessage().contains("CommentNotFoundWithId")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("Comment Not Found With Id : " + id));
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
