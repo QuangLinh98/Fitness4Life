@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 @RestController
-@RequestMapping("/api/forums")
+@RequestMapping("/api/deal/")
 @RequiredArgsConstructor
 public class ForumController {
     private final QuestionService questionService;
@@ -34,7 +34,7 @@ public class ForumController {
     private final CommentProducer commentProducer;
     private final SpamFilterService spamFilterService;
 
-    @PostMapping("/{questionId}/vote")
+    @PostMapping("forums/{questionId}/vote")
     public ResponseEntity<?> vote(@PathVariable Long questionId,
                                   @RequestParam Long userId,
                                   @RequestParam VoteType voteType) {
@@ -42,7 +42,7 @@ public class ForumController {
         return ResponseEntity.ok("Vote successfully handled");
     }
 
-    @GetMapping("/{id}/view")
+    @GetMapping("forums/{id}/view")
     public ResponseEntity<?> incrementViewCount(@PathVariable Long id, @RequestParam Long userId) {
         try {
             questionService.incrementViewCount(id, userId);
@@ -52,7 +52,7 @@ public class ForumController {
         }
     }
     // Lấy tất cả câu hỏi
-    @GetMapping("/questions")
+    @GetMapping("forums/questions")
     public ResponseEntity<?> getAllQuestions() {
         try {
             List<QuestionResponseDTO> questions = questionService.findAllQuestions();
@@ -64,7 +64,7 @@ public class ForumController {
     }
 
     // Lấy câu hỏi theo ID
-    @GetMapping("/questions/{id}")
+    @GetMapping("forums/questions/{id}")
     public ResponseEntity<?> getQuestionById(@PathVariable Long id) {
         try {
             Optional<Question> question = questionService.findById(id);
@@ -81,7 +81,7 @@ public class ForumController {
     }
 
     // Tạo câu hỏi
-    @PostMapping("/questions/create")
+    @PostMapping("forums/questions/create")
     public ResponseEntity<?> createQuestion(@ModelAttribute @Valid QuestionDTO questionDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -97,7 +97,7 @@ public class ForumController {
     }
 
     // Cập nhật câu hỏi
-    @PutMapping("/questions/update/{id}")
+    @PutMapping("forums/questions/update/{id}")
     public ResponseEntity<?> updateQuestion(@PathVariable Long id, @ModelAttribute UpdateQuestionDTO updateQuestionDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -117,7 +117,7 @@ public class ForumController {
     }
 
     // Xóa câu hỏi
-    @DeleteMapping("/questions/delete/{id}")
+    @DeleteMapping("forums/questions/delete/{id}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long id) {
         try {
             questionService.deleteQuestion(id);
@@ -128,7 +128,7 @@ public class ForumController {
         }
     }
 
-    @PutMapping("/Questions/changePublished/{id}")
+    @PutMapping("forums/Questions/changePublished/{id}")
     public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody QuestionStatusDTO status,
                                              BindingResult bindingResult) {
         try {
@@ -145,7 +145,7 @@ public class ForumController {
     }
 
     // Tạo bình luận
-    @PostMapping("/comments/create")
+    @PostMapping("forums/comments/create")
     public ResponseEntity<?> createComment(@RequestBody @Valid CommentDTO commentDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -169,14 +169,14 @@ public class ForumController {
         }
     }
     // get commemt flow question id
-    @GetMapping("/question/{questionId}/comment")
+    @GetMapping("forums/question/{questionId}/comment")
     public ResponseEntity<List<GetCommentDTO>> getCommentsByQuestionId(@PathVariable Long questionId) {
         List<GetCommentDTO> comments = commentService.getCommentsByQuestionId(questionId);
         return ResponseEntity.ok(comments);
     }
 
     // Cập nhật bình luận
-    @PutMapping("/comments/update/{id}")
+    @PutMapping("forums/comments/update/{id}")
     public ResponseEntity<?> updateComment(@PathVariable Long id, @RequestBody @Valid CommentDTO commentDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -205,7 +205,7 @@ public class ForumController {
     }
 
     // Xóa bình luận
-    @DeleteMapping("/comments/delete/{id}")
+    @DeleteMapping("forums/comments/delete/{id}")
     public ResponseEntity<?> deleteComment(@PathVariable Long id) {
         try {
             commentService.deleteCommentForum(id);
@@ -223,7 +223,7 @@ public class ForumController {
     }
 
     // Thay đổi trạng thái xuất bản bình luận
-    @PutMapping("/comments/change-published/{id}")
+    @PutMapping("forums/comments/change-published/{id}")
     public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody ChangeStatusCommentDTO statusDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));

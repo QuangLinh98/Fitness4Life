@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/promotions")
+@RequestMapping("/api/deal/")
 @RequiredArgsConstructor
 public class PromotionController {
     private final PromotionService promotionService;
 
-    @GetMapping
+    @GetMapping("promotions")
     public ResponseEntity<?> getAllPromotions() {
         try {
             List<Promotion> promotions = promotionService.getAllPromotions();
@@ -30,7 +30,8 @@ public class PromotionController {
                     .body(ApiResponse.errorServer("error server"));
         }
     }
-    @PostMapping("/create")
+
+    @PostMapping("promotions/create")
     public ResponseEntity<?> createPromotion(@RequestBody PromotionDTO promotionDTO,
                                              BindingResult bindingResult) {
         try {
@@ -45,12 +46,12 @@ public class PromotionController {
                     .body(ApiResponse.errorServer("error server"));
         }
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("promotions/{id}")
     public void deletePromotion(@PathVariable Long id) {
         promotionService.deletePromotion(id);
     }
 
-    @PutMapping("/changePublished/{id}")
+    @PutMapping("promotions/changePublished/{id}")
     public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody PromotionStatusDTO promotionStatusDTO,
                                              BindingResult bindingResult) {
         try {
@@ -66,7 +67,7 @@ public class PromotionController {
         }
     }
 
-    @PostMapping("/verify")
+    @PostMapping("promotions/verify")
     public ResponseEntity<?> verifyCode(@RequestParam String code) {
         try {
             String result = promotionService.verifyCode(code);
@@ -83,19 +84,19 @@ public class PromotionController {
         }
     }
 
-    @GetMapping("/active")
+    @GetMapping("promotions/active")
     public ResponseEntity<List<PromotionDTO>> getActivePromotions() {
         List<PromotionDTO> promotions = promotionService.getActivePromotions();
         return ResponseEntity.ok(promotions);
     }
 
-    @PostMapping("/send-code-to-all")
+    @PostMapping("promotions/send-code-to-all")
     public ResponseEntity<String> sendCodeToAllUsers(@RequestParam String code) {
         promotionService.sendCodeToAllUsers(code);
         return ResponseEntity.ok("Code has been sent to all users.");
     }
 
-    @PostMapping("/send-code-to-user")
+    @PostMapping("promotions/send-code-to-user")
     public ResponseEntity<String> sendCodeToUser(@RequestParam String code, @RequestParam Long userId) {
         promotionService.sendCodeToUser(code, userId);
         return ResponseEntity.ok("Code has been sent to user with ID: " + userId);

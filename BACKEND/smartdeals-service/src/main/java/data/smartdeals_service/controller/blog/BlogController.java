@@ -241,14 +241,14 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/blogs")
+@RequestMapping("/api/deal/")
 public class BlogController {
     private final BlogService blogService;
     private final CommentService commentService;
     private final CommentProducer commentProducer;
     private final SpamFilterService spamFilterService;
 
-    @GetMapping
+    @GetMapping("blogs")
     public ResponseEntity<?> getAllBlog() {
         try {
             List<Blog> products = blogService.findAll();
@@ -259,7 +259,7 @@ public class BlogController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("blogs/{id}")
     public ResponseEntity<?> getBlogById(@PathVariable Long id) {
         try {
             Optional<Blog> blogs = blogService.findById(id);
@@ -271,7 +271,7 @@ public class BlogController {
         }
     }
 
-    @PostMapping("/create")
+    @PostMapping("blogs/create")
     public ResponseEntity<?> createBlog(@Valid @ModelAttribute CreateBlogDTO createBlogDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -286,7 +286,7 @@ public class BlogController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("blogs/update/{id}")
     public ResponseEntity<?> updateBlog(@PathVariable Long id, @Valid @ModelAttribute UpdateBlogDTO updateBlogDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -301,7 +301,7 @@ public class BlogController {
         }
     }
 
-    @DeleteMapping("/deleteBlog/{id}")
+    @DeleteMapping("blogs/deleteBlog/{id}")
     public ResponseEntity<ApiResponse<?>> deleteBlog(@PathVariable Long id) {
         try {
             Optional<Blog> blogExisting = blogService.findById(id);
@@ -317,7 +317,7 @@ public class BlogController {
         }
     }
 
-    @GetMapping("/comment")
+    @GetMapping("blogs/comment")
     public ResponseEntity<?> getAllComments() {
         try {
             List<CommentDTO> comments = commentService.getAllComments();
@@ -328,7 +328,7 @@ public class BlogController {
         }
     }
 
-    @GetMapping("/comment/{id}")
+    @GetMapping("blogs/comment/{id}")
     public ResponseEntity<?> getCommentById(@PathVariable Long id) {
         try {
             Optional<CommentDTO> comment = commentService.findCommentById(id);
@@ -340,7 +340,7 @@ public class BlogController {
         }
     }
 
-    @GetMapping("/commentInBlog/{blogId}")
+    @GetMapping("blogs/commentInBlog/{blogId}")
     public ResponseEntity<?> getCommentInBlog(@PathVariable Long blogId) {
         try {
             List<CommentDTO> commentInBlog = commentService.findCommentsByBlog(blogId);
@@ -351,7 +351,7 @@ public class BlogController {
         }
     }
 
-    @PostMapping("/comment/create")
+    @PostMapping("blogs/comment/create")
     public ResponseEntity<?> createComment(@Valid @RequestBody CommentDTO comment, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -370,7 +370,7 @@ public class BlogController {
         }
     }
 
-    @PutMapping("/comment/update/{id}")
+    @PutMapping("blogs/comment/update/{id}")
     public ResponseEntity<?> updateComment(@PathVariable Long id, @Valid @RequestBody CommentDTO commentDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -384,7 +384,7 @@ public class BlogController {
         }
     }
 
-    @DeleteMapping("/comment/{id}")
+    @DeleteMapping("blogs/comment/{id}")
     public ResponseEntity<?> deleteComment(@PathVariable Long id) {
         try {
             commentService.deleteComment(id);
@@ -395,7 +395,7 @@ public class BlogController {
         }
     }
 
-    @PutMapping("/comment/changePublished/{id}")
+    @PutMapping("blogs/comment/changePublished/{id}")
     public ResponseEntity<?> changePublishedStatus(@PathVariable Long id, @RequestBody ChangeStatusCommentDTO changeStatusCommentDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -408,7 +408,7 @@ public class BlogController {
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
     }
-    @GetMapping("/blog/{blogId}/comment")
+    @GetMapping("blog/{blogId}/comment")
     public ResponseEntity<List<GetCommentDTO>> getCommentsByBlog(@PathVariable Long blogId) {
         List<GetCommentDTO> comments = commentService.getCommentsByBlogId(blogId);
         return ResponseEntity.ok(comments);
