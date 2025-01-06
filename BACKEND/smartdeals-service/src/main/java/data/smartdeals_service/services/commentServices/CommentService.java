@@ -89,8 +89,10 @@ public class CommentService {
         if (commentDTO.getBlogId() != null) {
             Blog blogs = blogRepository.findById(commentDTO.getBlogId())
                     .orElseThrow(() -> new RuntimeException("blogs not found"));
+            System.out.println("Blog id : " + blogs);
             comment.setBlog(blogs);
         }
+
         // Kiểm tra bình luận cha
         if (commentDTO.getParentCommentId() != null) {
             Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId())
