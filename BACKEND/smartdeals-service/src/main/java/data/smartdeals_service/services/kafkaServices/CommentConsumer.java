@@ -25,36 +25,27 @@ public class CommentConsumer {
     private void listen(String message) {
         try {
             CommentDTO comments = objectMapper.readValue(message, CommentDTO.class);
-
-            // Log dữ liệu nhận được
-            System.out.println("Received message: " + comments);
-
             Optional<Blog> existingBlog = Optional.empty();
             if (comments.getBlogId() != null) {
                 existingBlog = blogService.findById(comments.getBlogId());
             }
             if (existingBlog.isPresent()) {
                 commentService.createCommentBlog(comments);
-                return; // Nếu Blog có dữ liệu, bỏ qua việc xử lý Question
+                return;
             }
-
             Optional<Question> existingQuestion = Optional.empty();
             if (comments.getQuestionId() != null) {
                 existingQuestion = questionService.findById(comments.getQuestionId());
             }
             if (existingQuestion.isPresent()) {
                 commentService.createCommentForum(comments);
-                return; // Nếu Question có dữ liệu, bỏ qua các bước tiếp theo
+                return;
             }
-
-            // Nếu cả Blog và Question đều không có dữ liệu, thông báo lỗi
-            System.out.println("No Blog or Question found for this comment.");
             throw new RuntimeException("BLOGANDQUESTIONNOTFOUND");
-
         } catch (Exception e) {
-            System.out.println("failed to process feed message: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
 }
