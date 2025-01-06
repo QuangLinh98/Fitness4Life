@@ -160,7 +160,6 @@ public class GoalService {
         }
     }
 
-
     //Handle update Goal
     public Goal updateGoal(int id, UpdateGoalDTO goalDTO) {
         Goal existingGoal = goalRepository.findById(id).orElseThrow(() -> new RuntimeException("Goal not found"));

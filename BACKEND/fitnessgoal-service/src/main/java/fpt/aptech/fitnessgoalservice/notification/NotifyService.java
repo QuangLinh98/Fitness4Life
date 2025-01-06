@@ -30,6 +30,7 @@ public class NotifyService {
         // Gửi thông báo thông qua NotifyProducer
         notifyProducer.sendNotify(notifyDTO);
     }
+
     //Gửi thông báo nhắc nhở về thời gian kết thúc goal
     public void sendGoalNotification(UserDTO existingUser, Goal goal) {
         String content = String.format(

@@ -33,7 +33,6 @@ public class ExerciseDietSuggestionsService {
         Goal existingGoal = goalRepository.findById(goal.getId()).orElseThrow(() -> new RuntimeException("Goal not found"));
 
         try {
-
             //1. Gửi yêu cầu tới API của Google để nhận kế hoạch chế độ ăn
             String content = createInputTextForGoogle(userDTO, goal);  //Tạo câu lệnh gửi tới API google
             String googleResponse = googleApiClient.getDietPlanFromGoogle(content);  // Gửi yêu cầu tới API Google
