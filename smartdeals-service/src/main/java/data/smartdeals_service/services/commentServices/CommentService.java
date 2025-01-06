@@ -87,14 +87,12 @@ public class CommentService {
 
         // kiểm tra blog có tồn tại ko
         if (commentDTO.getBlogId() != null) {
-            Blog blogs = blogRepository.findById(commentDTO.getBlogId())
-                    .orElseThrow(() -> new RuntimeException("blogs not found"));
+            Blog blogs = blogRepository.findById(commentDTO.getBlogId()).orElse(null);
             comment.setBlog(blogs);
         }
         // Kiểm tra bình luận cha
         if (commentDTO.getParentCommentId() != null) {
-            Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId())
-                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+            Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId()).orElse(null);
             comment.setParentComment(parentComment);
         }
         return commentRepository.save(comment);
@@ -103,7 +101,7 @@ public class CommentService {
     public Comment updateComment(Long id, CommentDTO commentDTO) {
         Comment commentFindById = commentRepository.findById(id).orElse(null);
         if (commentFindById == null) {
-            throw new IllegalArgumentException("Comment not found");
+            throw new RuntimeException("CommentNotFound");
         }
 
         commentFindById.setContent(EmojiUtils.emojiToUnicode(commentDTO.getContent()));
@@ -114,14 +112,14 @@ public class CommentService {
         // Kiểm tra blog tồn tại
         if (commentDTO.getBlogId() != null) {
             Blog blog = blogRepository.findById(commentDTO.getBlogId())
-                    .orElseThrow(() -> new IllegalArgumentException("Blog not found"));
+                    .orElseThrow(() -> new RuntimeException("BlogNotFound"));
             commentFindById.setBlog(blog);
         }
 
         // Kiểm tra bình luận cha
         if (commentDTO.getParentCommentId() != null) {
             Comment parentComment = commentRepository.findById(commentDTO.getParentCommentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
+                    .orElseThrow(() -> new RuntimeException("ParentCommentNotFound"));
             commentFindById.setParentComment(parentComment);
         }
 
@@ -134,7 +132,7 @@ public class CommentService {
 
     public Comment changeStatusCMB(Long id, ChangeStatusCommentDTO status) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("CommentNotFoundWithId"));
         comment.setIsPublished(status.getIsPublished());
         return commentRepository.save(comment);
     }

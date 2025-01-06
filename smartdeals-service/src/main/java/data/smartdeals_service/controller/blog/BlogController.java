@@ -224,7 +224,9 @@ import data.smartdeals_service.dto.comment.GetCommentDTO;
 import data.smartdeals_service.helpers.ApiResponse;
 import data.smartdeals_service.models.blog.Blog;
 import data.smartdeals_service.models.comment.Comment;
+import data.smartdeals_service.models.forum.Question;
 import data.smartdeals_service.services.blogServices.BlogService;
+import data.smartdeals_service.services.kafkaServices.CommentConsumer;
 import data.smartdeals_service.services.kafkaServices.CommentProducer;
 import data.smartdeals_service.services.commentServices.CommentService;
 import data.smartdeals_service.services.spam.SpamFilterService;
@@ -238,6 +240,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
@@ -361,9 +364,13 @@ public class BlogController {
             if (spamFilterService.isSpam(comment.getContent(), detectedLanguage)) {
                 return ResponseEntity.badRequest().body("Your comment contains spam words and cannot be accepted.");
             }
-//            Comment createdComment = commentService.createCommentBlog(comment);
-            commentProducer.sendComment(comment);
-            return ResponseEntity.ok(ApiResponse.success(null, "Create comment successfully"));
+            Optional<Blog> blogId = blogService.findById(comment.getBlogId());
+            if(blogId.isPresent()) {
+                commentProducer.sendComment(comment);
+                return ResponseEntity.ok(ApiResponse.success(null, "Create comment successfully"));
+            }else {
+                return ResponseEntity.badRequest().body("Blog by Id Not Found");
+            }
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));

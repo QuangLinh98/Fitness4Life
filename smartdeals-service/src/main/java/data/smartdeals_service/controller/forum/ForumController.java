@@ -155,8 +155,14 @@ public class ForumController {
             if (spamFilterService.isSpam(commentDTO.getContent(), detectedLanguage)) {
                 return ResponseEntity.status(402).body("Comment contains spam and cannot be accepted.");
             }
-            commentProducer.sendComment(commentDTO); // Gửi bình luận tới Kafka
-            return ResponseEntity.ok(ApiResponse.created(null, "Create comment successfully"));
+            Optional<Question> questionId = questionService.findById(commentDTO.getQuestionId());
+            if (questionId.isPresent()) {
+                commentProducer.sendComment(commentDTO); // Gửi bình luận tới Kafka
+                return ResponseEntity.ok(ApiResponse.created(null, "Create comment successfully"));
+            }else {
+                return ResponseEntity.badRequest().body("Question By Id not found");
+            }
+
         } catch (Exception ex) {
             if (ex.getMessage().contains("QuestionNotFound")) {
                 return ResponseEntity.status(400).body(ApiResponse.badRequest("question not found"));
@@ -168,6 +174,7 @@ public class ForumController {
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
     }
+
     // get commemt flow question id
     @GetMapping("/question/{questionId}/comment")
     public ResponseEntity<List<GetCommentDTO>> getCommentsByQuestionId(@PathVariable Long questionId) {

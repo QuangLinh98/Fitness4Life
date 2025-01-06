@@ -18,4 +18,5 @@ public class CommentProducer {
             System.out.println("failed to send comment"+ex.getMessage());
         }
     }
+
 }
