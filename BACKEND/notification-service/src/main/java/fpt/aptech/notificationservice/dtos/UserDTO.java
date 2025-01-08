@@ -1,13 +1,10 @@
-package fpt.aptech.fitnessgoalservice.dtos;
+package fpt.aptech.notificationservice.dtos;
 
-import fpt.aptech.fitnessgoalservice.models.Gender;
 import lombok.Data;
 
 @Data
 public class UserDTO {
-    private String fullName;
+    private Long id;
     private String email;
-    private Gender gender;
-
-    private ProfileUserDTO profileUserDTO;
+    private String fullName;
 }

@@ -3,7 +3,6 @@ package fpt.aptech.notificationservice.service;
 import fpt.aptech.notificationservice.models.Notify;
 import fpt.aptech.notificationservice.repository.NotifyRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,7 +11,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class NotifyService {
-    private final  NotifyRepository notifyRepository;
+    private final NotifyRepository notifyRepository;
 
     //Phương thức lấy data
     public List<Notify> findAll() {
@@ -29,4 +28,11 @@ public class NotifyService {
         notify.setCreatedDate(LocalDateTime.now());
         return notifyRepository.save(notify);
     }
+
+    //Phương thức delete 1 notify
+    public void deleteNotify(int id) {
+        Notify notifyExisting = notifyRepository.findById(id).orElse(null);
+         notifyRepository.delete(notifyExisting);
+    }
+
 }

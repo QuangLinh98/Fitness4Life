@@ -1,4 +1,4 @@
-package fpt.aptech.fitnessgoalservice.config;
+package fpt.aptech.notificationservice.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

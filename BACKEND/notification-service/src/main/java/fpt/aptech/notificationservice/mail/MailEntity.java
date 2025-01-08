@@ -1,4 +1,4 @@
-package kj001.user_service.dtos;
+package fpt.aptech.notificationservice.mail;
 
 import lombok.Data;
 

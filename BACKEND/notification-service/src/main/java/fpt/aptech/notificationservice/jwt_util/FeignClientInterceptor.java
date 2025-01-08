@@ -1,4 +1,4 @@
-package fpt.aptech.fitnessgoalservice.jwt_util;
+package fpt.aptech.notificationservice.jwt_util;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -18,6 +18,7 @@ public class FeignClientInterceptor implements RequestInterceptor {
         if (authentication != null && authentication.getCredentials() != null) {
             // Lấy token từ Authentication
             String token = authentication.getCredentials().toString();
+            System.out.println("Token from SecurityContextHolder: " + token);
 
             // Đảm bảo không thêm tiền tố Bearer nhiều lần
             if (!token.startsWith("Bearer ")) {
@@ -27,7 +28,10 @@ public class FeignClientInterceptor implements RequestInterceptor {
             // Đảm bảo header Authorization không bị ghi đè nhiều lần
             if (!requestTemplate.headers().containsKey("Authorization")) {
                 requestTemplate.header("Authorization", token);
+                System.out.println("Authorization header added: " + token);
             }
+        }else {
+            System.out.println("No authentication or credentials found in SecurityContextHolder");
         }
     }
 }

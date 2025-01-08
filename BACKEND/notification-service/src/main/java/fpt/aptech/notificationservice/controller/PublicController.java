@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/notify")
+@RequestMapping("/api/notify/")
 public class PublicController {
     @Autowired
     private  NotifyService notifyService;
 
-    @GetMapping("/all")
+    @GetMapping("all")
     public ResponseEntity<?> getAllNotify() {
         try {
             List<Notify> notifies = notifyService.findAll();
@@ -28,7 +28,7 @@ public class PublicController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<?> getNotifyById(@PathVariable int id) {
         try {
             Notify notify = notifyService.findById(id);

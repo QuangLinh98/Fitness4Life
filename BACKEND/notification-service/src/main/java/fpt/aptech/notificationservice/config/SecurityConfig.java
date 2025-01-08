@@ -1,8 +1,7 @@
-package fpt.aptech.fitnessgoalservice.config;
+package fpt.aptech.notificationservice.config;
 
 
-
-import fpt.aptech.fitnessgoalservice.filter.RoleHeaderFilter;
+import fpt.aptech.notificationservice.filter.RoleHeaderFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,14 +18,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 public class SecurityConfig {
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        System.out.println("SecurityFilterChain is initialized");
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest()
-                        .authenticated() // Yêu cầu tất cả endpoint cần xác thực
+                        .authenticated()
                 )
-                .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class); // Sử dụng bean
+
         return http.build();
     }
 }
