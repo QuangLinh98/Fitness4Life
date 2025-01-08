@@ -32,19 +32,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/dashboard/room/**")
+                        .permitAll()
                         .anyRequest()
                         .authenticated() // Yêu cầu tất cả endpoint cần xác thực
                 )
                 .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-//    @Bean
-//    public JwtDecoder jwtDecoder() {
-//        byte[] keyBytes = Decoders.BASE64URL.decode(jwtProperties.getSecretKey());
-//        SecretKey secretKey = Keys.hmacShaKeyFor(keyBytes);
-//        return NimbusJwtDecoder.withSecretKey(secretKey).build();
-//
-//    }
-
 }

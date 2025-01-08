@@ -7,13 +7,14 @@ import fpt.aptech.dashboardservice.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/dashboard/")
+
 @RequiredArgsConstructor
 public class PublicController {
     private final ClubService clubService;
@@ -25,7 +26,7 @@ public class PublicController {
 
     //======================= CLUB ============================
     @GetMapping("clubs")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getAllClub() {
         try {
             List<Club> clubs = clubService.getAllClubs();
@@ -36,7 +37,7 @@ public class PublicController {
     }
 
     @GetMapping("club/{id}")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getClubById(@PathVariable int id) {
         try {
             Club club = clubService.getClubById(id);
@@ -48,7 +49,7 @@ public class PublicController {
 
     // API get all Club with primary image
     @GetMapping("clubImage/image-primary")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getAllClubWithImagePrimary() {
         try {
             List<ClubPrimaryImageDTO> clubs = clubService.getAllClubWithPrimaryImage();
@@ -60,7 +61,7 @@ public class PublicController {
 
     //======================= BRANCH ============================
     @GetMapping("branchs")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getAllBranch() {
         try {
             List<Branch> branches = branchService.getAllBranch();
@@ -71,7 +72,7 @@ public class PublicController {
     }
 
     @GetMapping("branch/{id}")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getBranchById(@PathVariable int id) {
         try {
             Branch branch = branchService.getBranchById(id);
@@ -86,7 +87,7 @@ public class PublicController {
 
     //======================= TRAINER ============================
     @GetMapping("trainers")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllTrainer() {
         try {
             List<Trainer> trainers = trainerService.getAllTrainer();
@@ -97,7 +98,7 @@ public class PublicController {
     }
 
     @GetMapping("trainer/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getTrainerById(@PathVariable int id) {
         try {
             Trainer trainer = trainerService.getTrainerById(id);
@@ -112,7 +113,7 @@ public class PublicController {
 
     //======================= ROOM ============================
     @GetMapping("rooms")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+   // //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getAllRoom() {
         try {
             List<Room> rooms = roomService.getAllRoom();
@@ -123,7 +124,7 @@ public class PublicController {
     }
 
     @GetMapping("room/{id}")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getRoomById(@PathVariable int id) {
         try {
             Room room = roomService.getRoomById(id);
@@ -138,7 +139,7 @@ public class PublicController {
 
     //======================= WORKOUT PACKAGE ROOM ============================
     @GetMapping("packages/{packageId}/rooms")
-    @PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getClassesByWorkoutPackage(@PathVariable int packageId,@RequestHeader("Authorization") String token) {
         List<Room> rooms = packageClassService.getRoomsByWorkoutPackage(packageId,token);
         return ResponseEntity.ok(rooms);
