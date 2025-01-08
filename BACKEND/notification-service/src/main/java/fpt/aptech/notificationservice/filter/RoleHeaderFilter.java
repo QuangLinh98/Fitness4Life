@@ -1,4 +1,4 @@
-package fpt.aptech.bookingservice.filter;
+package fpt.aptech.fitnessgoalservice.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,8 +17,6 @@ import java.util.List;
 public class RoleHeaderFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String requestUri = request.getRequestURI();
-
         String role = request.getHeader("X-Role"); // Lấy role từ header
         String token = request.getHeader("Authorization"); // Lấy token từ header
 
@@ -29,7 +27,7 @@ public class RoleHeaderFilter extends OncePerRequestFilter {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-            System.out.println("Role or Authorization header is missing for request: " + requestUri);
+            System.out.println("Role or Authorization header is missing");
         }
 
         filterChain.doFilter(request, response);

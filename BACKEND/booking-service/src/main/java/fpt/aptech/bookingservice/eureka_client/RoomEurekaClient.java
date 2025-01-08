@@ -4,7 +4,7 @@ import fpt.aptech.bookingservice.dtos.RoomDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "dashboard-service")
+@FeignClient(name = "dashboard-service",url = "http://localhost:8081")
 public interface RoomEurekaClient {
     @GetMapping("/api/dashboard/room/{id}")
     RoomDTO getRoomById(@PathVariable int id);

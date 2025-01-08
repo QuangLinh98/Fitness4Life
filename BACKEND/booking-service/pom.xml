@@ -136,6 +136,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <!-- Spring Security OAuth2 Resource Server with JWT support -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+
+        <!-- JWT (nếu sử dụng JWT cho OAuth2) -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.48</version> <!-- Thêm phụ thuộc cho xử lý JWT -->
+        </dependency>
     </dependencies>
 
     <build>

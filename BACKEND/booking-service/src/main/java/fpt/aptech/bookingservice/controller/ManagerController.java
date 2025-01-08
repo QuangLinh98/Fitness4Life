@@ -72,7 +72,7 @@ public class ManagerController {
 
     //======================= WORKOUT PACKAGE ============================
     @PostMapping("/bookingRoom/add")
-    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<?> addBookingRoom(@Valid @RequestBody BooKingRoomDTO booKingRoomDTO,
                                             BindingResult bindingResult) {
         try {
@@ -114,24 +114,24 @@ public class ManagerController {
 
     @PostMapping("/qrCode")
     public ResponseEntity<?> createQrCodeWithBookingRoom(@RequestBody BookingRoom bookingRoomRequest) {
-           try {
-               // Lưu thông tin booking và tạo mã QR
-             QRCode qrCode = qrService.createBookingWithQRCode(bookingRoomRequest);
-               return ResponseEntity.status(201).body(ApiResponse.created(qrCode, "QR Code created successfully"));
-           }
-           catch (Exception e) {
-               return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : " + e.getMessage()));
-           }
+        try {
+            // Lưu thông tin booking và tạo mã QR
+            QRCode qrCode = qrService.createBookingWithQRCode(bookingRoomRequest);
+            return ResponseEntity.status(201).body(ApiResponse.created(qrCode, "QR Code created successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : " + e.getMessage()));
+        }
 
     }
 
     @GetMapping("/qrCode/validate")
     public ResponseEntity<?> validateQrCode(@RequestParam int qrCodeId) {
         try {
-          Map<String,Object> response =  qrService.validateQRCodeAndFetchBookingDetails(qrCodeId);
+            System.out.println("Test dữ liệu");
+            Map<String, Object> response = qrService.validateQRCodeAndFetchBookingDetails(qrCodeId);
+            System.out.println("Request received for QR Code ID: " + qrCodeId);
             return ResponseEntity.status(200).body(ApiResponse.success(response, "QR Code validation successfully"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : " + e.getMessage()));
         }
     }

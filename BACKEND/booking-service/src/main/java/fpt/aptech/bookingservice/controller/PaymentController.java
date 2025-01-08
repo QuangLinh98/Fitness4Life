@@ -4,6 +4,7 @@ import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 import fpt.aptech.bookingservice.dtos.MembershipSubscriptionDTO;
+import fpt.aptech.bookingservice.models.MembershipSubscription;
 import fpt.aptech.bookingservice.service.PayPalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,16 @@ public class PaymentController {
             Payment payment = payPalService.executePayment(paymentId, payerID);
             return ResponseEntity.ok(payment.toJSON());
         } catch (PayPalRESTException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getMembershipByPamentId/{paymentId}")
+    public  ResponseEntity<?> getMembershipByPamentId(@PathVariable("paymentId") String paymentId) {
+        try {
+            MembershipSubscription member = payPalService.getMembershippaymentId(paymentId);
+            return ResponseEntity.ok(member);
+        }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

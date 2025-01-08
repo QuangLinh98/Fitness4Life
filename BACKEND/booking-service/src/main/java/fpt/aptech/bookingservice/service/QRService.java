@@ -14,6 +14,7 @@ import fpt.aptech.bookingservice.repository.BookingRoomRepository;
 import fpt.aptech.bookingservice.repository.QRRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,12 +55,15 @@ public class QRService {
         BookingRoom savedBooking = bookingRoomRepository.save(bookingRoom);
 
         try {
+            // Lấy địa chỉ IP cục bộ (thay đổi 'localhost' thành địa chỉ IP)
+            String localIpAddress = "192.168.1.20"; // Thay bằng địa chỉ IP thực tế của máy
+
             // Tạo mã RANDOM cho QR
             String checkInCode = UUID.randomUUID().toString();
 
             // Tạo đối tượng QRCode trước để lấy qrId
             QRCode qrCode = QRCode.builder()
-                    .qrCodeUrl("http://localhost:8082/qrcodes/" + checkInCode + ".jpg")
+                    .qrCodeUrl("http://" + localIpAddress + ":8082/qrcodes/" + checkInCode + ".jpg")
                     .qrCodeStatus(QRCodeStatus.VALID)
                     .bookingRoom(savedBooking)
                     .build();
@@ -68,14 +72,14 @@ public class QRService {
             qrRepository.save(qrCode);
 
             // Tạo URL API chứa qrId
-            String apiUrl = "http://192.168.1.21:9000/api/booking/qrCode/validate?qrCodeId=" + qrCode.getId();
+            String apiUrl = String.format("http://%s:9000/api/booking/qrCode/validate?qrCodeId=%d",localIpAddress,qrCode.getId());
 
             // Gọi hàm tạo mã QR với URL API
             String qrFilePath = QR_CODE_DIRECTORY + checkInCode + ".jpg";
             QRCodeGenerator.generateQRCodeImage(apiUrl, qrFilePath);
 
             // Cập nhật đường dẫn vào QRCode và BookingRoom
-            qrCode.setQrCodeUrl("http://localhost:8082/qrcodes/" + checkInCode + ".jpg");
+            qrCode.setQrCodeUrl("http://"+ localIpAddress +":8082/qrcodes/" + checkInCode + ".jpg");
             qrRepository.save(qrCode);
             savedBooking.setQrCode(qrCode);
 
@@ -92,6 +96,9 @@ public class QRService {
     //Xác thực mã QR
     @Transactional(noRollbackFor = RuntimeException.class)
     public Map<String, Object> validateQRCodeAndFetchBookingDetails(int qrCodeId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication at start: " + authentication);
+
         QRCode qrCode = qrRepository.findById(qrCodeId).orElseThrow(() -> new RuntimeException(" QR Code not found"));
         //Kiểm tra trạng thái mã QR
         if (QRCodeStatus.USED.equals(qrCode.getQrCodeStatus())) {

@@ -138,4 +138,8 @@ public class PayPalService {
         }
         return executedPayment;
     }
+
+    public MembershipSubscription getMembershippaymentId(String paymentId) {
+        return membershipRepository.findByPaymentId(paymentId);
+    }
 }
