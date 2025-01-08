@@ -18,6 +18,14 @@ public class JwtHeaderFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String path = exchange.getRequest().getPath().toString();
+
+        // Bỏ qua endpoint không cần xác thực
+        if (path.startsWith("/api/booking/qrCode/validate")) {
+            System.out.println("Skipping JwtHeaderFilter for: " + path);
+            return chain.filter(exchange); // Bỏ qua filter
+        }
+
         // Lấy Authorization header
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 

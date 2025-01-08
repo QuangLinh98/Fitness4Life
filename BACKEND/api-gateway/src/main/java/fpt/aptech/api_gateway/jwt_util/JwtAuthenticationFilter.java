@@ -39,8 +39,8 @@ public class JwtAuthenticationFilter implements WebFilter {
                 path.startsWith("/api/users/register") ||
                 path.startsWith("/api/users/send-otp") ||
                 path.startsWith("/api/users/reset-password") ||
-                path.startsWith("/api/users/refresh_token")||
-                path.startsWith("/api/booking/qrCode/validate")) {
+                path.startsWith("/api/users/refresh_token") ||
+                path.startsWith("/api/booking/qrCode/validate")){
             System.out.println("Skipping JWT filter for: " + path);
             return chain.filter(exchange);
         }

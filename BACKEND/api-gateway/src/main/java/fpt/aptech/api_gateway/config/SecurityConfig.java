@@ -40,7 +40,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http)  {
-        System.out.println("CSRF is disabled for this configuration");
         http.csrf(ServerHttpSecurity.CsrfSpec::disable) // Bỏ qua CSRF cho API
                 .authorizeExchange(
                         exchange  -> exchange .pathMatchers(
@@ -58,6 +57,7 @@ public class SecurityConfig {
                                 .pathMatchers("/api/dashboard/**").hasAnyAuthority("ADMIN", "MANAGER")
                                 .pathMatchers("/api/goal/**").hasAnyAuthority("ADMIN", "USER")
                                 .pathMatchers("/api/deal/**").hasAnyAuthority("ADMIN", "USER")
+                                .pathMatchers("/api/notify/**").hasAnyAuthority("ADMIN", "USER")
                                 .anyExchange()
                                 .authenticated() // Các yêu cầu khác cần xác thực
                 ).addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
