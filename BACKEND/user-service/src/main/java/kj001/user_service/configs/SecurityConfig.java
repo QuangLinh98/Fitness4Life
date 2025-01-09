@@ -1,8 +1,9 @@
 package kj001.user_service.configs;
 
 import kj001.user_service.filter.JwtAuthenticationFilter;
+
+import kj001.user_service.filter.RoleHeaderFilter;
 import kj001.user_service.service.UserDetailsServiceImp;
-import lombok.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,11 +12,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -31,14 +32,18 @@ public class SecurityConfig {
     // Inject JwtAuthenticationFilter để xử lý xác thực JWT
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // Inject CustomLogoutHandler để xử lý logout tùy chỉnh
-    // private final CustomLogoutHandler logoutHandler;
+
+    //Inject CustomLogoutHandler để xử lý logout tùy chỉnh
+    private final CustomLogoutHandler logoutHandler;
 
     // Constructor injection cho các dependency
     public SecurityConfig(UserDetailsServiceImp userDetailsServiceImp,
+                          CustomLogoutHandler logoutHandler,
                           JwtAuthenticationFilter jwtAuthenticationFilter
+
     ) {
         this.userDetailsServiceImp = userDetailsServiceImp;
+        this.logoutHandler = logoutHandler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -51,25 +56,24 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/users/login",
-                                "/api/users/register",
-                                "/api/users/send-otp",
-                                "/api/users/reset-password",
-                                "/api/users/refresh_token"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers("/api/users/logout")
+                                .authenticated()
+                                .anyRequest()
+                                .permitAll()
+                              //.authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // Cấu hình logout
+                .logout(l -> l
+                        .logoutUrl("/api/users/logout") // Định nghĩa URL logout
+                        .addLogoutHandler(logoutHandler) // Thêm handler xử lý logout tùy chỉnh
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                SecurityContextHolder.clearContext()) // Xóa thông tin bảo mật sau khi logout
+                );
         return http.build();
     }
 
-    @Bean
-    public JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
-        return NimbusJwtDecoder.withSecretKey(
-                new SecretKeySpec(jwtProperties.getSecretKey().getBytes(), "HmacSHA384")
-        ).build();
-    }
 
     // Định nghĩa bean AuthenticationManager để quản lý xác thực
     @Bean

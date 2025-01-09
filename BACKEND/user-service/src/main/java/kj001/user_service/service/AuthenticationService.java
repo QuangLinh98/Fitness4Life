@@ -1,7 +1,6 @@
 package kj001.user_service.service;
 
 
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -11,6 +10,7 @@ import kj001.user_service.models.User;
 import kj001.user_service.repository.TokenRepository;
 import kj001.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,21 +24,28 @@ import java.util.List;
 
 // Đánh dấu class là một Spring service
 @Service
+
 public class AuthenticationService {
 
     // Khai báo các dependency cần thiết
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // Để mã hóa mật khẩu người dùng
-    private final JwtService jwtService; // Để tạo và xác thực JWT tokens
-    private final TokenRepository tokenRepository; // Repository để quản lý token
-    private final AuthenticationManager authenticationManager; // Spring Security để xác thực người dùng
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Để mã hóa mật khẩu người dùng
+    @Autowired
+    private JwtService jwtService; // Để tạo và xác thực JWT tokens
+    @Autowired
+    private TokenRepository tokenRepository; // Repository để quản lý token
+    @Autowired
+    private AuthenticationManager authenticationManager; // Spring Security để xác thực người dùng
 
     // Constructor injection cho các dependency
     public AuthenticationService(UserRepository userRepository,
                                  PasswordEncoder passwordEncoder,
                                  JwtService jwtService,
                                  TokenRepository tokenRepository,
-                                 AuthenticationManager authenticationManager) {
+                                 AuthenticationManager authenticationManager
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -48,7 +55,7 @@ public class AuthenticationService {
 
     // Phương thức kích hoạt tài khoản sau khi user đăng ký thành công
     @Transactional
-    public AuthenticationResponse verifyAndActivateAccount(String email , String otpCode) {
+    public boolean verifyAndActivateAccount(String email, String otpCode) {
 
         // Kiểm tra xem người dùng đã tồn tại hay chưa, nếu đã tồn tại thì trả về phản hồi lỗi
         User user = userRepository.findByEmail(email)
@@ -66,25 +73,15 @@ public class AuthenticationService {
 
         // Kích hoạt tài khoản
         user.setActive(true);
-        user.setOtpCode(null); // Xóa OTP sau khi kích hoạt
-        user.setExpiryTime(null);
         userRepository.save(user);
 
         // Xóa các bản ghi không kích hoạt khác có cùng email
         userRepository.deleteInactiveUsersByEmail(email, user.getId());
 
-        // Tạo Access Token và Refresh Token cho người dùng mới
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        // Lưu thông tin token của người dùng
-        saveUserToken(accessToken, refreshToken, user);
-
-        // Trả về phản hồi đăng ký thành công với các token
-        return new AuthenticationResponse(accessToken, refreshToken,"User registration was successful");
+        return true;
     }
 
-    // Phương thức để xác thực người dùng đã tồn tại
+    // Phương thức để xác thực người dùng (Login)
     public AuthenticationResponse authenticate(User request) {
         // Sử dụng AuthenticationManager để xác thực người dùng dựa trên username và password
         authenticationManager.authenticate(
@@ -115,12 +112,12 @@ public class AuthenticationService {
     private void revokeAllTokenByUser(User user) {
         // Lấy tất cả các token hợp lệ của người dùng
         List<Token> validTokens = tokenRepository.findAllAccessTokensByUser(user.getId());
-        if(validTokens.isEmpty()) {
+        if (validTokens.isEmpty()) {
             return; // Nếu không có token hợp lệ thì kết thúc
         }
 
         // Đánh dấu tất cả các token là đã đăng xuất
-        validTokens.forEach(t-> {
+        validTokens.forEach(t -> {
             t.setLoggedOut(true);
         });
 
@@ -130,12 +127,12 @@ public class AuthenticationService {
 
     // Phương thức để lưu thông tin token của người dùng
     private void saveUserToken(String accessToken, String refreshToken, User user) {
-        Token token = new Token(); // Tạo đối tượng Token mới
-        token.setAccessToken(accessToken); // Thiết lập Access Token
-        token.setRefreshToken(refreshToken); // Thiết lập Refresh Token
+        Token token = new Token();
+        token.setAccessToken(accessToken);
+        token.setRefreshToken(refreshToken);
         token.setLoggedOut(false); // Đặt trạng thái là chưa đăng xuất
         token.setUser(user); // Gán người dùng cho token
-        tokenRepository.save(token); // Lưu token vào cơ sở dữ liệu
+        tokenRepository.save(token);
     }
 
     // Phương thức để refresh token của người dùng
@@ -146,7 +143,7 @@ public class AuthenticationService {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         // Kiểm tra nếu header không hợp lệ
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED); // Trả về mã lỗi không được phép
         }
 
@@ -158,10 +155,10 @@ public class AuthenticationService {
 
         // Tìm người dùng theo email
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("No user found"));
+                .orElseThrow(() -> new RuntimeException("No user found"));
 
         // Kiểm tra tính hợp lệ của Refresh Token
-        if(jwtService.isValidRefreshToken(token, user)) {
+        if (jwtService.isValidRefreshToken(token, user)) {
             // Nếu hợp lệ thì tạo Access Token mới và Refresh Token mới
             String accessToken = jwtService.generateAccessToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);

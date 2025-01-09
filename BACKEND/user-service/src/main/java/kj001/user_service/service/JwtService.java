@@ -92,6 +92,7 @@ public class JwtService {
 
     // Phương thức để kiểm tra xem token có hợp lệ hay không
     public boolean isValid(String token, UserDetails user) {
+        System.out.println("Có lọt vào đây không ");
         Logger logger = Logger.getLogger(this.getClass().getName()); // Tạo logger
 
         String username = extractUsername(token); // Lấy username từ token
@@ -103,7 +104,7 @@ public class JwtService {
                 .map(t -> !t.isLoggedOut()) // Token vẫn hợp lệ nếu chưa bị đăng xuất
                 .orElse(false);
 
-        // Kiểm tra điều kiện hợp lệ
+        // Kiểm tra điều kiện Token hợp lệ nếu username khớp, chưa hết hạn, và chưa bị đăng xuất
         boolean isValid = username.equals(user.getUsername()) && !isTokenExpired(token) && validToken;
 
         // Ghi log trạng thái token
@@ -124,6 +125,7 @@ public class JwtService {
 
         return isValid;
     }
+
     // Phương thức kiểm tra xem token có hết hạn hay chưa
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date()); // Kiểm tra nếu ngày hết hạn trước ngày hiện tại

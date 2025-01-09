@@ -31,7 +31,7 @@ public class ManagerController {
     }
 
     @GetMapping("manager/users/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getUserById(@PathVariable long id){
         UserDTO userDTO = userService.getUserById(id);
         return ResponseEntity.ok(userDTO);

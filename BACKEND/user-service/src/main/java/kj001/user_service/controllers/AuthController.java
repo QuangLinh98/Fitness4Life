@@ -56,7 +56,7 @@ public class AuthController {
     @GetMapping("verify-account/{email}/{code}")
     public ResponseEntity<?> verifyAccount(@PathVariable String email, @PathVariable String code) {
         try {
-            AuthenticationResponse response  = authenticationService.verifyAndActivateAccount(email, code);
+            boolean response  = authenticationService.verifyAndActivateAccount(email, code);
             return ResponseEntity.ok(response );
         } catch (RuntimeException ex) {
             if (ex.getMessage().contains("OTPHasExpired")) {
@@ -69,22 +69,11 @@ public class AuthController {
         }
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-//        Optional<UserResponseDTO> user = userService.login(loginRequestDTO);
-//        if (user.isPresent()) {
-//            // redisProducer.publishMessage("userId" , "3");  //Publish id khi user login để trip lưu id của user đó vào session để phục vụ cho việc gửi notify
-//            return ResponseEntity.ok(user.get());
-//        }
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or password mismatch.");
-//    }
-
     @PostMapping("login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody User request)
     {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
-
 
     @PostMapping("change-pass")
     public ResponseEntity<?> changePass(@Valid

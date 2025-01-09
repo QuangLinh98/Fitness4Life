@@ -36,8 +36,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final OtpRepository otpRepository;
     private final MailResetPass mailResetPass;
-    private final ObjectMapper objectMapper;   //Là 1 lớp thư viện trong java , nhằm để chuyển đổi dạng Object sang JSON
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();   //Mã hóa mật khẩu
+    private final ObjectMapper objectMapper;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final FileUpload fileUpload;
     private String subFolder = "avatarImage";
     String uploadFolder = "uploads";
@@ -46,11 +46,6 @@ public class UserService {
     private static final int OTP_EXPIRATION_MINUTES = 5;   //Đặt thời gian hết hạn cho mã OTP
 
     //Phương thức Show Data
-//    public List<UserResponseDTO> getAllUser() {
-//        List<User> users = userRepository.findAll();
-//        return users.stream().map(user -> objectMapper.convertValue(user, UserResponseDTO.class))
-//                .collect(Collectors.toList());
-//    }
     public List<UserResponseDTO> getAllUser() {
         List<User> users = userRepository.findAll();
         return users.stream().map(user -> {
@@ -96,32 +91,6 @@ public class UserService {
                 .build();
         return userDTO;
     }
-
-//    public UserResponseDTO toUserResponseDTO(User user) {
-//        UserResponseDTO userResponseDTO = new UserResponseDTO();
-//        userResponseDTO.setId(user.getId());
-//        userResponseDTO.setFullName(user.getFullName());
-//        userResponseDTO.setEmail(user.getEmail());
-//        userResponseDTO.setActive(user.isActive());
-//        userResponseDTO.setPhone(user.getPhone());
-//        userResponseDTO.setRole(user.getRole());
-//        userResponseDTO.setGender(user.getGender());
-//
-//        // Chuyển đổi Profile sang ProfileDTO
-//        if (user.getProfile() != null) {
-//            ProfileDTO profileDTO = new ProfileDTO();
-//            profileDTO.setId(user.getProfile().getId());
-//            profileDTO.setAvatar(user.getProfile().getAvatar());
-//            profileDTO.setAge(user.getProfile().getAge());
-//            profileDTO.setHobbies(user.getProfile().getHobbies());
-//            profileDTO.setAddress(user.getProfile().getAddress());
-//            profileDTO.setMaritalStatus(user.getProfile().getMaritalStatus());
-//            profileDTO.setDescription(user.getProfile().getDescription());
-//            userResponseDTO.setProfileDTO(profileDTO);
-//        }
-//        return userResponseDTO;
-//    }
-
 
     //Phương thức Register User
     @Transactional
@@ -174,36 +143,6 @@ public class UserService {
         return userResponseDTO;
     }
 
-    //VerifyAccount
-//    public boolean verifyAccount(String email, String code) {
-//        Optional<User> user = userRepository.findByEmailAndOtpCode(email, code);
-//        if (user.isPresent()) {
-//            //Nếu đã verify mà user tiếp tục verify thì báo lỗi
-//            if (user.get().isActive()) {
-//                throw new RuntimeException("OTPVERIFIED");
-//            }
-//            //Kiểm tra OTP đã hết hạn chưa
-//            if (user.get().getExpiryTime().isBefore(LocalDateTime.now())) {
-//                throw new RuntimeException("OTPHasExpired");
-//            }
-//            user.get().setActive(true);    //KHi user đã xác thực thì đặt trạng thái isActive = true
-//            userRepository.save(user.get());
-//
-//            // Xóa các bản ghi khác có cùng email nhưng không được kích hoạt
-//            userRepository.deleteInactiveUsersByEmail(email, user.get().getId());
-//            return true;
-//        }
-//        return false;
-//    }
-
-    //Phương thức Login
-    public Optional<UserResponseDTO> login(LoginRequestDTO loginRequestDTO) {
-        Optional<User> user = userRepository.findByEmail(loginRequestDTO.getEmail());
-        if (user.isPresent() && passwordEncoder.matches(loginRequestDTO.getPassword(), user.get().getPassword())) {
-            return Optional.of(convertToUserResponseDTO(user.get()));
-        }
-        return Optional.empty();
-    }
 
     //Phương thức Update User
     public Optional<UserResponseDTO> updateUser(Long userId, UserAndProfileUpdateDTO userAndProfileUpdateDTO) throws IOException {
@@ -280,6 +219,7 @@ public class UserService {
     public boolean changePassword(ChangePasswordRequestDTO changePasswordRequestDTO) {
         //Lấy email từ SecurityContext (đã xác thực)
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("Test Email : " + email);
 
         // Tìm người dùng theo email
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("UserNotFound"));
