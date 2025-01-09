@@ -36,11 +36,4 @@ public class SecurityConfig {
                 .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-//    @Bean
-//    public JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
-//        return NimbusJwtDecoder.withSecretKey(
-//                new SecretKeySpec(jwtProperties.getSecretKey().getBytes(), "HmacSHA384")
-//        ).build();
-//    }
 }

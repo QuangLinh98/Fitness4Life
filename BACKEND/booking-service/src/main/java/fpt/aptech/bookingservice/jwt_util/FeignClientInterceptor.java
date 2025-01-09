@@ -24,11 +24,9 @@ public class FeignClientInterceptor implements RequestInterceptor {
         // Lấy Authentication từ SecurityContextHolder
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        System.out.println("Test Authentication : " +  authentication);
         if (authentication != null && authentication.getCredentials() != null) {
             // Lấy token từ Authentication
             String token = authentication.getCredentials().toString();
-            System.out.println("Test Token : "  + token);
 
             // Đảm bảo không thêm tiền tố Bearer nhiều lần
             if (!token.startsWith("Bearer ")) {

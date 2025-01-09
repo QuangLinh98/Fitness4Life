@@ -45,11 +45,11 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/getMembershipByPamentId/{paymentId}")
+    @GetMapping("getMembershipByPamentId/{paymentId}")
     public  ResponseEntity<?> getMembershipByPamentId(@PathVariable("paymentId") String paymentId) {
         try {
             MembershipSubscription member = payPalService.getMembershippaymentId(paymentId);
-            return ResponseEntity.ok(member);
+            return ResponseEntity.status(200).body(ResponseEntity.ok(member));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
