@@ -13,7 +13,7 @@ public interface GoalRepository extends JpaRepository<Goal, Integer> {
     List<Goal> findGoalByUserId(@Param("userId") int userId);
 
     // Truy vấn tìm các mục tiêu chưa hoàn thành trước một ngày cụ thể
-    @Query("SELECT g FROM Goal g WHERE g.endDate < :endDate AND " +
+    @Query("SELECT g FROM Goal g WHERE g.endDate = :endDate AND " +
             "(SELECT MAX(p.value) FROM g.progresses p) < :progress")
     List<Goal> findByEndDateBeforeAndProgressLessThan(LocalDate endDate, double progress);
 

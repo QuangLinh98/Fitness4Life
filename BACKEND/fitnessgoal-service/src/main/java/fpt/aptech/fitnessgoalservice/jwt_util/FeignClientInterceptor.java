@@ -13,22 +13,23 @@ public class FeignClientInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate requestTemplate) {
         // Lấy Authentication từ SecurityContextHolder
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.getCredentials() != null) {
-            // Lấy token từ Authentication
-            String token = authentication.getCredentials().toString();
-
-            // Đảm bảo không thêm tiền tố Bearer nhiều lần
-            if (!token.startsWith("Bearer ")) {
-                token = "Bearer " + token;
-            }
-
-            // Đảm bảo header Authorization không bị ghi đè nhiều lần
-            if (!requestTemplate.headers().containsKey("Authorization")) {
-                requestTemplate.header("Authorization", token);
-            }
-        }
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println("Authentication la : " + authentication);
+//        if (authentication != null && authentication.getCredentials() != null) {
+//            // Lấy token từ Authentication
+//            String token = authentication.getCredentials().toString();
+//
+//            // Đảm bảo không thêm tiền tố Bearer nhiều lần
+//            if (!token.startsWith("Bearer ")) {
+//                token = "Bearer " + token;
+//            }
+//
+//            // Đảm bảo header Authorization không bị ghi đè nhiều lần
+//            if (!requestTemplate.headers().containsKey("Authorization")) {
+//                requestTemplate.header("Authorization", token);
+//            }
+//        }
+        requestTemplate.header("Authorization", (String) null);
     }
 }
 

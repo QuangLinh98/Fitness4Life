@@ -1,5 +1,6 @@
 package fpt.aptech.fitnessgoalservice.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fpt.aptech.fitnessgoalservice.dtos.*;
 import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
@@ -10,8 +11,10 @@ import fpt.aptech.fitnessgoalservice.models.GoalExtension;
 import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.notification.NotifyService;
 import fpt.aptech.fitnessgoalservice.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +33,8 @@ public class ManagerController {
     private final ExerciseDietSuggestionsService dietPlanService;
     private final UserEurekaClient userEurekaClient;
     private final NotifyService notifyService;
+    private final HttpServletRequest request;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("add")
     public ResponseEntity<?> AddGoal(@RequestBody GoalDTO goalDTO) {
@@ -37,7 +42,6 @@ public class ManagerController {
             Goal newGoal = goalService.createGoal(goalDTO);
             //Test user
             UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
-            System.out.println("Có nhận đươc user không : " + existingUser);
 
             //Send notification to user . When user add a goal successfully
             try {

@@ -1,5 +1,7 @@
 package fpt.aptech.fitnessgoalservice.notification;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fpt.aptech.fitnessgoalservice.dtos.GoalDTO;
 import fpt.aptech.fitnessgoalservice.dtos.NotifyDTO;
 import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
@@ -7,7 +9,9 @@ import fpt.aptech.fitnessgoalservice.kafka.NotifyProducer;
 import fpt.aptech.fitnessgoalservice.models.Goal;
 import fpt.aptech.fitnessgoalservice.models.Progress;
 import fpt.aptech.fitnessgoalservice.service.CalculationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotifyService {
     private final NotifyProducer notifyProducer;
-    private final CalculationService calculationService;
+    private final HttpServletRequest request;
+    private final ObjectMapper objectMapper;
 
-    public void sendCreatedNotification(UserDTO existingUser, NotifyDTO notifyDTO , GoalDTO goalDTO) {
+    public void sendCreatedNotification(UserDTO existingUser, NotifyDTO notifyDTO , GoalDTO goalDTO) throws JsonProcessingException {
+        //String token = request.getHeader("Authorization"); // Lấy token từ header
+
         //Thiết lập thông báo
         notifyDTO = NotifyDTO.builder()
                 .itemId(notifyDTO.getItemId())
@@ -26,9 +33,12 @@ public class NotifyService {
                 .fullName(existingUser.getFullName())
                 .title("Chao mung " + existingUser.getFullName() + " đen voi muc tieu " +goalDTO.getGoalType())
                 .content("Chuc ban som hoan thanh đuoc muc tieu đe ra.")
+                //.token(token)
                 .build();
         // Gửi thông báo thông qua NotifyProducer
         notifyProducer.sendNotify(notifyDTO);
+        System.out.println("Message gửi qua Kafka: " + objectMapper.writeValueAsString(notifyDTO));
+
     }
 
     //Gửi thông báo nhắc nhở về thời gian kết thúc goal

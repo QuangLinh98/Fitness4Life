@@ -111,12 +111,12 @@ public class GoalService {
         return savedGoal;
     }
 
-    //PHương thức kiểm tra tất cả những mục tiêu có endDate <= currentDate và chưa hoàn thành mục tiêu sẽ gửi thông báo
-    @Scheduled(cron = "0 0 0 * * ?")
+    //PHương thức kiểm tra tất cả những mục tiêu có endDate = currentDate và chưa hoàn thành mục tiêu sẽ gửi thông báo
+    @Scheduled(cron = "0 0 7 * * ?")
     public void checkAndNotifyUnfinishedGoals() {
-        // Lấy tất cả các mục tiêu có endDate <= hôm nay và chưa hoàn thành
+        // Lấy tất cả các mục tiêu có endDate = hôm nay và chưa hoàn thành
         List<Goal> unfinishedGoals = goalRepository.findByEndDateBeforeAndProgressLessThan(
-                LocalDate.now().plusDays(4), 100);  //Gửi cảnh báo trước 3 ngày
+                LocalDate.now(), 100);
         for (Goal goal : unfinishedGoals) {
             UserDTO user = userEurekaClient.getUserById(goal.getUserId());
             // Gửi thông báo đến user
@@ -126,7 +126,7 @@ public class GoalService {
 
     //Phương thức gửi thông báo xác nhận gia hạn mục tiêu
     @Transactional
-    @Scheduled(cron = "0 0 7 * * ?") // Chạy mỗi ngày lúc 7 giờ sáng
+    @Scheduled(cron = "0 0 7 * * ?")// Chạy mỗi ngày lúc 7 giờ sáng
     public void checkGoalsOnEndDate() {
         try {
             // Lấy ngày hiện tại
@@ -198,6 +198,8 @@ public class GoalService {
         existingGoal.setTargetValue(goalDTO.getTargetValue());
         existingGoal.setCurrentValue(goalDTO.getCurrentValue());
         existingGoal.setWeight(weight);
+        existingGoal.setStartDate(goalDTO.getStartDate());
+        existingGoal.setEndDate(goalDTO.getEndDate());
         existingGoal.setActivityLevel(goalDTO.getActivityLevel());
 
         // Nếu trạng thái của goal đang trong tiến trình hoặc thất bại, cho phép cập nhật ngày bắt đầu và ngày kết thúc
