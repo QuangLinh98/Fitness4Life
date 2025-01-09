@@ -26,7 +26,6 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        System.out.println("JwtAuthenticationFilter initialized");
     }
 
     @Override
@@ -45,7 +44,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
-        // Lấy Authorization header từ yêu cầu
+        // Lấy Authorization header
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
         // Kiểm tra xem header có hợp lệ không (có bắt đầu với "Bearer " không)
@@ -56,14 +55,10 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         // Trích xuất token từ header (bỏ qua chuỗi "Bearer ")
         String token = authHeader.substring(7);
-        System.out.println("JWT Token: " + token);
         try {
             // Kiểm tra token hợp lệ
             String role = jwtUtil.extractUserRole(token);   //Giải mã lấy role từ token
-            System.out.println("Role: " + role);
-
             String username = jwtUtil.extractUserId(token); // Giải mã lấy username từ token
-            System.out.println("User name : " + username);
 
             if (jwtUtil.validateToken(token)) {
 
@@ -74,19 +69,13 @@ public class JwtAuthenticationFilter implements WebFilter {
                                 .header("X-Role", role)
                                 .build())
                         .build();
-                System.out.println("Added X-Username and X-Role to headers.");
-//                UsernamePasswordAuthenticationToken authToken  = new UsernamePasswordAuthenticationToken(
-//                         username,
-//                        null,
-//                        List.of(new SimpleGrantedAuthority(jwtUtil.extractUserRole(token)))
-//                );
-//               System.out.println("Authorities: " + authToken.getAuthorities());
-                // Thiết lập SecurityContext bằng ReactiveSecurityContextHolder
-//                return chain.filter(exchange)
-//                        .contextWrite(context -> ReactiveSecurityContextHolder.withAuthentication(authToken));
+                //Thiết lập SecurityContext cho ReactiveSecurity
                 return chain.filter(mutatedExchange)
                         .contextWrite(context -> ReactiveSecurityContextHolder.withAuthentication(
-                                new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority(role)))
+                                new UsernamePasswordAuthenticationToken(
+                                        username,
+                                        null,
+                                        List.of(new SimpleGrantedAuthority(role)))
                         ));
             }else {
                 System.out.println("Invalid JWT token");
@@ -94,8 +83,6 @@ public class JwtAuthenticationFilter implements WebFilter {
                 return exchange.getResponse().setComplete();
             }
         } catch (Exception e) {
-            // Xử lý token không hợp lệ
-            System.out.println("JWT validation error: " + e.getMessage());
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
