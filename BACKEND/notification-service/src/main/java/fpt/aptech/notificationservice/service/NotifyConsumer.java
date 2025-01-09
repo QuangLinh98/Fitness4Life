@@ -10,6 +10,7 @@ import fpt.aptech.notificationservice.models.Notify;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.kafka.annotation.KafkaListener;
 
@@ -21,6 +22,8 @@ public class NotifyConsumer {
     private ObjectMapper objectMapper;
     @Autowired
     private NotifyService notifyService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;  //Dùng để gửi tin nhắn qua template
     @Autowired
     private UserEurekaClient eurekaClient;
     @Autowired
@@ -35,8 +38,14 @@ public class NotifyConsumer {
            // String token  = notifyDTO.getToken();
 
             Notify notify = objectMapper.convertValue(notifyDTO, Notify.class);
-            System.out.println("Message nhận qua Kafka" + notify);
             notifyService.addNotify(notify);
+
+            //Gửi thông báo qua websocket
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(notify.getUserId()),             //Gửi tới user
+                    "/queue/notifications",         // Endpoint cá nhân hóa
+                    notify                          // Nội dung thông báo
+            );
 
             //Lấy email từ user-service thông qua feign client
 //            UserDTO userDTO = eurekaClient.getUserById(notify.getUserId(),token);
@@ -58,4 +67,6 @@ public class NotifyConsumer {
             System.out.println("Failed to process feed message: " + e.getMessage());
         }
     }
+
+
 }
