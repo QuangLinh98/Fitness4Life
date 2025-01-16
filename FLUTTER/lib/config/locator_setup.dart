@@ -1,5 +1,6 @@
 // File chứa hàm `setupLocator()` và cấu hình DI
 import 'package:dio/dio.dart';
+import 'package:fitness4life/api/Booking_Repository/BookingRoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/TrainerRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
@@ -27,4 +28,7 @@ void setUpLocator() {
 
   // Đăng ký RoomRepository
   locator.registerLazySingleton(() => GoalRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký BookingRepository
+  locator.registerLazySingleton(() => BookingRoomRepository(locator<ApiGateWayService>()));
 }

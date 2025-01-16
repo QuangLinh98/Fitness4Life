@@ -1,17 +1,25 @@
+import 'package:fitness4life/core/widgets/CustomDialog.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
+import 'package:fitness4life/features/booking/data/BookingRoom.dart';
+import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ClassScreen extends StatefulWidget {
-  const ClassScreen({super.key});
+  final int roomId;
+  final int userId;
+
+  const ClassScreen({super.key,  this.roomId = 3 , this.userId = 152});
 
   @override
   State<ClassScreen> createState() => _ClassScreenState();
 }
 
 class _ClassScreenState extends State<ClassScreen> {
+  bool isBooked = false; // Biến trạng thái: true => hiển thị booked classes
+
   final List<String> images = [
     'images/cycling.jpg',
     'images/dance.jpg',
@@ -29,6 +37,18 @@ class _ClassScreenState extends State<ClassScreen> {
       // Gọi fetchRooms
       final roomService = Provider.of<RoomService>(context, listen: false);
       roomService.fetchRooms();
+
+      //Gọi bookingRoom
+      final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
+      bookingRoomService.bookingRoom(widget.roomId, widget.userId);
+
+      //Gọi booked room by userId
+      final bookedRoomService = Provider.of<BookingRoomService>(context, listen: false);
+      bookedRoomService.fetchBookedRooms(widget.userId);
+
+      //Gọi cancel booking room
+      final cancelBooking = Provider.of<BookingRoomService>(context, listen: false);
+      cancelBooking.cancelBooking(widget.roomId);
 
     });
   }
@@ -64,20 +84,28 @@ class _ClassScreenState extends State<ClassScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        isBooked = false;  //Hiển thị tất cả room
+                      });
+                    },
                     child: Text('All classes', style: TextStyle(color: Colors.white, fontSize: 16)),
                     style: TextButton.styleFrom(
-                      //backgroundColor: Colors.black,
+                      backgroundColor: !isBooked ? Colors.purple.shade300 : Colors.transparent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                        setState(() {
+                          isBooked = true ; //Hiển thị những lớp được book
+                        });
+                    },
                     child: Text('Booked classes', style: TextStyle(color: Colors.white, fontSize: 16)),
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.purple.shade300,
+                      backgroundColor: isBooked ? Colors.purple.shade300 : Colors.transparent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -136,29 +164,10 @@ class _ClassScreenState extends State<ClassScreen> {
                 ),
               ),
             ),
-            Expanded(
-              child: Consumer<RoomService>(
-                builder: (context, roomService, child) {
-                  if (roomService.rooms.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "No Upcoming Classes Available",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    padding: EdgeInsets.all(16),
-                    itemCount: roomService.rooms.length,
-                    itemBuilder: (context, index) {
-                      final room = roomService.rooms[index];
-                      return buildUpcomingClassCard(room,index);
-                    },
-                  );
-                },
-              ),
-            ),
 
+            Expanded(
+              child: isBooked ? _buildBookedClasses() : _buildAllClasses(),
+            ),
           ],
         ),
       )
@@ -166,7 +175,167 @@ class _ClassScreenState extends State<ClassScreen> {
     );
   }
 
-  //Xử lý Upcoming Classes
+  // Xây dựng danh sách tất cả rooms
+  Widget _buildAllClasses() {
+    return Consumer<RoomService>(
+      builder: (context, roomService, child) {
+        final rooms = roomService.rooms;
+
+        if (rooms.isEmpty) {
+          return const Center(
+            child: Text(
+              "No classes available",
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: rooms.length,
+          itemBuilder: (context, index) {
+            final room = rooms[index];
+            return buildUpcomingClassCard(room,index);
+          },
+        );
+      },
+    );
+  }
+
+  // Xây dựng danh sách các booked rooms
+  Widget _buildBookedClasses() {
+    return Consumer<BookingRoomService>(
+      builder: (context, bookingRoomService, child) {
+        final bookings = bookingRoomService.bookedRooms;
+
+        if (bookings.isEmpty) {
+          return const Center(
+            child: Text(
+              "No booked classes available",
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: bookings.length,
+          itemBuilder: (context, index) {
+            final booking = bookings[index];
+            return _buildBookingCard(booking);
+          },
+        );
+      },
+    );
+  }
+
+  // Card hiển thị thông tin booking room
+  Widget _buildBookingCard(BookingRoom booking) {
+    String formatDateTime(DateTime? dateTime) {
+      if (dateTime != null) {
+        return DateFormat('dd/MM/yyyy hh:mm a').format(dateTime);
+      }
+      return 'N/A';
+    }
+    // Không hiển thị nếu trạng thái là "cancel"
+    if (booking.status?.toLowerCase() == 'canceled') {
+      return SizedBox.shrink();
+    }
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: const Color(0xFF392F7D),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              booking.roomName!,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Booked by: ${booking.userName}",
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Booking Date: ${formatDateTime(booking.bookingDate)}",
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Status: ${booking.status}",
+              style: const TextStyle(
+                color: Colors.greenAccent,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: () async {
+                  // Xử lý sự kiện hủy booking
+                  final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
+                  try {
+                  await bookingRoomService.cancelBooking(booking.id ?? 0);
+
+                    // Hiển thị dialog thông báo thành công
+                    CustomDialog.show(
+                      context,
+                      title: "Success",
+                      content: "Booking cancelled successfully!",
+                      buttonText: "OK",
+                      onButtonPressed: () {
+                        // Xử lý sau khi đóng dialog, ví dụ load lại danh sách
+                        setState(() {
+                          // Logic để làm mới danh sách booked rooms
+                          Provider.of<BookingRoomService>(context, listen: false).fetchBookedRooms(booking.userId ?? 0);
+                        });
+                      },
+                    );
+                  } catch(e) {
+                    // Hiển thị dialog thông báo thất bại
+                    CustomDialog.show(
+                      context,
+                      title: "Error",
+                      content: "Failed to cancel booking. Please try again.",
+                      buttonText: "OK",
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  //Card hiển thị tất cả room
   Widget buildUpcomingClassCard(Room room, int index) {
     // Format thời gian
     String formatTime(List<int>? timeList) {
@@ -216,7 +385,7 @@ class _ClassScreenState extends State<ClassScreen> {
                     room.roomname ?? "Unknown Room",
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -226,7 +395,7 @@ class _ClassScreenState extends State<ClassScreen> {
                     "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
                     style: const TextStyle(
                       color: Colors.white70,
-                      fontSize: 14,
+                      fontSize: 16,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -247,24 +416,54 @@ class _ClassScreenState extends State<ClassScreen> {
                             "${room.availableseats ?? 0} / ${room.capacity}",
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: 14,
                             ),
                           ),
                         ],
                       ),
+                      // Nút "Book" hoặc "Full"
                       ElevatedButton(
-                        onPressed: () {
-                          // Xử lý khi nhấn nút
+                        onPressed: (room.availableseats ?? 0) == (room.capacity ?? 0)
+                            ? null // Vô hiệu hóa nút nếu đầy
+                            : () async {
+                          // Xử lý sự kiện click Book button
+                          final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
+                          bool success = await bookingRoomService.bookingRoom(room.id ?? 0, widget.userId);
+
+                          if(success) {
+                            //Nếu booking thành công , hiển thị dialog thông báo thành công
+                            CustomDialog.show(
+                                context,
+                                title: "Success",
+                                content: "Room booked successfully!",
+                                buttonText: "OK",
+                                onButtonPressed: () {
+                                  setState(() {
+                                    room.availableseats = (room.availableseats ?? 0 ) + 1; //Cập nhật số ghế
+                                  });
+                                }
+                            );
+                          }else{
+                            // Hiển thị dialog thông báo lỗi
+                            CustomDialog.show(
+                              context,
+                              title: "Error",
+                              content: "Failed to book room. Please try again.",
+                              buttonText: "OK",
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF9747FF),
+                          backgroundColor: (room.availableseats ?? 0) == (room.capacity ?? 0)
+                              ? Colors.grey // Màu xám khi đầy
+                              : const Color(0xFF9747FF), // Màu tím khi còn chỗ
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text(
-                          "Book",
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        child: Text(
+                          (room.availableseats ?? 0) == (room.capacity ?? 0) ? "Full" : "Book",
+                          style: const TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ),
                     ],

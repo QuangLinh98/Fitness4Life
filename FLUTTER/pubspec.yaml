@@ -36,7 +36,8 @@ dependencies:
   get_it: ^7.2.0         # Khi bạn cần quản lý các đối tượng hoặc dịch vụ toàn cục như API client, repository, hoặc state manager.
   freezed_annotation: ^2.2.0   #Tạo các đối tượng dữ liệu (data Classes) mà không cần viết thủ công. Thường được sử dụng với freezed và build_runner.
   shared_preferences: ^2.0.15 # Để lưu token
-  intl: ^0.17.0
+  intl: ^0.17.0         #Format ngày tháng
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

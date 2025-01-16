@@ -10,9 +10,22 @@ class Room {
   List<int>? endtimeList;
   List<int>? createdatList;
   List<int>? updatedatList;
+  late bool isBooked;
 
-  Room(
-      {this.id, this.roomname, this.slug, this.capacity, this.availableseats, this.facilities, this.status, this.starttimeList, this.endtimeList, this.createdatList, this.updatedatList});
+  Room({
+    this.id,
+    this.roomname,
+    this.slug,
+    this.capacity,
+    this.availableseats,
+    this.facilities,
+    this.status,
+    this.starttimeList,
+    this.endtimeList,
+    this.createdatList,
+    this.updatedatList,
+    this.isBooked = false,
+  });
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -27,6 +40,7 @@ class Room {
     map["endTime"] = endtimeList;
     map["createdAt"] = createdatList;
     map["updatedAt"] = updatedatList;
+    map["isBooked"] = isBooked;
     return map;
   }
 
@@ -45,5 +59,6 @@ class Room {
     json["createdAt"] != null ? json["createdAt"].cast<int>() : [];
     updatedatList =
     json["updatedAt"] != null ? json["updatedAt"].cast<int>() : [];
+    isBooked = false;
   }
 }
