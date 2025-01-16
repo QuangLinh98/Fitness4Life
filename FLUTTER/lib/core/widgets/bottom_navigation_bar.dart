@@ -1,4 +1,5 @@
 import 'package:fitness4life/features/Home/presentation/screens/HomeScreen.dart';
+import 'package:fitness4life/features/booking/presentation/screens/ClassesScreen.dart';
 import 'package:flutter/material.dart';
 
 class PageManager extends StatefulWidget {
@@ -13,7 +14,7 @@ class _PageManagerState extends State<PageManager> {
 
   final List<Widget> _pages = [
     HomeScreen(), // Tab "Home"
-    // ClassesPage(),  // Tab "Classes"
+    ClassScreen(),  // Tab "Classes"
     // AccountPage(),  // Tab "Account"
   ];
 

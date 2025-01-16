@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final roomService = Provider.of<RoomService>(context, listen: false);
       roomService.fetchRooms();
 
+      // Gọi fetchGoals
       final goalService = Provider.of<GoalService>(context, listen: false);
       goalService.fetchGoals();
     });
@@ -223,11 +224,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Icon(Icons.people, color: Colors.red, size: 16),
+                        Icon(Icons.people, color: Color(0xFF9747FF), size: 16),
                         SizedBox(width: 4),
                         Text(
                           "0/25",
-                          style: TextStyle(fontSize: 14, color: Colors.red),
+                          style: TextStyle(fontSize: 14, color: Color(0xFF9747FF)),
                         ),
                       ],
                     ),
