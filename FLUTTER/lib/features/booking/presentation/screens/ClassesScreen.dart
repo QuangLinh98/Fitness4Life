@@ -2,6 +2,7 @@ import 'package:fitness4life/core/widgets/CustomDialog.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/booking/data/BookingRoom.dart';
+import 'package:fitness4life/features/booking/presentation/screens/BookingDetailScreen.dart';
 import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -286,49 +287,75 @@ class _ClassScreenState extends State<ClassScreen> {
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () async {
-                  // Xử lý sự kiện hủy booking
-                  final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
-                  try {
-                  await bookingRoomService.cancelBooking(booking.id ?? 0);
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end, // Đưa các nút về góc phải
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Xử lý sự kiện hủy booking
+                      final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
+                      try {
+                        await bookingRoomService.cancelBooking(booking.id ?? 0);
 
-                    // Hiển thị dialog thông báo thành công
-                    CustomDialog.show(
-                      context,
-                      title: "Success",
-                      content: "Booking cancelled successfully!",
-                      buttonText: "OK",
-                      onButtonPressed: () {
-                        // Xử lý sau khi đóng dialog, ví dụ load lại danh sách
-                        setState(() {
-                          // Logic để làm mới danh sách booked rooms
-                          Provider.of<BookingRoomService>(context, listen: false).fetchBookedRooms(booking.userId ?? 0);
-                        });
-                      },
-                    );
-                  } catch(e) {
-                    // Hiển thị dialog thông báo thất bại
-                    CustomDialog.show(
-                      context,
-                      title: "Error",
-                      content: "Failed to cancel booking. Please try again.",
-                      buttonText: "OK",
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                        // Hiển thị dialog thông báo thành công
+                        CustomDialog.show(
+                          context,
+                          title: "Success",
+                          content: "Booking cancelled successfully!",
+                          buttonText: "OK",
+                          onButtonPressed: () {
+                            // Xử lý sau khi đóng dialog, ví dụ load lại danh sách
+                            setState(() {
+                              Provider.of<BookingRoomService>(context, listen: false).fetchBookedRooms(booking.userId ?? 0);
+                            });
+                          },
+                        );
+                      } catch (e) {
+                        // Hiển thị dialog thông báo thất bại
+                        CustomDialog.show(
+                          context,
+                          title: "Error",
+                          content: "Failed to cancel booking. Please try again.",
+                          buttonText: "OK",
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  "Cancel",
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
+                  const SizedBox(width: 8), // Khoảng cách giữa hai nút
+                  ElevatedButton(
+                    onPressed: () {
+                      // Chuyển hướng đến trang chi tiết
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BookingDetailScreen(bookingId: booking.id ?? 0),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      "Detail",
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ),
+                ],
               ),
-            ),
+            )
           ],
         ),
       ),

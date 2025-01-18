@@ -53,7 +53,6 @@ class BookingRoomRepository {
       try {
         // Gửi yêu cầu hủy đặt phòng tới API
         final response = await _apiGateWayService.putData("/booking/cancelBookingRoom/$id");
-        print("Response cancel booking: ${response.data}");
 
       } catch (e) {
         // Xử lý lỗi nếu xảy ra

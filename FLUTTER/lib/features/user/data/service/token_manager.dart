@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenManager {
-  static const _accessTokenKey = 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuZ3V5ZW5saW5oYWs0QGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImZ1bGxOYW1lIjoiVHJhbiBOaGFuIEFuIiwiaWF0IjoxNzM3MDE5NDYyLCJleHAiOjE3MzcxMDU4NjJ9.ffa94a72EoxfNfxAr7z7ssFIHJtmyiXmGAE2iIF6L0jjdFPygE0hdGnjZoWe_ns2';
+  static const _accessTokenKey = 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuZ3V5ZW5saW5oYWs0QGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImZ1bGxOYW1lIjoiVHJhbiBOaGFuIEFuIiwiaWF0IjoxNzM3MTY5OTAwLCJleHAiOjE3MzcyNTYzMDB9.pXAooGKkphLfgga4TwO38w9-PBgk4Eha9OlaCAOvIc5FbqdUbRYptYQmwkpLV8tL';
   static const _refreshTokenKey = 'refreshToken';
 
   // Lưu token vào SharedPreferences

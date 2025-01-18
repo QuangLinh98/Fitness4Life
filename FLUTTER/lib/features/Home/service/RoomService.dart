@@ -17,7 +17,7 @@ class RoomService extends ChangeNotifier {
       rooms = await _roomRepository.getAllRooms();
     }
     catch(e) {
-      print("Error fetching trainers: $e");
+      print("Error fetching room: $e");
     }
     finally {
       isLoading = false;

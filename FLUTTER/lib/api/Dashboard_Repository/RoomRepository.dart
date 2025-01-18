@@ -15,8 +15,8 @@ class RoomRepository{
           .toList();
     }
     catch(e) {
-      print("Error fetching trainers: $e");
-      throw Exception("Error fetching trainers: $e");
+      print("Error fetching rooms: $e");
+      throw Exception("Error fetching rooms: $e");
     }
   }
 }
