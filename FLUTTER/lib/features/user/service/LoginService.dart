@@ -15,6 +15,7 @@ class LoginService extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   User? get loggedInUser => _loggedInUser;
 
+  //Xử lý login
   Future<void> login(String email , String password) async {
     _isLoading = true;
     _errorMessage = null;
@@ -30,6 +31,29 @@ class LoginService extends ChangeNotifier {
     }
     catch (e) {
       // Handle error and notify UI
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  //Xử lý Logout
+  Future<void> logout() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try{
+      await _loginRepository.logout();
+
+      // Xóa thông tin người dùng sau khi logout
+      _loggedInUser = null;
+
+      // Đặt lại trạng thái
+      _isLoading = false;
+      notifyListeners();
+    }catch (e) {
+      // Xử lý lỗi và thông báo tới UI
       _isLoading = false;
       _errorMessage = e.toString();
       notifyListeners();

@@ -62,4 +62,22 @@ class LoginRepository {
       throw Exception("Error during login: $e");
     }
   }
+
+  //Xử lý Logout
+  Future<void> logout() async {
+    try{
+      final response = await _apiGateWayService.postData("/users/logout");
+      if(response.statusCode == 200) {
+        //Xóa token khởi Secure Store
+        await TokenManager.clearTokens();
+        print("User successfully logged out");
+      }else {
+        // Xử lý các mã lỗi khác
+        throw Exception("Failed to logout. Status code: ${response.statusCode}");
+      }
+    }
+    catch(e) {
+      throw Exception("Error during login: $e");
+    }
+  }
 }

@@ -46,9 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final roomService = Provider.of<RoomService>(context);
     final goalService = Provider.of<GoalService>(context);
 
-
-    final userName = "Quang Linh"; // Tên người dùng
-
     return Scaffold(
       body: Stack(
         children: [
@@ -66,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                    ),
                    const SizedBox(height: 12),
+
                    // Phần "Personal goal this week"
                    buildPersonalGoalSection(),
 
@@ -117,7 +115,9 @@ class _HomeScreenState extends State<HomeScreen> {
                        : const Center(
                      child: Text("No trainers available"),
                    ),
+
                    const SizedBox(height: 15),
+
                    const Text(
                      "Upcoming Challenges",
                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -145,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                ),
              ),
          ),
+
           const LoginRegisterHeader(),  //Hiển thị phần đăng ký đăng nhập
         ],
       )
@@ -498,58 +499,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // User Profile
-  Widget buildUserProfile(String userName) {
-    return Row(
-      children: [
-        // Avatar từ hình ảnh trong assets
-        CircleAvatar(
-          radius: 30,
-          backgroundImage: const AssetImage('images/gym5.jpg'), // Sử dụng AssetImage
-          backgroundColor: Colors.grey[300],
-        ),
-        const SizedBox(width: 16),
-        // Tên người dùng
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Hello",
-              style: TextStyle(fontSize: 16, color: Colors.black54),
-            ),
-            Text(
-              userName,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget buildLoginRegisterButton(IconData icon, String title, VoidCallback onPressed) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Column(
-          children: [
-            Icon(icon, size: 50, color: Colors.white),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
