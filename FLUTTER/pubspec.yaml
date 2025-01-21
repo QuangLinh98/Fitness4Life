@@ -37,9 +37,10 @@ dependencies:
   freezed_annotation: ^2.2.0   #Tạo các đối tượng dữ liệu (data Classes) mà không cần viết thủ công. Thường được sử dụng với freezed và build_runner.
   shared_preferences: ^2.0.15 # Để lưu token
   intl: ^0.17.0         #Format ngày tháng
+  jwt_decoder: ^2.0.1   #Giải mã token
+  flutter_secure_storage: ^8.0.0   # Lưu token
 
-
-  # The following adds the Cupertino Icons font to your application.
+# The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 

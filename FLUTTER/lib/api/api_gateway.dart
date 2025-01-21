@@ -1,20 +1,40 @@
 import 'package:dio/dio.dart';
-import 'package:fitness4life/features/user/data/service/token_manager.dart';
+import 'package:fitness4life/token/token_manager.dart';
 
 class ApiGateWayService {
   final Dio _dio;   //Cấu hình Dio để thêm Authorization Header vào mọi yêu cầu và xử lý lỗi khi token hết hạn.
+
+  // Danh sách các endpoint không cần token
+  static const  List<String> noAuthEndpoints = [
+    "/users/login",
+    "/users/register",
+    "/users/send-otp",
+    "/users/reset-password",
+    "/users/refresh_token",
+    "/booking/qrCode/validate",
+    "/uploads/TrainerImage/**"
+  ];
 
   //Thêm token vào header cho mỗi yêu cầu.
   ApiGateWayService(this._dio) {
     _dio.interceptors.add(InterceptorsWrapper(
       // Xử lý trước khi gửi yêu cầu
       onRequest: (options, handler) async {
-        String? token = await TokenManager.getAccessToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-          print("Authorization Header: Bearer $token");
+        print("Request Path: ${options.path}");
+        print("Headers Before Adding Authorization: ${options.headers}");
+        print("Full Path: ${_dio.options.baseUrl}${options.path}");
+
+        // Kiểm tra nếu endpoint thuộc danh sách không cần token
+        if (!noAuthEndpoints.any((endpoint) => options.path == endpoint)) {
+          String? token = await TokenManager.getAccessToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+            print("Authorization Header: Bearer $token");
+          } else {
+            print("Token is null");
+          }
         }else {
-          print("Token is null");
+          print("No Authorization required for this endpoint: ${options.path}");
         }
         options.headers['Content-Type'] = 'application/json';
         return handler.next(options);
@@ -77,9 +97,32 @@ class ApiGateWayService {
   }
 
   // Phương thức POST
-  Future<Response> postData(String endpoint, {Map<String, dynamic>? data}) async {
-    return await _dio.post(endpoint, data: data);
+  // Future<Response> postData(String endpoint, {Map<String, dynamic>? data}) async {
+  //   return await _dio.post(endpoint, data: data);
+  // }
+
+  Future<Response> postData(String endpoint, {Map<String, dynamic>? data, Options? options}) async {
+    try {
+      final response = await _dio.post(
+        endpoint,
+        data: data,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          validateStatus: (status) {
+            return status != null && status < 500; // Cho phép 4xx phản hồi
+          },
+        ),
+      );
+      return response;
+    } catch (e) {
+      print("Error in postData: $e");
+      rethrow; // Để xử lý lỗi ở lớp trên
+    }
   }
+
 
   // Phương thức PUT
   Future<Response> putData(String endpoint, {Map<String, dynamic>? data}) async {

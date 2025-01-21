@@ -59,65 +59,59 @@ class _ClassScreenState extends State<ClassScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(8),
         child: AppBar(
-          backgroundColor:  Colors.purple.shade300,
+          backgroundColor:  const Color(0xFFB00020),
           //title: Text('Fitness Gym', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           centerTitle: true,
         ),
       ),
 
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF9C9AFF), // Màu tím nhạt ở trên
-              Color(0xFFB478BD), // Màu hồng nhẹ ở dưới
-            ],
-          ),
-        ),
         child:  Column(
           children: [
             Container(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              color: Color(0xFF9C9AFF),
+              color: const Color(0xFFB00020),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        isBooked = false;  //Hiển thị tất cả room
-                      });
-                    },
-                    child: Text('All classes', style: TextStyle(color: Colors.white, fontSize: 16)),
-                    style: TextButton.styleFrom(
-                      backgroundColor: !isBooked ? Colors.purple.shade300 : Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                  Expanded(
+                      child:TextButton(
+                        onPressed: () {
+                          setState(() {
+                            isBooked = false;  //Hiển thị tất cả room
+                          });
+                        },
+                        child: Text('All classes', style: TextStyle(color: !isBooked ? Colors.white : Colors.red, fontSize: 16)),
+                        style: TextButton.styleFrom(
+                          backgroundColor: !isBooked ? Colors.red : Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
                       ),
-                    ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                        setState(() {
-                          isBooked = true ; //Hiển thị những lớp được book
-                        });
-                    },
-                    child: Text('Booked classes', style: TextStyle(color: Colors.white, fontSize: 16)),
-                    style: TextButton.styleFrom(
-                      backgroundColor: isBooked ? Colors.purple.shade300 : Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                  Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          setState(() {
+                            isBooked = true ; //Hiển thị những lớp được book
+                          });
+                        },
+                        child: Text('Booked classes', style: TextStyle(color: isBooked ? Colors.white : Colors.red, fontSize: 16)),
+                        style: TextButton.styleFrom(
+                          backgroundColor: isBooked ? Colors.red : Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
                       ),
-                    ),
                   ),
                 ],
               ),
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 8),
-              color: Color(0xFF9C9AFF),
+              //color: Color(0xFF9C9AFF),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -128,9 +122,9 @@ class _ClassScreenState extends State<ClassScreen> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: index == 0 ? Colors.purple : Colors.grey,
+                              color: index == 0 ? Color(0xFFB8213D) : Colors.grey.shade500,
                               border: Border.all(
-                                color: Colors.grey.shade600,
+                                color: Colors.grey.shade700,
                                 width: 1.0,
                               ),
                               borderRadius: BorderRadius.circular(20),
@@ -245,8 +239,15 @@ class _ClassScreenState extends State<ClassScreen> {
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: const Color(0xFF392F7D),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(
+            color: Colors.redAccent, // Màu viền
+            width: 0.8,
+          ),
+      ),
+      //color: const Color(0xFF392F7D),
+      elevation: 10,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -255,7 +256,7 @@ class _ClassScreenState extends State<ClassScreen> {
             Text(
               booking.roomName!,
               style: const TextStyle(
-                color: Colors.white,
+                color: Color(0xFFB00020),
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -264,7 +265,7 @@ class _ClassScreenState extends State<ClassScreen> {
             Text(
               "Booked by: ${booking.userName}",
               style: const TextStyle(
-                color: Colors.white70,
+                color: Colors.grey,
                 fontSize: 14,
               ),
             ),
@@ -272,7 +273,7 @@ class _ClassScreenState extends State<ClassScreen> {
             Text(
               "Booking Date: ${formatDateTime(booking.bookingDate)}",
               style: const TextStyle(
-                color: Colors.white70,
+                color: Colors.grey,
                 fontSize: 14,
               ),
             ),
@@ -280,7 +281,7 @@ class _ClassScreenState extends State<ClassScreen> {
             Text(
               "Status: ${booking.status}",
               style: const TextStyle(
-                color: Colors.greenAccent,
+                color: Colors.redAccent,
                 fontSize: 14,
               ),
             ),
@@ -343,7 +344,7 @@ class _ClassScreenState extends State<ClassScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.redAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -381,8 +382,15 @@ class _ClassScreenState extends State<ClassScreen> {
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: const Color(0xFF392F7D),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(
+            color: Colors.redAccent, // Màu viền
+            width: 0.8, // Độ dày viền
+        ),
+      ),
+      elevation: 10,  //Hiệu ứng đổ bóng card
+
       child: Row(
         children: [
           // HÌnh ảnh random
@@ -411,7 +419,7 @@ class _ClassScreenState extends State<ClassScreen> {
                   Text(
                     room.roomname ?? "Unknown Room",
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFB00020),
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -421,7 +429,7 @@ class _ClassScreenState extends State<ClassScreen> {
                   Text(
                     "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
                     style: const TextStyle(
-                      color: Colors.white70,
+                      color: Colors.grey,
                       fontSize: 16,
                     ),
                   ),
@@ -435,14 +443,14 @@ class _ClassScreenState extends State<ClassScreen> {
                         children: [
                           const Icon(
                             Icons.people,
-                            color:  Colors.white,
+                            color:  Color(0xFFB00020),
                             size: 16,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             "${room.availableseats ?? 0} / ${room.capacity}",
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Color(0xFFB00020),
                               fontSize: 14,
                             ),
                           ),
@@ -483,7 +491,7 @@ class _ClassScreenState extends State<ClassScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: (room.availableseats ?? 0) == (room.capacity ?? 0)
                               ? Colors.grey // Màu xám khi đầy
-                              : const Color(0xFF9747FF), // Màu tím khi còn chỗ
+                              : const Color(0xFFB00020), // Màu tím khi còn chỗ
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),

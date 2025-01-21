@@ -33,16 +33,7 @@ class _PageManagerState extends State<PageManager> {
         children: _pages,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF9C9AFF), // Tím sáng hơn
-              Color(0xFFB478BD), // Tím đậm hơn
-            ],
-          ),
-        ),
+        color: const Color(0xFFB00020),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           elevation: 0, // Loại bỏ bóng

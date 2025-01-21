@@ -1,9 +1,13 @@
+import 'package:fitness4life/core/widgets/SubMenu.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/Home/data/Trainer.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
+import 'package:fitness4life/features/user/presentation/screens/LoginRegisterHeader.dart';
+import 'package:fitness4life/features/user/presentation/screens/LoginScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -46,110 +50,104 @@ class _HomeScreenState extends State<HomeScreen> {
     final userName = "Quang Linh"; // Tên người dùng
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF9C9AFF), // Màu tím sáng ở trên
-              Color(0xFFB478BD), // Màu tím đậm ở dưới
-            ],
-          ),
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // hiển thị profile
-              buildUserProfile(userName),
-              const SizedBox(height: 15),
+      body: Stack(
+        children: [
+         Padding(
+           padding: const EdgeInsets.only(top: 210),
+             child:SingleChildScrollView(
+               padding: const EdgeInsets.all(16.0),
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                   const SubMenu(),   // Menu bên dưới header
+                   const SizedBox(height: 16),
+                   const Text(
+                     "Personal goal this week",
+                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(height: 12),
+                   // Phần "Personal goal this week"
+                   buildPersonalGoalSection(),
 
-              const Text(
-                "Personal goal this week",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+                   const SizedBox(height: 15),
+                   const Text(
+                     "Upcoming Classes",
+                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(height: 6),
+                   roomService.isLoading
+                       ? const Center(child: CircularProgressIndicator())
+                       : roomService.rooms.isNotEmpty
+                       ? SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: roomService.rooms.map((room) {
+                         return Padding(
+                           padding: const EdgeInsets.only(right: 10),
+                           child: buildUpcomingClassCard(room),
+                         );
+                       }).toList(),
+                     ),
+                   )
+                       : const Center(
+                     child: Text("No Rooms available"),
+                   ),
 
-              // Phần "Personal goal this week"
-              buildPersonalGoalSection(),
-
-              const SizedBox(height: 15),
-              const Text(
-                "Upcoming Classes",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              roomService.isLoading
-                 ? const Center(child: CircularProgressIndicator())
-                 : roomService.rooms.isNotEmpty
-                 ? SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: roomService.rooms.map((room) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: buildUpcomingClassCard(room),
-                    );
-                  }).toList(),
-                ),
-              )
-                  : const Center(
-                child: Text("No Rooms available"),
-              ),
-
-              const SizedBox(height: 15),
-              const Text(
-                "Personal Trainers",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              trainerService.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : trainerService.trainers.isNotEmpty
-                  ? SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: trainerService.trainers.map((trainer) {
-                    return Padding(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: buildTrainerAvatar(trainer),
-                    );
-                  }).toList(),
-                ),
-              )
-                  : const Center(
-                child: Text("No trainers available"),
-              ),
-              const SizedBox(height: 15),
-              const Text(
-                "Upcoming Challenges",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              goalService.isLoading
-                 ? const Center(child: CircularProgressIndicator())
-                  : goalService.goals.isNotEmpty
-                 ? SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: goalService.goals.map((goal) {
-                        return Padding(
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: buildGoalCard(goal),
-                        );
-                      }).toList(),
-                    ),
-              )
-                  : const Center(
-                child: Text("No Goal available"),
-              ),
-            ],
-          ),
-        ),
-      ),
+                   const SizedBox(height: 15),
+                   const Text(
+                     "Personal Trainers",
+                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(height: 15),
+                   trainerService.isLoading
+                       ? const Center(child: CircularProgressIndicator())
+                       : trainerService.trainers.isNotEmpty
+                       ? SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: trainerService.trainers.map((trainer) {
+                         return Padding(
+                           padding:
+                           const EdgeInsets.symmetric(horizontal: 8.0),
+                           child: buildTrainerAvatar(trainer),
+                         );
+                       }).toList(),
+                     ),
+                   )
+                       : const Center(
+                     child: Text("No trainers available"),
+                   ),
+                   const SizedBox(height: 15),
+                   const Text(
+                     "Upcoming Challenges",
+                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(height: 10),
+                   goalService.isLoading
+                       ? const Center(child: CircularProgressIndicator())
+                       : goalService.goals.isNotEmpty
+                       ? SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: goalService.goals.map((goal) {
+                         return Padding(
+                           padding:
+                           const EdgeInsets.symmetric(horizontal: 8.0),
+                           child: buildGoalCard(goal),
+                         );
+                       }).toList(),
+                     ),
+                   )
+                       : const Center(
+                     child: Text("No Goal available"),
+                   ),
+                 ],
+               ),
+             ),
+         ),
+          const LoginRegisterHeader(),  //Hiển thị phần đăng ký đăng nhập
+        ],
+      )
     );
   }
 
@@ -168,130 +166,130 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return SizedBox(
-      width: 320,
-      height: 250,
-      child:  Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 4,
-        //color: const Color(0xFFE6DFFA),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 8),
-                decoration: const BoxDecoration(
-                  color: const Color(0xFF392F7D), // Màu đỏ cho header
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+        width: 320,
+        height: 250,
+        child:  Card(
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
+          //color: const Color(0xFFE6DFFA),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 8),
+                  decoration: const BoxDecoration(
+                    color: const Color(0xFFB00020), // Màu đỏ cho header
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                child: Text(
-                  "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
 
-              // Phần thông tin chi tiết
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                // Phần thông tin chi tiết
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       // Tên phòng
-                    Text(
-                      room.roomname ?? "Unknown Room",
+                      Text(
+                        room.roomname ?? "Unknown Room",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
-                    ),
-
-                    // Số người tham gia
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(Icons.people, color: Color(0xFF9747FF), size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          "0/25",
-                          style: TextStyle(fontSize: 14, color: Color(0xFF9747FF)),
-                        ),
-                      ],
-                    ),
-
-                    //const SizedBox(height: 4),
-                    const Row(
-                      children: [
-                        Icon(Icons.event, color: Colors.grey, size: 16),
-                        SizedBox(width: 8),
-                        Text(
-                          "Studio: Dance",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Row(
-                      children: [
-                        Icon(Icons.person, color: Colors.grey, size: 16),
-                        SizedBox(width: 8),
-                        Text(
-                          "Trainer: Thanh Vi",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Nút "Đặt lịch"
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF392F7D),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 2,
                       ),
-                      onPressed: () {
-                        //Xử lý đặt lịch
-                      },
-                      child: const Text(
-                        "Book now",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+
+                      // Số người tham gia
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(Icons.people, color: Color(0xFF9747FF), size: 16),
+                          SizedBox(width: 4),
+                          Text(
+                            "0/25",
+                            style: TextStyle(fontSize: 14, color: Color(0xFF9747FF)),
+                          ),
+                        ],
+                      ),
+
+                      //const SizedBox(height: 4),
+                      const Row(
+                        children: [
+                          Icon(Icons.event, color: Colors.grey, size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            "Studio: Dance",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      const Row(
+                        children: [
+                          Icon(Icons.person, color: Colors.grey, size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            "Trainer: Thanh Vi",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Nút "Đặt lịch"
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFB00020),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 2,
+                        ),
+                        onPressed: () {
+                          //Xử lý đặt lịch
+                        },
+                        child: const Text(
+                          "Book now",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      )
+        )
     );
   }
 
@@ -321,115 +319,115 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //Xử lý Upcoming Challenges
   Widget buildGoalCard(Goal goal) {
-      final startDate = goal.startDate != null
-          ? DateFormat('d MMM').format(goal.startDate!)
-          : 'Unknown';
-      final endDate = goal.endDate != null
-          ? DateFormat('d MMM').format(goal.endDate!)
-          : 'Unknown';
+    final startDate = goal.startDate != null
+        ? DateFormat('d MMM').format(goal.startDate!)
+        : 'Unknown';
+    final endDate = goal.endDate != null
+        ? DateFormat('d MMM').format(goal.endDate!)
+        : 'Unknown';
 
-      return Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 0,
-        color: const Color(0xFF1E1B2E),
-        child: Container(
-          width: 372,
-          padding: const EdgeInsets.all(16),
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                // Left section - Icon/Image
-                Container(
-                  width: 80,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF9747FF).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.fitness_center,
-                    color: Color(0xFF9747FF),
-                    size: 30,
-                  ),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 0,
+      color: const Color(0xFF1E1B2E),
+      child: Container(
+        width: 372,
+        padding: const EdgeInsets.all(16),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              // Left section - Icon/Image
+              Container(
+                width: 80,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF9747FF).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(width: 12),
-
-                // Middle section - Title and Date
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        goal.goalType ?? "Unknown Goal",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            color: Colors.white70,
-                            size: 12,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "$startDate - $endDate",
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        "7 Spaces left",
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: const Icon(
+                  Icons.fitness_center,
+                  color: Color(0xFF9747FF),
+                  size: 30,
                 ),
+              ),
+              const SizedBox(width: 12),
 
-                // Right section - Join button
-                Container(
-                  height: 32,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF9747FF),
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'Join',
-                      style: TextStyle(
+              // Middle section - Title and Date
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      goal.goalType ?? "Unknown Goal",
+                      style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.calendar_today_outlined,
+                          color: Colors.white70,
+                          size: 12,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "$startDate - $endDate",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "7 Spaces left",
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Right section - Join button
+              Container(
+                height: 32,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF9747FF),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Join',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
 
   //Xử lý Personal goal this week
@@ -533,5 +531,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
+  Widget buildLoginRegisterButton(IconData icon, String title, VoidCallback onPressed) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onPressed,
+        child: Column(
+          children: [
+            Icon(icon, size: 50, color: Colors.white),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

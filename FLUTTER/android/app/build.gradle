@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.fitness4life"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -24,10 +24,12 @@ android {
         applicationId = "com.example.fitness4life"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Kích hoạt MultiDex
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -45,4 +47,6 @@ flutter {
 
 dependencies {
     implementation 'androidx.core:core:1.6.0' // Bổ sung dòng này
+    implementation 'androidx.security:security-crypto:1.0.0-alpha03'
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
