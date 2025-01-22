@@ -75,6 +75,7 @@ public class ManagerController {
     //@PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<?> addBookingRoom(@Valid @RequestBody BooKingRoomDTO booKingRoomDTO,
                                             BindingResult bindingResult) {
+        System.out.println("Received Request: " + booKingRoomDTO);
         try {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));

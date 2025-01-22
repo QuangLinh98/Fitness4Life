@@ -102,20 +102,6 @@ public class BookingRoomService {
         return newBooking;
     }
 
-    //Handle confirm booking room
-//    public void confirmBookingRoom(int id) {
-//        BookingRoom bookingRoom = bookingRoomRepository.findById(id).get();
-//        if (bookingRoom.getStatus() == BookingStatus.PENDING) {
-//            bookingRoom.setStatus(BookingStatus.CONFIRMED);
-//            bookingRoomRepository.save(bookingRoom);
-//
-//            //Update số lượng ghế khả dụng trong Room
-//            RoomDTO roomExiting = roomEurekaClient.getRoomById(bookingRoom.getRoomId());
-//            roomExiting.setAvailableSeats(roomExiting.getAvailableSeats() + 1);
-//            roomEurekaClient.updateRoom(roomExiting.getId(), roomExiting);
-//        }
-//    }
-
     //Handle cancel booking room
     public void cancelBookingRoom(int id) {
         BookingRoom bookingRoom = bookingRoomRepository.findById(id).orElseThrow(() -> new RuntimeException("BookingRoomNotFound"));
