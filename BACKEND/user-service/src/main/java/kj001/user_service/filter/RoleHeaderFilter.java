@@ -30,7 +30,6 @@ public class RoleHeaderFilter extends OncePerRequestFilter {
         } else {
             System.out.println("Role or Authorization header is missing");
         }
-
         filterChain.doFilter(request, response);
     }
 }

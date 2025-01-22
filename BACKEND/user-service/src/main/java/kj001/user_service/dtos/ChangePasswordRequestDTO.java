@@ -7,8 +7,6 @@ import lombok.Data;
 
 @Data
 public class ChangePasswordRequestDTO {
-    @NotNull
-    @Email
     private String email;
     @NotNull
     private String oldPassword;

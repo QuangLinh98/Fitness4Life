@@ -22,6 +22,10 @@ public class ApiResponse<T> {
        this.message = message;
        this.status = status;
    }
+
+    public ApiResponse(boolean b, String s) {
+    }
+
     //success
     public static <T> ApiResponse<T>
             success(T data,String message){

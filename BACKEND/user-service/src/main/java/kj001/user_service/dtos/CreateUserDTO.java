@@ -1,5 +1,7 @@
 package kj001.user_service.dtos;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +13,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class CreateUserDTO {
+    public class CreateUserDTO {
     @NotNull(message = "Full name is required.")
     private String fullName;
 
@@ -27,8 +29,8 @@ public class CreateUserDTO {
     @Email(message = "Email should be valid")
     private String email;
 
-    @NotNull(message = "Role is required.")
-    private Roles role;
+    @Enumerated(EnumType.STRING)
+    private Roles role = Roles.USER;
 
     private String otpCode;
     private LocalDateTime expiryTime;

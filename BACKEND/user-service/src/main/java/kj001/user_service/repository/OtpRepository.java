@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface OtpRepository extends JpaRepository<OTP , Long> {
-   Optional<OTP> findByEmailAndOtpCode(String otpCode,String email);
+   Optional<OTP> findByOtpCode(String otpCode);
 
    //Câu truy vấn sử dụng trong database MySql
 //   @Query(value = "SELECT * FROM OTP o WHERE o.email = :email ORDER BY o.last_Send DESC LIMIT 1" , nativeQuery = true)

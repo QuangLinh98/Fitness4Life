@@ -135,14 +135,12 @@ public class AuthController {
             userService.resetPassword(resetPasswordRequestDTO);
             return ResponseEntity.ok(ApiResponse.success(true, "Reset Password successfully"));
         } catch (RuntimeException ex) {
-            if (ex.getMessage().contains("UserNotFound")) {
-                return ResponseEntity.status(404).body(ApiResponse.notfound("User with the given email does not exist"));
-            } else if (ex.getMessage().contains("OTPHasExpired")) {
+            if (ex.getMessage().contains("OTPHasExpired")) {
                 return ResponseEntity.status(400).body(ApiResponse.badRequest("OTP has expired"));
             } else if (ex.getMessage().contains("OTPIsUsed")) {
                 return ResponseEntity.status(400).body(ApiResponse.badRequest("OTP has already been used"));
             }
-        } catch (MessagingException | UnsupportedEncodingException e) {
+        } catch (MessagingException e) {
             // Handle messaging exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.errorServer("Unexpected error: " + e.getMessage()));
         }

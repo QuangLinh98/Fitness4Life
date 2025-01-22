@@ -6,8 +6,6 @@ import lombok.Data;
 
 @Data
 public class VerifyOTPRequestDTO {
-    @NotNull
-    @Email
     private String email;
     @NotNull
     private String otpCode;

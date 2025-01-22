@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import kj001.user_service.dtos.*;
+import kj001.user_service.helpers.ApiResponse;
 import kj001.user_service.helpers.FileUpload;
 import kj001.user_service.models.OTP;
 import kj001.user_service.models.Profile;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -291,34 +293,41 @@ public class UserService {
 
     //Logic ResetPassword
     public boolean resetPassword(VerifyOTPRequestDTO resetPasswordRequestDTO) throws MessagingException, UnsupportedEncodingException {
-        //Tìm OTP theo email và mã OTP
-        OTP otp = otpRepository.findByEmailAndOtpCode(resetPasswordRequestDTO.getEmail(),
-                resetPasswordRequestDTO.getOtpCode()).orElseThrow(() -> new RuntimeException("UserNotFound"));
+        // Tìm mã OTP và email liên kết với mã đó
+        OTP otp = otpRepository.findByOtpCode(resetPasswordRequestDTO.getOtpCode())
+                .orElseThrow(() -> new RuntimeException("Invalid OTP"));
 
-        //Kiểm tra OTP đã hết hạn chưa
+        // Kiểm tra OTP đã hết hạn chưa
         if (otp.getExpiryTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("OTPHasExpired");
+            throw new RuntimeException("OTP has expired");
         }
-        //Kiểm tra nếu OTP đã được sử dụng hãy chưa
+
+        // Kiểm tra nếu OTP đã được sử dụng
         if (otp.isUsed()) {
-            throw new RuntimeException("OTPIsUsed");
+            throw new RuntimeException("OTP has already been used");
         }
-        //Tạo 1 random Password và gửi qua mail
+
+        // Lấy email từ mã OTP
+        String email = otp.getEmail();
+
+        // Tạo mật khẩu mới
         String newPassword = generateRandomPassword();
-        User user = userRepository.findByEmail(resetPasswordRequestDTO.getEmail()).orElseThrow(() -> new RuntimeException("UserNotFound"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        //Đánh dấu là OTP đã được sử dụng
+        // Đánh dấu OTP là đã sử dụng
         otp.setUsed(true);
         otpRepository.save(otp);
 
-        //Gửi newPassword qua mail
+        // Gửi mật khẩu mới qua email
         MailEntity mailEntity = new MailEntity();
-        mailEntity.setEmail(resetPasswordRequestDTO.getEmail());
-        mailEntity.setSubject("Reset password OTP");
-        mailEntity.setContent("Your password id: " + newPassword);
+        mailEntity.setEmail(email);
+        mailEntity.setSubject("Your new password");
+        mailEntity.setContent("Your new password is: " + newPassword);
         mailResetPass.sendMailOTP(mailEntity);
+
         return true;
     }
 
