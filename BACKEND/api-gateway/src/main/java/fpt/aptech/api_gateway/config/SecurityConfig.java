@@ -48,7 +48,8 @@ public class SecurityConfig {
                                         "/api/users/send-otp",
                                         "/api/users/reset-password",
                                         "/api/users/refresh_token",
-                                        "/api/booking/qrCode/validate"
+                                        "/api/booking/qrCode/validate",
+                                        "/uploads/TrainerImage/**"
                                 )
                                 .permitAll()
                                 .pathMatchers("/api/users/**").hasAnyAuthority("ADMIN", "USER")  // Cả ADMIN và USER đều có thể truy cập các endpoint này
@@ -104,7 +105,8 @@ public class SecurityConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowedOrigins(List.of("*"));
-        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type" , "Accept"));
+        corsConfig.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "PUT", "DELETE"));
         corsConfig.setAllowCredentials(true); // Cho phép gửi thông tin xác thực
         corsConfig.setMaxAge(3600L); // Thời gian cache cho phép là 1 giờ
 
