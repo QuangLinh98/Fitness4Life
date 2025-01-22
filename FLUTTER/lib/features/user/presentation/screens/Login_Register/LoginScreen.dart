@@ -1,4 +1,6 @@
 import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
+import 'package:fitness4life/features/user/presentation/screens/Login_Register/RegisterScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Password/ForgotPasswordScreen.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 
@@ -97,7 +99,12 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotPasswordScreen())
+                    );
+                  },
                   child: const Text(
                     'Forgot password?',
                     style: TextStyle(
@@ -193,25 +200,37 @@ class LoginScreen extends StatelessWidget {
 
             // Register Navigation
             Center(
-              child: RichText(
-                text: const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "If you don't have an account, please register for free ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    TextSpan(
-                      text: 'here',
-                      style: TextStyle(
-                        color: Colors.green,
-                        decoration: TextDecoration.underline,
+              child: TextButton(
+                onPressed: () {
+                  // Chuyển hướng đến trang đăng ký
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RegisterScreen()), // Đổi thành màn hình bạn muốn
+                  );
+                },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero, // Xóa khoảng cách mặc định
+                ),
+                child: const Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "If you don't have an account, please register ",
+                        style: TextStyle(color: Colors.white, fontSize: 15),
                       ),
-                      recognizer: null, // Add a gesture recognizer for navigation.
-                    ),
-                  ],
+                      TextSpan(
+                        text: 'Here',
+                        style: TextStyle(
+                          color: Colors.green,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
+
           ],
         ),
       ),

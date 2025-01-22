@@ -6,6 +6,8 @@ import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/TrainerRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
+import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
+import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:get_it/get_it.dart';
 
@@ -39,4 +41,10 @@ void setUpLocator() {
 
   // Đăng ký LoginRepository
   locator.registerLazySingleton(() => LoginRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký RegisterRepository
+  locator.registerLazySingleton(() => RegisterRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký PasswordRepository
+  locator.registerLazySingleton(() => PasswordRepository(locator<ApiGateWayService>()));
 }

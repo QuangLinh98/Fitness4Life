@@ -18,7 +18,6 @@ class LoginRepository {
           'email': email,
           'password': password,
         },
-
       );
 
       if (response.statusCode == 200) {

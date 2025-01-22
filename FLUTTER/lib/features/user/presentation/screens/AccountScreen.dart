@@ -1,4 +1,6 @@
 import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
+import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Password/ChangePasswordScreen.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +18,6 @@ class _AccountScreenState extends State<AccountScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final loginService = Provider.of<LoginService>(context, listen: false);
-      loginService.logout();
-    });
   }
 
   @override
@@ -133,10 +131,13 @@ class _AccountScreenState extends State<AccountScreen> {
                 buildOptionItem("Liên hệ", Icons.phone, () {}),
                 buildOptionItem("Hợp đồng", Icons.description_outlined, () {}),
                 buildOptionItem("Lịch sử chăm sóc khách hàng", Icons.history, () {}),
-                buildOptionItem("Thay mật khẩu", Icons.lock_outline, ()  {
-
+                buildOptionItem("Change password", Icons.lock_outline, ()  {
+                     Navigator.push(
+                         context,
+                         MaterialPageRoute(builder: (context) => const ChangePasswordScreen())
+                     );
                 }),
-                buildOptionItem("Đăng xuất", Icons.logout, ()async {
+                buildOptionItem("Logout", Icons.logout, ()async {
                   await handleLogout(context);
                 }),
               ],
@@ -166,22 +167,26 @@ class _AccountScreenState extends State<AccountScreen> {
   //Xử lý logout
   Future<void> handleLogout(BuildContext context) async {
     try {
+      // Gọi hàm logout từ LoginService
+      final loginService = Provider.of<LoginService>(context, listen: false);
+      await loginService.logout();
+
       // Điều hướng về màn hình đăng nhập
       Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => PageManager())
+          MaterialPageRoute(builder: (context) => LoginScreen())
       );
     } catch (e) {
       // Hiển thị thông báo lỗi nếu logout thất bại
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Đăng xuất thất bại"),
+          title: const Text("Logout failed"),
           content: Text(e.toString()),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Đóng"),
+              child: const Text("Close"),
             ),
           ],
         ),

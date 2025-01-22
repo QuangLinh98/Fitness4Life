@@ -2,7 +2,7 @@ import 'package:fitness4life/token/app_initializer.dart';
 import 'package:fitness4life/config/locator_setup.dart';
 import 'package:fitness4life/config/provider_setup.dart';
 import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
-import 'package:fitness4life/features/user/presentation/screens/LoginScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

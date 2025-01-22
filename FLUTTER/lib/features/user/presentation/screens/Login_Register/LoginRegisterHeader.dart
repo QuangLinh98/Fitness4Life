@@ -1,7 +1,7 @@
 import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
-import 'package:fitness4life/features/user/presentation/screens/LoginScreen.dart';
-import 'package:fitness4life/features/user/presentation/screens/RegisterScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Login_Register/RegisterScreen.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 
