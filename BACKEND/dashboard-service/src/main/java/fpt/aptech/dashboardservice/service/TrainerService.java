@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class TrainerService {
     private final FileUpload fileUpload;
     private String subFolder = "TrainerImage";
     String uploadFolder = "uploads";
-    private String rootUrl = "http://localhost:8080/";
+    private String rootUrl = "http://localhost:8081/";
     private String urlImage = rootUrl + uploadFolder + File.separator + subFolder;
 
 
@@ -47,6 +48,7 @@ public class TrainerService {
         String imageName = fileUpload.storeImage(subFolder, trainerDTO.getFile());
         //Tạo url chính xác cho image
         String exacImage = urlImage + File.separator + imageName;
+
 
         Optional<Branch> branchExisting = branchRepository.findById(trainerDTO.getBranch());
         Trainer trainer = Trainer.builder()
