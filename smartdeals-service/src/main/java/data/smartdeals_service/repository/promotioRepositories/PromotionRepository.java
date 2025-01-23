@@ -14,9 +14,16 @@ import java.util.Optional;
 @Repository
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
     @Modifying
-    @Query("UPDATE Promotion p SET p.isActive = false WHERE p.endDate <= :currentTime AND p.isActive = true")
+    @Query("UPDATE Promotion p SET p.isActive = false, p.updatedAt = CURRENT_TIMESTAMP WHERE p.endDate <= :currentTime AND p.isActive = true")
     void bulkClosePromotions(@Param("currentTime") LocalDateTime currentTime);
+
+    @Modifying
+    @Query("DELETE FROM Promotion p WHERE p.isActive = false AND p.updatedAt <= :timeLimit")
+    void deleteInactivePromotions(@Param("timeLimit") LocalDateTime timeLimit);
+
     boolean existsByCode(String code);
-    Optional<Promotion> findByCode(String code); // Tìm kiếm promotion theo code
+    Optional<Promotion> findByCode(String code);
+
+    Promotion findPromotionByCode(String promotionCode);
     List<Promotion> findByIsActiveTrue();
 }

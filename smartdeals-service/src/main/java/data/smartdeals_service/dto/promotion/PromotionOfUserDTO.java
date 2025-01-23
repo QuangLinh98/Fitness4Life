@@ -5,6 +5,7 @@ import data.smartdeals_service.models.promotion.ApplicableServices;
 import data.smartdeals_service.models.promotion.CustomerType;
 import data.smartdeals_service.models.promotion.DiscountType;
 import data.smartdeals_service.models.promotion.PackageName;
+import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,22 +13,24 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class PromotionDTO {
-    private String id;
+public class PromotionOfUserDTO {
+    private Long id;
+    private Long userId;
     private String title;
     private String description;
-    private List<DiscountType> discountType;
     private BigDecimal discountValue;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime startDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime endDate;
-    private Boolean isActive;
+    private List<DiscountType> discountType;
     private List<ApplicableServices> applicableService;
-    private BigDecimal minValue;
     private List<CustomerType> customerType;
+    private List<PackageName> packageName;
+    private BigDecimal minValue;
+    private String code;
+    private Long promotionAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startDate;// ngày bắt đầu km
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime endDate; // ngày kết thúc km
+    private Boolean isUsed;
     private Integer maxUsage;
     private String createdBy;
-    private List<PackageName> packageName;
-    private String code;
 }

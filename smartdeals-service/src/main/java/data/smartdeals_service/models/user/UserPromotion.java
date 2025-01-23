@@ -1,4 +1,5 @@
 package data.smartdeals_service.models.user;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +19,14 @@ public class UserPromotion {
 
     private Long userId; // ID của user (từ user-service)
     private String promotionCode; // Mã promotion
+    private Long promotionAmount; // số lượng mã
+    private Boolean isUsed; // Trạng thái đã sử dụng hay chưa
+    @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startDate;// ngày bắt đầu km
 
-    private Boolean isUsed = false; // Trạng thái đã sử dụng hay chưa
-    private LocalDateTime usedAt; // Thời gian sử dụng (nếu có)
+    @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime endDate; // ngày kết thúc km
 }
 

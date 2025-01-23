@@ -12,15 +12,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class PromotionDTO {
+public class PromotionPointDTO {
     private String id;
     private String title;
     private String description;
     private List<DiscountType> discountType;
     private BigDecimal discountValue;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endDate;
     private Boolean isActive;
     private List<ApplicableServices> applicableService;
@@ -30,4 +28,5 @@ public class PromotionDTO {
     private String createdBy;
     private List<PackageName> packageName;
     private String code;
+    private int points;
 }

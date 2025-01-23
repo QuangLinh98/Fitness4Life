@@ -8,6 +8,5 @@ import java.util.Optional;
 
 public interface QuestionVoteRepository extends JpaRepository<QuestionVote, Long> {
     Optional<QuestionVote> findByQuestionIdAndUserId(Long questionId, Long userId);
-    long countByQuestionIdAndVoteType(Long questionId, VoteType voteType);
 }
 

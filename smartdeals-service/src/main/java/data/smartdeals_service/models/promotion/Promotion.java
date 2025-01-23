@@ -59,8 +59,10 @@ public class Promotion {
 
     private Integer maxUsage; // số lần dùng
 
-    @JsonFormat(pattern = "yyyy-M-d'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate; //ngày tạo
+
+    private LocalDateTime updatedAt;
 
     @Column(length = 255)
     private String createdBy; //người tạo

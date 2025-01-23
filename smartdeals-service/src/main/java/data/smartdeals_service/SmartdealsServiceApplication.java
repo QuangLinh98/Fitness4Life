@@ -11,9 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @EnableFeignClients
 public class SmartdealsServiceApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(SmartdealsServiceApplication.class, args);
 	}
-
 }
