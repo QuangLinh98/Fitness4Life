@@ -97,6 +97,10 @@ public class UserService {
     //Phương thức Register User
     @Transactional
     public UserResponseDTO createUser(CreateUserDTO createUserDTO) throws MessagingException, IOException {
+        // Chuẩn hóa email từ DTO
+        String normalizedEmail = normalizeEmail(createUserDTO.getEmail());
+        createUserDTO.setEmail(normalizedEmail);
+
         //Kiểm tra nếu có bất kỳ user nào với email đang acive
         List<User> existingActiveUsers = userRepository.findByEmailAndIsActiveTrue(createUserDTO.getEmail());
         if (!existingActiveUsers.isEmpty()) {
@@ -143,6 +147,18 @@ public class UserService {
         mailEntity.setContent(emailContent);
         mailResetPass.sendMailOTP(mailEntity);
         return userResponseDTO;
+    }
+
+    //Hàm chuẩn hóa email tránh lỗ hổng 1 email có thể đăng ký nhiều account
+    private String normalizeEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return email; // Nếu email không hợp lệ, trả về như ban đầu
+        }
+        // Tách email thành phần local và domain
+        String[] parts = email.split("@");
+        String localPart = parts[0].split("\\+")[0].toLowerCase(); // Lấy phần trước dấu '+' và chuyển về chữ thường
+        String domainPart = parts[1].toLowerCase(); // Chuyển domain về chữ thường
+        return localPart + "@" + domainPart; // Gộp lại email đã chuẩn hóa
     }
 
 

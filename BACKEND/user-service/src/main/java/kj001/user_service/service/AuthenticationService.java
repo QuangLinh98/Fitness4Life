@@ -55,11 +55,11 @@ public class AuthenticationService {
 
     // Phương thức kích hoạt tài khoản sau khi user đăng ký thành công
     @Transactional
-    public boolean verifyAndActivateAccount(String email, String otpCode) {
+    public boolean verifyAndActivateAccount( String otpCode) {
 
         // Kiểm tra xem người dùng đã tồn tại hay chưa, nếu đã tồn tại thì trả về phản hồi lỗi
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("UserNotFound"));
+        User user = userRepository.findByOtpCode(otpCode)
+                .orElseThrow(() -> new RuntimeException("Invalid OTP"));
 
         // Kiểm tra OTP có khớp không và còn hiệu lực không
         if (!otpCode.equals(user.getOtpCode()) || user.getExpiryTime().isBefore(LocalDateTime.now())) {
@@ -76,7 +76,7 @@ public class AuthenticationService {
         userRepository.save(user);
 
         // Xóa các bản ghi không kích hoạt khác có cùng email
-        userRepository.deleteInactiveUsersByEmail(email, user.getId());
+        userRepository.deleteInactiveUsersByEmail(user.getEmail(), user.getId());
 
         return true;
     }

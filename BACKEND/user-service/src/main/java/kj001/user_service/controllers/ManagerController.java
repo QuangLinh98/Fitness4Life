@@ -36,13 +36,4 @@ public class ManagerController {
         UserDTO userDTO = userService.getUserById(id);
         return ResponseEntity.ok(userDTO);
     }
-
-//    @GetMapping("/manager/users/{id}")
-//    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable long id) {
-//        User user = userRepository.findByIdWithProfile(id)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        UserResponseDTO userResponseDTO = userService.toUserResponseDTO(user);
-//        return ResponseEntity.ok(userResponseDTO);
-//    }
 }

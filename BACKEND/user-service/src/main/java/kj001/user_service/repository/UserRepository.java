@@ -1,6 +1,7 @@
 package kj001.user_service.repository;
 
 import jakarta.transaction.Transactional;
+import kj001.user_service.models.OTP;
 import kj001.user_service.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,9 +16,13 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
+
     // Lấy tất cả người dùng có email và đang hoạt động
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.isActive = true")
     List<User> findByEmailAndIsActiveTrue(@Param("email") String email);
+
+    Optional<User> findByOtpCode(String otpCode);
+
     Optional<User> findByEmailAndOtpCode(String email,String code);
 
     // Lấy tất cả người dùng có email và ngày đăng ký trong khoảng thời gian
