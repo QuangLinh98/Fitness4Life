@@ -45,6 +45,7 @@ public class SecurityConfig {
                         exchange  -> exchange .pathMatchers(
                                         "/api/users/login",
                                         "/api/users/register",
+                                        "/api/users/verify-account/**",
                                         "/api/users/send-otp",
                                         "/api/users/reset-password",
                                         "/api/users/refresh_token",

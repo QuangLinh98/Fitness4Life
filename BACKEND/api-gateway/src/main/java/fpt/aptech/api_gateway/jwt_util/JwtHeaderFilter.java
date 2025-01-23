@@ -25,6 +25,10 @@ public class JwtHeaderFilter implements GlobalFilter {
             System.out.println("Skipping JwtHeaderFilter for: " + path);
             return chain.filter(exchange); // Bỏ qua filter
         }
+        if (path.startsWith("/api/users/verify-account")) {
+            System.out.println("Skipping JwtHeaderFilter for: " + path);
+            return chain.filter(exchange); // Bỏ qua filter
+        }
 
         // Lấy Authorization header
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
