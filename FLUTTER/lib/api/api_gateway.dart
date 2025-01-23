@@ -8,11 +8,12 @@ class ApiGateWayService {
   static const  List<String> noAuthEndpoints = [
     "/users/login",
     "/users/register",
+    "/users/verify-account/",
     "/users/send-otp",
     "/users/reset-password",
     "/users/refresh_token",
     "/booking/qrCode/validate",
-    "/uploads/TrainerImage/**"
+    "/uploads/TrainerImage/"
   ];
 
   //Thêm token vào header cho mỗi yêu cầu.
@@ -25,7 +26,7 @@ class ApiGateWayService {
         print("Full Path: ${_dio.options.baseUrl}${options.path}");
 
         // Kiểm tra nếu endpoint thuộc danh sách không cần token
-        if (!noAuthEndpoints.any((endpoint) => options.path == endpoint)) {
+        if (!noAuthEndpoints.any((endpoint) => options.path.startsWith(endpoint))) {
           String? token = await TokenManager.getAccessToken();
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';

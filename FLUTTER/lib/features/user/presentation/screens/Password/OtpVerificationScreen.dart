@@ -1,5 +1,6 @@
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:fitness4life/features/user/service/PasswordService.dart';
+import 'package:fitness4life/features/user/service/RegisterService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -8,8 +9,9 @@ import 'package:provider/provider.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String email;
+  final String mode; // "resetPassword" hoặc "verifyAccount"
 
-  const OtpVerificationScreen({Key? key, required this.email}) : super(key: key);
+  const OtpVerificationScreen({Key? key, required this.email , required this.mode}) : super(key: key);
 
   @override
   _OtpVerificationScreenState createState() => _OtpVerificationScreenState();
@@ -48,20 +50,24 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   Future<void> _resendOtp(BuildContext context) async {
     final passwordService = Provider.of<PasswordService>(context, listen: false);
+    final registerService = Provider.of<RegisterService>(context, listen: false);
 
     setState(() {
       _isResending = true;
     });
 
     try {
-      await passwordService.sendOtpPassword(widget.email);
+      if (widget.mode == "resetPassword") {
+        await passwordService.sendOtpPassword(widget.email);
+      } else if (widget.mode == "verifyAccount") {
+        await registerService.verifyAccount(widget.email);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("OTP sent successfully!"),
           backgroundColor: Colors.green,
         ),
       );
-      // Reset thời gian đếm ngược
       setState(() {
         _remainingTime = 300;
       });
@@ -93,35 +99,58 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     }
 
     final passwordService = Provider.of<PasswordService>(context, listen: false);
+    final registerService = Provider.of<RegisterService>(context, listen: false);
 
     setState(() {
       _isResending = true; // Dùng chung trạng thái để hiển thị loader khi đang xác thực OTP
     });
 
     try {
-      // Gửi OTP đến API để xác thực
-      await passwordService.resetPassword(otp);
+      if(widget.mode == "resetPassword") {
+        // Gửi OTP đến API để xác thực
+        await passwordService.resetPassword(otp);
 
-      // Hiển thị thông báo thành công
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("OTP verified successfully!"),
-          backgroundColor: Colors.green,
-        ),
-      );
+        // Hiển thị thông báo thành công
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("OTP verified successfully!"),
+            backgroundColor: Colors.green,
+          ),
+        );
 
-      // Chuyển sang màn hình tiếp theo
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>  LoginScreen(), // Hoặc bất kỳ màn hình nào sau xác thực
-        ),
-      );
+        // Chuyển sang màn hình tiếp theo
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                LoginScreen(), // Hoặc bất kỳ màn hình nào sau xác thực
+          ),
+        );
+      }
+      else if (widget.mode == "verifyAccount") {
+         await registerService.verifyAccount(otp);
+         ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(
+             content: Text("Account verified successfully!"),
+             backgroundColor: Colors.green,
+           ),
+         );
+         Navigator.pushReplacement(
+           context,
+           MaterialPageRoute(
+             builder: (context) => LoginScreen(),
+           ),
+         );
+      }
     } catch (e) {
       // Hiển thị thông báo lỗi nếu OTP không hợp lệ
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(passwordService.errorMessage ?? "Invalid OTP!"),
+          content: Text(
+            widget.mode == "resetPassword"
+                ? (passwordService.errorMessage ?? "Invalid OTP for reset password!")
+                : (registerService.errorMessage ?? "Invalid OTP for account verification!")
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -168,8 +197,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              const Text(
-                "Enter the OTP sent to your email",
+               Text(
+                widget.mode == "resetPassword"
+                     ? "Enter the OTP sent to your email to reset your password"
+                     : "Enter the OTP sent to your email to verify your account",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,

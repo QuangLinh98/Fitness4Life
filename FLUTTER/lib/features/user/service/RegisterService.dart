@@ -37,4 +37,22 @@ class RegisterService extends ChangeNotifier {
     }
   }
 
+  //Xử lý verify account
+ Future<void> verifyAccount(String code) async {
+   _isLoading = true;
+   _errorMessage = null;
+   notifyListeners(); // Thông báo UI
+    try{
+      await _registerRepository.verifyAccount(code);
+      _isLoading = false;
+      notifyListeners();
+    }
+    catch(e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners(); // Thông báo UI lỗi
+      rethrow;
+    }
+ }
+
 }
