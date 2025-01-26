@@ -57,8 +57,6 @@ public class Promotion {
     @Column(nullable = false)
     private List<CustomerType> customerType; // Nhiều loại khách hàng
 
-    private Integer maxUsage; // số lần dùng
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate; //ngày tạo
 

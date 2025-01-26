@@ -83,7 +83,6 @@ public class PromotionService {
         promotion.setEndDate(promotionDTO.getEndDate());
         promotion.setIsActive(promotionDTO.getIsActive());
         promotion.setMinValue(promotionDTO.getMinValue());
-        promotion.setMaxUsage(promotionDTO.getMaxUsage());
         promotion.setCreatedBy(promotionDTO.getCreatedBy());
         promotion.setCreatedDate(LocalDateTime.now());
         promotion.setPackageName(promotionDTO.getPackageName());
@@ -168,7 +167,6 @@ public class PromotionService {
         dto.setApplicableService(promotion.getApplicableService());
         dto.setMinValue(promotion.getMinValue());
         dto.setCustomerType(promotion.getCustomerType());
-        dto.setMaxUsage(promotion.getMaxUsage());
         dto.setCreatedBy(promotion.getCreatedBy());
         dto.setPackageName(promotion.getPackageName());
         dto.setCode(promotion.getCode());
@@ -335,7 +333,6 @@ public class PromotionService {
             promotionDTO.setCustomerType(promotion.getCustomerType());
             promotionDTO.setPackageName(promotion.getPackageName());
             promotionDTO.setCreatedBy(promotion.getCreatedBy());
-            promotionDTO.setMaxUsage(promotion.getMaxUsage());
             promotionOfUserDTOs.add(promotionDTO);
         }
         return promotionOfUserDTOs;
@@ -367,7 +364,6 @@ public class PromotionService {
                             newPromotion.setEndDate(calculateEndDate(LocalDateTime.now()));
                             newPromotion.setIsActive(getOnePromotion.getIsActive());
                             newPromotion.setMinValue(getOnePromotion.getMinValue());
-                            newPromotion.setMaxUsage(getOnePromotion.getMaxUsage());
                             newPromotion.setCreatedBy(getOnePromotion.getCreatedBy());
                             newPromotion.setCreatedDate(LocalDateTime.now());
                             newPromotion.setPackageName(getOnePromotion.getPackageName());

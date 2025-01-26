@@ -16,15 +16,45 @@ public class FileUploadAvata {
     @Value("${upload.folder}")
     private String uploadFolder;
 
+    // hàm MIME types hợp lệ (check các định dạng file hợp lệ)
+    private static final String[] ALLOWED_MIME_TYPES = {
+            "image/png", "image/jpeg","image/gif","image/bmp",
+            "image/webp","image/tiff", "image/x-icon","image/svg+xml",
+            "video/mp4","video/x-msvideo", "video/x-matroska",
+            "video/quicktime", "video/x-ms-wmv", "video/x-flv",
+            "video/webm", "video/3gpp", "video/mpeg"
+    };
+
     public String storeImage(String subFolder, MultipartFile multipartFile) throws IOException {
+
+        // Kiểm tra loại file (MIME type)
+        String fileType = multipartFile.getContentType();
+        boolean isValidType = false;
+        for (String mimeType : ALLOWED_MIME_TYPES) {
+            if (mimeType.equals(fileType)) {
+                isValidType = true;
+                break;
+            }
+        }
+
+        // lỗi xuất dưới terminal và status 500 server error
+        if (!isValidType) {
+            throw new IllegalArgumentException("Loại file không được hỗ trợ. Chỉ chấp nhận các loại: image/png, image/jpeg.");
+        }
+
+        // tạo thư mục nếu chưa tồn tại
         String exactFolderPath = uploadFolder + File.separator + subFolder;
         File directory = new File(exactFolderPath);
         if (!directory.exists()) {
             directory.mkdirs();
         }
+        // tạo tên đường dẫn
         String fileName = UUID.randomUUID().toString() +"_"+ multipartFile.getOriginalFilename();
         Path destination = Path.of(exactFolderPath, fileName);
+
+        // lưu file
         Files.copy(multipartFile.getInputStream(), destination);
+
         return fileName;
     }
 

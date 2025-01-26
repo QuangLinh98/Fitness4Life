@@ -31,6 +31,5 @@ public class PromotionOfUserDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endDate; // ngày kết thúc km
     private Boolean isUsed;
-    private Integer maxUsage;
     private String createdBy;
 }

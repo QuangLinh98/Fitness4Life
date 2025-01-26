@@ -24,7 +24,6 @@ public class PromotionPointDTO {
     private List<ApplicableServices> applicableService;
     private BigDecimal minValue;
     private List<CustomerType> customerType;
-    private Integer maxUsage;
     private String createdBy;
     private List<PackageName> packageName;
     private String code;
