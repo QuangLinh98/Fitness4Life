@@ -1,27 +1,43 @@
 import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
+import 'package:fitness4life/features/booking/data/MembershipSubscription%20.dart';
+import 'package:fitness4life/features/booking/service/MembershipSubscriptionService.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/Password/ChangePasswordScreen.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
+import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({Key? key}) : super(key: key);
+  final int userId;
+  const AccountScreen({super.key,  this.userId = 102});
 
   @override
-  _AccountScreenState createState() => _AccountScreenState();
+  State<AccountScreen> createState() => _AccountScreenState();
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  MembershipSubscription? memberShipData; // Biến lưu trữ thông tin QR
+  bool isLoading = true; // Trạng thái chờ
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // Gọi các service để lấy dữ liệu
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final membershipService = Provider.of<MembershipSubscriptionService>(context, listen: false);
+      membershipService.getMembershipSubscription(widget.userId); // 🔹 Chỉ gọi API, không dùng setState()
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final userName = Provider.of<UserInfoProvider>(context).userName;
+    final membershipService = Provider.of<MembershipSubscriptionService>(context);
+    final membership = membershipService.membershipSubscription;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -32,10 +48,10 @@ class _AccountScreenState extends State<AccountScreen> {
             Container(
               color: const Color(0xFFB00020),
               padding: const EdgeInsets.all(16),
-              child: const Row(
+              child: Row(
                 children: [
                   // Avatar
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 30,
                     backgroundColor: Colors.white,
                     child: Icon(
@@ -44,22 +60,22 @@ class _AccountScreenState extends State<AccountScreen> {
                       color: Colors.grey,
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   // User Information
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Bảo Anh",
-                        style: TextStyle(
+                        userName != null ? '$userName!' : 'Hello customers !',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        "Hồ sơ >",
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Profile >",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -71,7 +87,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             ),
 
-            // Account Info Section
+            // Account Info Section (Hiển thị Membership)
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
@@ -81,44 +97,69 @@ class _AccountScreenState extends State<AccountScreen> {
                   color: const Color(0xFFB00020),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "HO_MB211118321290",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Bảo Anh_Signature",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Ngày kích hoạt: 18/11/2021",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Ngày kết thúc: 17/11/2023",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
+                child: Consumer<MembershipSubscriptionService>(
+                  builder: (context, membershipService, child) {
+                    final membership = membershipService.membershipSubscription;
+
+                    // 🔥 Kiểm tra xem có lỗi không
+                    if (membershipService.errorMessage != null) {
+                      return Text(
+                        "❌ Error: ${membershipService.errorMessage}",
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      );
+                    }
+
+                    // 🔥 Kiểm tra xem Membership có null không
+                    if (membership == null) {
+                      print("⏳ Membership vẫn chưa có dữ liệu, đang loading...");
+                      return const Column(
+                        children: [
+                          CircularProgressIndicator(color: Colors.white),
+                          Text("🔄 Loading...", style: TextStyle(color: Colors.white)),
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${membership.transactionId}",
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children:[
+                            Text(
+                              "Membership: ${membership.membershipLevel}",
+                              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              "${NumberFormat('#,###').format(membership.amount)} đ",
+                              style: const TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ]
+                        ),
+
+                        const SizedBox(height: 8),
+                        Text(
+                          "Activation Date: ${membership.formattedTransactionDate}",
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Expiration Date: ${membership.formattedExpirationDate}",
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                      ],
+                    );
+                  },
                 ),
+
               ),
             ),
 
@@ -127,10 +168,10 @@ class _AccountScreenState extends State<AccountScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                buildOptionItem("Hướng dẫn sử dụng", Icons.help_outline, () {}),
-                buildOptionItem("Liên hệ", Icons.phone, () {}),
-                buildOptionItem("Hợp đồng", Icons.description_outlined, () {}),
-                buildOptionItem("Lịch sử chăm sóc khách hàng", Icons.history, () {}),
+                buildOptionItem("User Guide", Icons.help_outline, () {}),
+                buildOptionItem("Contact", Icons.phone, () {}),
+                buildOptionItem("Contract", Icons.description_outlined, () {}),
+                buildOptionItem("Customer Care History", Icons.history, () {}),
                 buildOptionItem("Change password", Icons.lock_outline, ()  {
                      Navigator.push(
                          context,

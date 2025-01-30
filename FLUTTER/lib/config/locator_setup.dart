@@ -1,7 +1,9 @@
 // File chứa hàm `setupLocator()` và cấu hình DI
 import 'package:dio/dio.dart';
 import 'package:fitness4life/api/Booking_Repository/BookingRoomRepository.dart';
+import 'package:fitness4life/api/Booking_Repository/MembershipSubscriptionRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
+import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/TrainerRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
@@ -16,7 +18,7 @@ final GetIt locator = GetIt.instance;
 void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
-    baseUrl: "http://192.168.1.28:9000/api", // API Gateway URL
+    baseUrl: "http://172.20.10.5:9000/api", // API Gateway URL
     connectTimeout: const Duration(milliseconds: 10000), // Thời gian timeout kết nối
     receiveTimeout: const Duration(milliseconds: 10000), // Thời gian timeout nhận dữ liệu
   )));
@@ -47,4 +49,10 @@ void setUpLocator() {
 
   // Đăng ký PasswordRepository
   locator.registerLazySingleton(() => PasswordRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký MemberShipRepository
+  locator.registerLazySingleton(() => MembershipSubscriptionRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký WorkoutPackageRepository
+  locator.registerLazySingleton(() => WorkoutPackageRepository(locator<ApiGateWayService>()));
 }

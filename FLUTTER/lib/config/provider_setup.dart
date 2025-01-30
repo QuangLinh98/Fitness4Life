@@ -1,5 +1,7 @@
 import 'package:fitness4life/api/Booking_Repository/BookingRoomRepository.dart';
+import 'package:fitness4life/api/Booking_Repository/MembershipSubscriptionRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
+import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
@@ -8,7 +10,9 @@ import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
+import 'package:fitness4life/features/booking/service/MembershipSubscriptionService.dart';
 import 'package:fitness4life/features/booking/service/QrService.dart';
+import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:fitness4life/features/user/service/PasswordService.dart';
@@ -31,5 +35,7 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => RegisterService(locator<RegisterRepository>())),
   ChangeNotifierProvider(create: (_) => UserInfoProvider()),
   ChangeNotifierProvider(create: (_) => PasswordService(locator<PasswordRepository>())),
+  ChangeNotifierProvider(create: (_) => MembershipSubscriptionService(locator<MembershipSubscriptionRepository>())),
+  ChangeNotifierProvider(create: (_) => WorkoutPackageService(locator<WorkoutPackageRepository>())),
 
 ];
