@@ -58,7 +58,7 @@ public class PayPalService {
         // Tạo đối tượng Amount và thiết lập tiền tệ và tổng số tiền
         Amount amount = new Amount();
         amount.setCurrency(subscriptionDTO.getCurrency());
-        amount.setTotal(String.format("%.2f", subscriptionDTO.getTotalAmount()));   //Format cho nó chỉ lấy 2 chữ số phía sau
+        amount.setTotal(String.format("%.2f", subscriptionDTO.getTotalAmount()));
 
         // Tạo đối tượng Transaction và thiết lập mô tả và số tiền
         Transaction transaction = new Transaction();
@@ -86,20 +86,25 @@ public class PayPalService {
         payment.setRedirectUrls(redirectUrls);
 
         // Tạo một Payment mới trên PayPal
-
         Payment createdPayment = payment.create(apiContext);
+
+        // Lấy ngày thanh toán là ngày hiện tại
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        // Tính toán ngày kết thúc (thêm durationMonth vào ngày bắt đầu)
+        LocalDateTime endDate = currentDateTime.plusMonths(packageExisting.getDurationMonth());
+
         // Lưu thông tin thanh toán vào cơ sở dữ liệu
-        Optional<WorkoutPackage> hotelExisting = workoutPackageRepository.findById(subscriptionDTO.getPackageId());
         MembershipSubscription membershipSubscription = MembershipSubscription.builder()
                 .packageId(subscriptionDTO.getPackageId())
                 .userId(subscriptionDTO.getUserId())
                 .fullName(userExisting.getFullName())
-                .buyDate(LocalDateTime.now())
-                .startDate(subscriptionDTO.getStartDate())
-                .endDate(subscriptionDTO.getEndDate())
+                .buyDate(currentDateTime)   //Ngày mua sẽ là ngày thanh toán
+                .startDate(currentDateTime.toLocalDate())  // Start date là ngày thanh toán thành công
+                .endDate(endDate.toLocalDate())    // End date là ngày tính toán dựa trên duration
                 .payMethodType(PayMethodType.valueOf(PayMethodType.PAYPAL.toString()))
                 .payStatusType(PayStatusType.valueOf(PayStatusType.PENDING.toString()))
-                .packageName(subscriptionDTO.getPackageName())
+                .packageName(packageExisting.getPackageName())
                 .description(subscriptionDTO.getDescription())
                 .totalAmount(subscriptionDTO.getTotalAmount())
                 .paymentId(createdPayment.getId())
@@ -141,5 +146,15 @@ public class PayPalService {
 
     public MembershipSubscription getMembershippaymentId(String paymentId) {
         return membershipRepository.findByPaymentId(paymentId);
+    }
+
+    public MembershipSubscription getMembershipByUserId(long userId)  {
+         var userExisting = membershipRepository.findMemberShipByUserId(userId);
+         if (userExisting != null) {
+             return membershipRepository.findMemberShipByUserId(userId);
+         }
+         else {
+             throw new RuntimeException("Membership with userId " + userId + " not found");
+         }
     }
 }
