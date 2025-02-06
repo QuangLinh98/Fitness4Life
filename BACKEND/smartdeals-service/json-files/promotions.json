@@ -1,0 +1,17 @@
+[ {
+  "id" : "1FF59645",
+  "title" : "Promotion Test1",
+  "description" : "Description for Promotion Test1",
+  "discountType" : [ "PERCENTAGE" ],
+  "discountValue" : 10.0,
+  "startDate" : null,
+  "endDate" : null,
+  "isActive" : true,
+  "applicableService" : [ "GYM", "MASSAGE" ],
+  "minValue" : 50.0,
+  "customerType" : [ "NEW", "RETURNING" ],
+  "createdBy" : "Admin",
+  "packageName" : [ "CLASSIC" ],
+  "code" : "76A26627",
+  "points" : 500
+} ]
