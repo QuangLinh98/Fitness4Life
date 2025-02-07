@@ -1,3 +1,4 @@
+import 'package:fitness4life/features/smartDeal/data/models/forum/Comment.dart';
 import 'package:fitness4life/features/smartDeal/data/models/forum/GetComment.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -25,4 +26,21 @@ class CommentService extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> CreateComment(Comment comment) async {
+    try {
+      bool success = await _commentRepository.createComment(comment);
+      if (success) {
+        await Future.delayed(Duration(milliseconds: 200)); // Đợi 2 giây trước khi làm mới
+        await fetchCommentFlowQuestion(comment.questionId!); // Làm mới danh sách bình luận
+      }
+      return success;
+    } catch (e) {
+      print("Error creating comment: $e");
+      return false;
+    }
+  }
+
+
+
 }

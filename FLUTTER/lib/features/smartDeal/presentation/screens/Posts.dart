@@ -105,13 +105,6 @@ class _PostsState extends State<Posts> {
               // 🛑 🛑 🛑hiển thị danh sách comment 🛑 🛑 🛑
               const Divider(),
               const SizedBox(height: 10),
-              Text(
-                "Comments",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-              ),
-              const SizedBox(height: 10),
-
-              // Hiển thị danh sách comment
               CommentPage(questionId: widget.questionId),
             ],
           ),

@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class GetComment {
   int? id;
   int? userId;
@@ -35,8 +37,19 @@ class GetComment {
       questionId: json['questionId'],
       blogId: json['blogId'],
       parentCommentId: json['parentCommentId'],
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      createdAt: json['createdAt'] != null && json['createdAt'] is List
+          ? DateTime(
+          json['createdAt'][0], json['createdAt'][1], json['createdAt'][2],
+          json['createdAt'][3], json['createdAt'][4], json['createdAt'][5],
+          json['createdAt'][6] ~/ 1000000) // Chuyển nano -> milli
+          : null,
+
+      updatedAt: json['updatedAt'] != null && json['updatedAt'] is List
+          ? DateTime(
+          json['updatedAt'][0], json['updatedAt'][1], json['updatedAt'][2],
+          json['updatedAt'][3], json['updatedAt'][4], json['updatedAt'][5],
+          json['updatedAt'][6] ~/ 1000000)
+          : null,
       isPublished: json['isPublished'],
       replies: (json['replies'] as List?)?.map((e) => GetComment.fromJson(e)).toList(),
     );
