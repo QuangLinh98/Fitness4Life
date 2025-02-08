@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:fitness4life/api/Booking_Repository/BookingRoomRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/MembershipSubscriptionRepository.dart';
+import 'package:fitness4life/api/Booking_Repository/PaypalRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
@@ -18,7 +19,7 @@ final GetIt locator = GetIt.instance;
 void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
-    baseUrl: "http://172.20.10.5:9000/api", // API Gateway URL
+    baseUrl: "http://192.168.1.45:9000/api", // API Gateway URL
     connectTimeout: const Duration(milliseconds: 10000), // Thời gian timeout kết nối
     receiveTimeout: const Duration(milliseconds: 10000), // Thời gian timeout nhận dữ liệu
   )));
@@ -55,4 +56,7 @@ void setUpLocator() {
 
   // Đăng ký WorkoutPackageRepository
   locator.registerLazySingleton(() => WorkoutPackageRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký PayPalRepository
+  locator.registerLazySingleton(() => PaypalRepository(locator<ApiGateWayService>()));
 }

@@ -1,5 +1,6 @@
 import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
 import 'package:fitness4life/features/booking/data/WorkoutPackage.dart';
+import 'package:fitness4life/features/booking/data/WorkoutPackageDTO.dart';
 import 'package:flutter/cupertino.dart';
 
 class WorkoutPackageService extends ChangeNotifier{
@@ -25,6 +26,16 @@ class WorkoutPackageService extends ChangeNotifier{
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  // ✅ Lấy gói tập theo packageId
+  Future<WorkoutPackageDTO?> fetchPackageById(int packageId) async {
+    try {
+      return await _packageRepository.fetchPackageById(packageId);
+    } catch (e) {
+      print("❌ Error fetching package by ID: $e");
+      return null;
     }
   }
 }

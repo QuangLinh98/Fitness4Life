@@ -24,4 +24,23 @@ class MembershipSubscriptionRepository {
       throw Exception('Failed to load subscriptions');
     }
   }
+
+  //Xử lý thanh toán
+  // Future<String> processPayment(MembershipSubscription subscription) async {
+  //   try{
+  //     //Chuyển đổi Object thành Json
+  //     final requestBody = {
+  //       "packageId": subscription.packageId,
+  //       "userId": subscription.userId,
+  //       "description": subscription.description,
+  //       "cancelUrl": "http://localhost:5173/cancel",
+  //       "successUrl": "http://localhost:5173/success",
+  //       "currency": "USD",
+  //       "intent": "sale",
+  //     }
+  //   }
+  //   catch (e) {
+  //     throw Exception('Lỗi khi xử lý thanh toán: $e');
+  //   }
+  // }
 }

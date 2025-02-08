@@ -1,5 +1,6 @@
 import 'package:fitness4life/api/Booking_Repository/BookingRoomRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/MembershipSubscriptionRepository.dart';
+import 'package:fitness4life/api/Booking_Repository/PaypalRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
@@ -11,6 +12,7 @@ import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
 import 'package:fitness4life/features/booking/service/MembershipSubscriptionService.dart';
+import 'package:fitness4life/features/booking/service/PaypalService.dart';
 import 'package:fitness4life/features/booking/service/QrService.dart';
 import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
@@ -37,5 +39,6 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => PasswordService(locator<PasswordRepository>())),
   ChangeNotifierProvider(create: (_) => MembershipSubscriptionService(locator<MembershipSubscriptionRepository>())),
   ChangeNotifierProvider(create: (_) => WorkoutPackageService(locator<WorkoutPackageRepository>())),
+  ChangeNotifierProvider(create: (_) => PaypalService(locator<PaypalRepository>())),
 
 ];

@@ -1,5 +1,7 @@
 import 'package:fitness4life/features/booking/data/WorkoutPackage.dart';
+import 'package:fitness4life/features/booking/presentation/screens/PayPalPaymentScreen.dart';
 import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart';
+import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -230,7 +232,7 @@ class WorkoutPackageCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Price: ${NumberFormat("#,###").format(package.price)} đ",
+                    "Price: \$${NumberFormat('#,###').format(package.price)}",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -313,7 +315,7 @@ class WorkoutPackageCard extends StatelessWidget {
 
                 // Giá tiền
                 Text(
-                  "Package ${package.durationMonth} month: ${NumberFormat("#,###").format(package.price)} VNĐ",
+                  "Package ${package.durationMonth} month: ${NumberFormat("#,###").format(package.price)} USD",
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -344,7 +346,17 @@ class WorkoutPackageCard extends StatelessWidget {
 
                 // Nút "Checkout"
                 ElevatedButton(
-                  onPressed: () {}, // Thêm logic cho việc thanh toán
+                  onPressed: () {
+                    // Lấy userId từ provider
+                    final userId = Provider.of<UserInfoProvider>(context, listen: false).userId;
+                    print('UserId : ${userId}');
+
+                    // Lấy packageId từ danh sách gói đăng ký
+                    final packageId = package.id;
+
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PayPalPaymentScreen(userId: userId ?? 0,
+                      packageId: packageId,)));
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,

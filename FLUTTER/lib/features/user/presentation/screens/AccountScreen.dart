@@ -136,7 +136,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "${NumberFormat('#,###').format(membership.amount)} đ",
+                              "${NumberFormat('#,###').format(membership.amount)} USD",
                               style: const TextStyle(color: Colors.white, fontSize: 16),
                             ),
                           ]

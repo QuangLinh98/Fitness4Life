@@ -1,5 +1,6 @@
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:fitness4life/features/booking/data/WorkoutPackage.dart';
+import 'package:fitness4life/features/booking/data/WorkoutPackageDTO.dart';
 
 class WorkoutPackageRepository {
   final ApiGateWayService _apiGateWayService;
@@ -27,4 +28,24 @@ class WorkoutPackageRepository {
       print("🔍 StackTrace: $stacktrace");
       throw Exception("Error fetching Workout Package: $e");
     }
-  }}
+  }
+
+  // ✅ Lấy thông tin gói tập từ database theo packageId
+  Future<WorkoutPackageDTO> fetchPackageById(int packageId) async {
+    try {
+      final response = await _apiGateWayService.getData('/booking/package/$packageId');
+      // 🔥 Log phản hồi để kiểm tra
+      print("Package by id : ${response.data}");
+
+      if (response.data == null) {
+        throw Exception("API response is null");
+      }
+
+      return WorkoutPackageDTO.fromJson(response.data);
+    } catch (e,stacktrace) {
+      print("❌ Error fetching package by ID: $e");
+      print("🔍 StackTrace: $stacktrace");
+      throw Exception("Error fetching package by ID: $e");
+    }
+  }
+}

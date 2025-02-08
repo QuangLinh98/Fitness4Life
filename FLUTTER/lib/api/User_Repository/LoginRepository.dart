@@ -3,6 +3,7 @@ import 'package:fitness4life/api/api_gateway.dart';
 import 'package:fitness4life/features/user/data/models/User.dart';
 import 'package:fitness4life/token/token_manager.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginRepository {
   final ApiGateWayService _apiGateWayService;
@@ -32,14 +33,25 @@ class LoginRepository {
         Map<String, dynamic> payload = JwtDecoder.decode(accessToken);
         String? fullname = payload['fullName']; // Trích xuất trường fullName
         String? role = payload['role']; // Trích xuất role
+        int? id = payload['id'];
+
+        if (id == null) {
+          throw Exception("User ID is null in the token payload.");
+        }
 
         // Lưu token vào Secure Storage
         await TokenManager.saveTokens(accessToken, refreshToken);
+
+        //  Lưu userId vào SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('user_id', id);
+        print("✅ Saved userId to SharedPreferences: $id");
 
         // Tạo đối tượng User từ dữ liệu giải mã
         final user = User(
           fullname: fullname ?? "Guest",
           role: role ,
+          id:id,
           tokensList: [
             Tokens(value: accessToken, type: "access_token"),
             Tokens(value: response.data['refresh_token'], type: "refresh_token"),
@@ -69,6 +81,12 @@ class LoginRepository {
       if(response.statusCode == 200) {
         //Xóa token khởi Secure Store
         await TokenManager.clearTokens();
+
+        // 🛑 Xóa userId khỏi SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('user_id');
+        print("✅ Removed userId from SharedPreferences");
+
         print("User successfully logged out");
       }else {
         // Xử lý các mã lỗi khác

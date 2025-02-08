@@ -7,12 +7,12 @@ import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ClassScreen extends StatefulWidget {
   final int roomId;
-  final int userId;
 
-  const ClassScreen({super.key,  this.roomId = 3 , this.userId = 152});
+  const ClassScreen({super.key,  this.roomId = 3 });
 
   @override
   State<ClassScreen> createState() => _ClassScreenState();
@@ -20,6 +20,17 @@ class ClassScreen extends StatefulWidget {
 
 class _ClassScreenState extends State<ClassScreen> {
   bool isBooked = false; // Biến trạng thái: true => hiển thị booked classes
+  int? userId; // Biến lưu userId lấy từ SharedPreferences
+
+
+  /// Hàm lấy `userId` từ SharedPreferences
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getInt('user_id');
+      print('UserId : ${userId}');
+    });
+  }
 
   final List<String> images = [
     'images/cycling.jpg',
@@ -33,6 +44,7 @@ class _ClassScreenState extends State<ClassScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadUserId();
     // Gọi các service để lấy dữ liệu
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Gọi fetchRooms
@@ -41,11 +53,11 @@ class _ClassScreenState extends State<ClassScreen> {
 
       //Gọi bookingRoom
       final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
-      bookingRoomService.bookingRoom(widget.roomId, widget.userId);
+      bookingRoomService.bookingRoom(widget.roomId, userId!);
 
       //Gọi booked room by userId
       final bookedRoomService = Provider.of<BookingRoomService>(context, listen: false);
-      bookedRoomService.fetchBookedRooms(widget.userId);
+      bookedRoomService.fetchBookedRooms(userId!);
 
       //Gọi cancel booking room
       final cancelBooking = Provider.of<BookingRoomService>(context, listen: false);
@@ -463,7 +475,7 @@ class _ClassScreenState extends State<ClassScreen> {
                             : () async {
                           // Xử lý sự kiện click Book button
                           final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
-                          bool success = await bookingRoomService.bookingRoom(room.id ?? 0, widget.userId);
+                          bool success = await bookingRoomService.bookingRoom(room.id ?? 0, userId!);
 
                           if(success) {
                             //Nếu booking thành công , hiển thị dialog thông báo thành công
