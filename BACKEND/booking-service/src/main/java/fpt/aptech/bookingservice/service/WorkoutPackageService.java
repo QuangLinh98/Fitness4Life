@@ -24,14 +24,15 @@ public class WorkoutPackageService {
 
     //Handle get a package
     public WorkoutPackageDTO getWorkoutPackageById(int id) {
-         Optional<WorkoutPackage> existingPackage = workoutPackageRepository.findById(id);
-         if (existingPackage.isPresent()) {
-             WorkoutPackageDTO workoutPackageDTO = new WorkoutPackageDTO();
-             workoutPackageDTO.setWorkoutPackageId(existingPackage.get().getId());
-             workoutPackageDTO.setPackageName(String.valueOf(existingPackage.get().getPackageName()));
-             return workoutPackageDTO;
-         }
-        return null;
+        return workoutPackageRepository.findById(id)
+                .map(existingPackage -> {
+                    WorkoutPackageDTO dto = new WorkoutPackageDTO();
+                    dto.setId(existingPackage.getId());
+                    dto.setPackageName(existingPackage.getPackageName().toString());
+                    dto.setPrice(existingPackage.getPrice());
+                    return dto;
+                })
+                .orElseThrow(() -> new RuntimeException("Workout Package not found"));
     }
 
     //Handle get many package
@@ -40,7 +41,7 @@ public class WorkoutPackageService {
         List<WorkoutPackageDTO> workoutPackageDTOS = new ArrayList<>();
         for (WorkoutPackage workoutPackage : workoutPackages) {
             WorkoutPackageDTO workoutPackageDTO = new WorkoutPackageDTO();
-            workoutPackageDTO.setWorkoutPackageId(workoutPackage.getId());
+            workoutPackageDTO.setId(workoutPackage.getId());
             workoutPackageDTO.setPackageName(String.valueOf(workoutPackage.getPackageName()));
             workoutPackageDTOS.add(workoutPackageDTO);
         }

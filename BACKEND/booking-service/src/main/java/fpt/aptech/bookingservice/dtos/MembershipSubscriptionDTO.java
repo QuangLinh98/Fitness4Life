@@ -22,8 +22,16 @@ public class MembershipSubscriptionDTO {
     private String cancelUrl;
     private LocalDate startDate;    //Ngày bắt đầu
     private LocalDate endDate;      //Ngày kết thúc
-    private double totalAmount;     // Tổng số tiền cần thanh toán cho booking
+    private Double totalAmount;     // Tổng số tiền cần thanh toán cho booking
     private String currency;     //Loại tiền tệ
     private String intent;
     private PackageName packageName;   // Tên membership
+
+    public Double getTotalAmount() {
+        return totalAmount != null ? totalAmount : 0.0;
+    }
+
+    public boolean hasTotalAmount() {
+        return totalAmount != null && totalAmount > 0;
+    }
 }
