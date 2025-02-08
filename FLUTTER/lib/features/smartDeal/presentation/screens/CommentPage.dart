@@ -16,6 +16,9 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   Map<int, bool> showReplyForm = {};
+  bool showAll = false;
+  static const int commentLimit = 5;
+  static const int maxLineLength = 50; // Giới hạn số ký tự trước khi xuống hàng
 
   @override
   void initState() {
@@ -31,11 +34,17 @@ class _CommentPageState extends State<CommentPage> {
     final commentService = Provider.of<CommentService>(context);
     final comments = commentService.comments;
 
-    // Sắp xếp danh sách bình luận từ mới nhất đến cũ nhất
     comments.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
-
-    // Lọc ra các bình luận cha (parentCommentId == null)
     final parentComments = comments.where((c) => c.parentCommentId == null).toList();
+
+    List allComments = [];
+    for (var parent in parentComments) {
+      allComments.add(parent);
+      allComments.addAll(_getAllChildComments(parent, comments));
+    }
+
+    bool hasMoreComments = allComments.length > commentLimit;
+    List displayedComments = showAll ? allComments : allComments.take(commentLimit).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,34 +59,29 @@ class _CommentPageState extends State<CommentPage> {
         const SizedBox(height: 10),
         commentService.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : parentComments.isNotEmpty
-            ? ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: parentComments.length,
-          itemBuilder: (context, index) {
-            return _buildComment(parentComments[index], comments);
-          },
+            : displayedComments.isNotEmpty
+            ? Column(
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: displayedComments.length,
+              itemBuilder: (context, index) {
+                return _commentCard(displayedComments[index], comments);
+              },
+            ),
+            if (hasMoreComments)
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    showAll = !showAll;
+                  });
+                },
+                child: Text(showAll ? "Thu hồi" : "Xem thêm"),
+              ),
+          ],
         )
             : const Center(child: Text("Chưa có bình luận nào")),
-      ],
-    );
-  }
-
-  Widget _buildComment(comment, List comments) {
-    // Lấy toàn bộ comment con của A
-    List childComments = _getAllChildComments(comment, comments);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _commentCard(comment, isParent: true), // Comment cha (A)
-
-        // Hiển thị toàn bộ comment con (B, C, D, ...) trên cùng 1 hàng
-        if (childComments.isNotEmpty)
-          Column(
-            children: childComments.map((child) => _commentCard(child, isParent: false)).toList(),
-          ),
       ],
     );
   }
@@ -88,48 +92,45 @@ class _CommentPageState extends State<CommentPage> {
       List children = comments.where((c) => c.parentCommentId == parent.id).toList();
       for (var child in children) {
         allChildren.add(child);
-        findChildren(child); // Lấy luôn các comment con của con
+        findChildren(child);
       }
     }
     findChildren(comment);
     return allChildren;
   }
 
-  Widget _commentCard(comment, {required bool isParent}) {
+  Widget _commentCard(comment, List comments) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: isParent ? 10 : 30), // Chỉ thụt lề comment con cấp 1
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: comment.parentCommentId == null ? 10 : 30),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              comment.userName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              comment.content,
-              style: const TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              DateFormat('yyyy-MM-dd HH:mm').format(comment.createdAt),
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 5),
             Row(
               children: [
-                IconButton(
-                  icon: Icon(Icons.reply, color: Colors.blue),
-                  onPressed: () {
-                    setState(() {
-                      showReplyForm[comment.id] = !(showReplyForm[comment.id] ?? false);
-                    });
-                  },
+                Text(
+                  comment.userName,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                const Text("Trả lời", style: TextStyle(color: Colors.blue)),
+                Text(
+                  DateFormat('   yyyy-MM-dd HH:mm').format(comment.createdAt),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
               ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              _formatCommentText(comment.content),
+              style: const TextStyle(fontSize: 14),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  showReplyForm[comment.id] = !(showReplyForm[comment.id] ?? false);
+                });
+              },
+              child: const Text("   Reply", style: TextStyle(color: Colors.blue)),
             ),
             if (showReplyForm[comment.id] ?? false)
               ReplyCommentForm(
@@ -140,5 +141,21 @@ class _CommentPageState extends State<CommentPage> {
         ),
       ),
     );
+  }
+
+  String _formatCommentText(String text) {
+    List<String> words = text.split(' ');
+    String formattedText = '';
+    String currentLine = '';
+    for (String word in words) {
+      if ((currentLine + ' ' + word).trim().length > maxLineLength) {
+        formattedText += currentLine.trim() + '\n';
+        currentLine = word;
+      } else {
+        currentLine += ' ' + word;
+      }
+    }
+    formattedText += currentLine.trim();
+    return formattedText;
   }
 }

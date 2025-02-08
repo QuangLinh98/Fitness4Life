@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:fitness4life/features/smartDeal/data/models/forum/CreateQuestionDTO.dart';
 import 'package:fitness4life/features/smartDeal/data/models/forum/Question.dart';
 import 'package:flutter/cupertino.dart';
 import '../api_gateway.dart';
@@ -69,28 +71,40 @@ class QuestionRepository {
     }
   }
 
-  // Future<bool> voteQuestion(int questionId, int userId, String voteType) async {
-  //   try {
-  //     final response = await _apiGateWayService.postData(
-  //       '/deal/forums/questions/$questionId/vote',
-  //       data: {
-  //         'userId': userId,
-  //         'voteType': voteType, // Giá trị này có thể là "UPVOTE" hoặc "DOWNVOTE"
-  //       },
-  //     );
-  //
-  //     debugPrint("Response từ API vote ($questionId): ${response.data}");
-  //
-  //     if (response.statusCode == 200) {
-  //       return true; // Xử lý vote thành công
-  //     } else {
-  //       throw Exception("Vote failed with status code: ${response.statusCode}");
-  //     }
-  //   } catch (e) {
-  //     print("❌ Lỗi khi vote câu hỏi $questionId: $e");
-  //     return false;
-  //   }
-  // }
+  Future<Response> createQuestion(CreateQuestionDTO question) async {
+    try {
+      // Chuyển danh sách Uint8List thành MultipartFile
+      List<MultipartFile> images = await Future.wait(
+        question.imageQuestionUrl.map((image) async {
+          return MultipartFile.fromBytes(image, filename: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg');
+        }),
+      );
+
+      final url = '/deal/forums/questions/create';
+      // Tạo FormData
+      FormData formData = FormData.fromMap({
+        'authorId': question.authorId,
+        'author': question.author,
+        'title': question.title,
+        'content': question.content,
+        'tag': question.tag,
+        'status': question.status,
+        'category': question.category,
+        'rolePost': question.rolePost,
+        'imageQuestionUrl': images,
+      });
+
+      // Gửi dữ liệu qua phương thức postDataWithFormData
+      Response response = await _apiGateWayService.postDataWithFormData(url,formData: formData,);
+
+      debugPrint("✅ API Response: ${response.data}");
+      return response;
+    } catch (e) {
+      print("❌ Lỗi khi tạo câu hỏi: $e");
+      rethrow;
+    }
+  }
+
 
 
 }

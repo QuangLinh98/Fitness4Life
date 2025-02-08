@@ -128,6 +128,8 @@ class _AccountScreenState extends State<AccountScreen> {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 buildOptionItem("Hướng dẫn sử dụng", Icons.help_outline, () {}),
+                buildOptionItem("mã khuyến mãi ", Icons.code, () {}),
+                buildOptionItem("Your Post", Icons.post_add_sharp, () {}),
                 buildOptionItem("Liên hệ", Icons.phone, () {}),
                 buildOptionItem("Hợp đồng", Icons.description_outlined, () {}),
                 buildOptionItem("Lịch sử chăm sóc khách hàng", Icons.history, () {}),

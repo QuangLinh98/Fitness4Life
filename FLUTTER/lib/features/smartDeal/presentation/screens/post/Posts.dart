@@ -4,7 +4,7 @@ import 'package:fitness4life/features/smartDeal/service/QuestionService.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 
-import 'CommentPage.dart';
+import '../CommentPage.dart';
 
 class Posts extends StatefulWidget {
   final int questionId;

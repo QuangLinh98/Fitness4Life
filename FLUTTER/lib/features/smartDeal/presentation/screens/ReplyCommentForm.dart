@@ -23,9 +23,8 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
   bool _isSubmitting = false;
 
   void _submitReply() async {
-    print("Nút gửi được nhấn!");
+
     if (_contentController.text.trim().isEmpty) {
-      print("Nội dung trống!");
       return;
     }
 
@@ -40,7 +39,6 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
       int? userId = prefs.getInt('user_id');
 
       if (userName == null || userId == null) {
-        print("Không tìm thấy thông tin người dùng!");
         setState(() {
           _isSubmitting = false;
         });
@@ -55,13 +53,14 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
         content: _contentController.text.trim(),
       );
 
-      print("Gửi bình luận...");
       bool success = await commentService.CreateComment(replyComment);
-      print("Kết quả gửi: $success");
 
       if (success) {
-        print("Gửi bình luận thành công!");
         _contentController.clear();
+
+        setState(() {
+          _isSubmitting = false;
+        });
       } else {
         print("Gửi bình luận thất bại!");
       }

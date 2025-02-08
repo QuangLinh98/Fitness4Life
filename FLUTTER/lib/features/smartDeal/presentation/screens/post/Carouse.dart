@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitness4life/features/smartDeal/service/QuestionService.dart';
 
+import 'GetAllPost.dart';
 import 'Posts.dart';
 
 class Carouse extends StatefulWidget {
@@ -30,10 +31,25 @@ class _CarouseState extends State<Carouse> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Forum Questions",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Căn hai phần tử về hai bên
+          children: [
+            const Text(
+              "Forum Questions",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GetAllPost()),
+                );
+              },
+              child: const Text("View All"),
+            ),
+          ],
         ),
+
         const SizedBox(height: 10),
         questionService.isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -43,7 +59,7 @@ class _CarouseState extends State<Carouse> {
           width: screenWidth,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: questionService.questions.length,
+            itemCount: questionService.questions.length > 10 ? 10 : questionService.questions.length,
             itemBuilder: (context, index) {
               final question = questionService.questions[index];
               final imageUrl = question.questionImages.isNotEmpty
@@ -52,7 +68,6 @@ class _CarouseState extends State<Carouse> {
 
               return GestureDetector(
                 onTap: () {
-                  // Chuyển sang màn hình Posts với questionId
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -113,6 +128,7 @@ class _CarouseState extends State<Carouse> {
               );
             },
           ),
+
         )
             : const Center(child: Text("No questions available")),
       ],

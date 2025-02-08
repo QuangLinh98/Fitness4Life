@@ -5,7 +5,7 @@ import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
-import 'package:fitness4life/features/smartDeal/presentation/screens/Carouse.dart';
+import 'package:fitness4life/features/smartDeal/presentation/screens/post/Carouse.dart';
 import 'package:fitness4life/features/smartDeal/service/QuestionService.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';

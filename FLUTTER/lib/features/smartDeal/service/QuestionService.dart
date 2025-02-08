@@ -1,6 +1,9 @@
 import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
+import 'package:fitness4life/features/smartDeal/data/models/forum/CreateQuestionDTO.dart';
 import 'package:fitness4life/features/smartDeal/data/models/forum/Question.dart';
 import 'package:flutter/cupertino.dart';
+
+import '../data/models/forum/CreateQuestionDTO.dart';
 
 class QuestionService extends ChangeNotifier {
   final QuestionRepository _questionRepository;
@@ -41,4 +44,21 @@ class QuestionService extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> CreateQuestion(CreateQuestionDTO newQuestion) async {
+    isFetchingSingle = true;
+    notifyListeners();
+    try {
+      await _questionRepository.createQuestion(newQuestion);
+      await fetchQuestions();
+      return true;
+    } catch (e) {
+      print("Error create question: $e");
+      return false;
+    } finally {
+      isFetchingSingle = false;
+      notifyListeners();
+    }
+  }
+
 }
