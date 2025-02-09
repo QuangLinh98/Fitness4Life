@@ -169,6 +169,8 @@ class _AccountScreenState extends State<AccountScreen> {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 buildOptionItem("User Guide", Icons.help_outline, () {}),
+                buildOptionItem("Your Discount ", Icons.code, () {}),
+                buildOptionItem("Your Post", Icons.post_add_sharp, () {}),
                 buildOptionItem("Contact", Icons.phone, () {}),
                 buildOptionItem("Contract", Icons.description_outlined, () {}),
                 buildOptionItem("Customer Care History", Icons.history, () {}),

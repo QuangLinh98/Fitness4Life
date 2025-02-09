@@ -5,6 +5,8 @@ import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
 import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
 import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
@@ -16,6 +18,8 @@ import 'package:fitness4life/features/booking/service/PaypalService.dart';
 import 'package:fitness4life/features/booking/service/QrService.dart';
 import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
+import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
+import 'package:fitness4life/features/smart_deal/service/QuestionService.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:fitness4life/features/user/service/PasswordService.dart';
 import 'package:fitness4life/features/user/service/RegisterService.dart';
@@ -40,5 +44,7 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => MembershipSubscriptionService(locator<MembershipSubscriptionRepository>())),
   ChangeNotifierProvider(create: (_) => WorkoutPackageService(locator<WorkoutPackageRepository>())),
   ChangeNotifierProvider(create: (_) => PaypalService(locator<PaypalRepository>())),
+  ChangeNotifierProvider(create: (_) => QuestionService(locator<QuestionRepository>())),
+  ChangeNotifierProvider(create: (_) => CommentService(locator<CommentRepository>())),
 
 ];

@@ -5,6 +5,7 @@ import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
+import 'package:fitness4life/features/smart_deal/presentation/screens/post/Carouse.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -139,6 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
                        : const Center(
                      child: Text("No Goal available"),
                    ),
+
+                   const SizedBox(height: 15),
+
+                   //Hiển thị Blog
+                   const Carouse(),
                  ],
                ),
              ),

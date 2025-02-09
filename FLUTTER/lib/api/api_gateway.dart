@@ -98,10 +98,6 @@ class ApiGateWayService {
   }
 
   // Phương thức POST
-  // Future<Response> postData(String endpoint, {Map<String, dynamic>? data}) async {
-  //   return await _dio.post(endpoint, data: data);
-  // }
-
   Future<Response> postData(String endpoint, {Map<String, dynamic>? data, Options? options}) async {
     try {
       final response = await _dio.post(
@@ -124,6 +120,27 @@ class ApiGateWayService {
     }
   }
 
+  Future<Response> postDataWithFormData(String endpoint, {FormData? formData, Options? options}) async {
+    try {
+      final response = await _dio.post(
+        endpoint,
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+          },
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+      return response;
+    } catch (e) {
+      print("Error in postDataWithFormData: $e");
+      rethrow;
+    }
+  }
 
   // Phương thức PUT
   Future<Response> putData(String endpoint, {Map<String, dynamic>? data}) async {
@@ -134,4 +151,5 @@ class ApiGateWayService {
   Future<Response> deleteData(String endpoint, {Map<String, dynamic>? data}) async {
     return await _dio.delete(endpoint, data: data);
   }
+
 }
