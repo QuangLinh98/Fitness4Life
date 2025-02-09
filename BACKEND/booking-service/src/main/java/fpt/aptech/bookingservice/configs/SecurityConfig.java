@@ -28,7 +28,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/booking/qrCode/validate")
+                        .requestMatchers("/api/booking/qrCode/validate","/uploads/qrCodeImages/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated() // Yêu cầu tất cả endpoint cần xác thực
