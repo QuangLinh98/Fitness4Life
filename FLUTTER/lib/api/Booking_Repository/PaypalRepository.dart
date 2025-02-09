@@ -42,7 +42,10 @@ class PaypalRepository {
   }
 
   /// **📌 Tạo thanh toán trên PayPal**
-  Future<Map<String, dynamic>?> createPayment(String accessToken, double amount, int userId, int packageId) async {
+  Future<Map<String, dynamic>?> createPayment(String accessToken, double amount, int userId, int packageId , {double? discountedAmount}) async {
+    double finalAmount = discountedAmount ?? amount;  //Nếu áp mã giảm giá
+    print("📌 Total Amount Sent to PayPal: \$${finalAmount.toStringAsFixed(2)}");
+
     final requestBody = {
       "packageId": packageId, // Thêm gói ID vào request
       "userId": userId, // Thêm userId vào request
@@ -54,7 +57,7 @@ class PaypalRepository {
       "transactions": [
         {
           "amount": {
-            "total": amount.toStringAsFixed(2), // Định dạng số tiền chính xác
+            "total": finalAmount.toStringAsFixed(2), // Định dạng số tiền chính xác
             "currency": "USD"
           },
           "description": "Payment for Gym Membership"
@@ -65,6 +68,9 @@ class PaypalRepository {
         "cancel_url": "fitness4life://paypal_cancel"
       }
     };
+
+    print("📌 Request Body gửi đến PayPal:");
+    print(jsonEncode(requestBody));
 
     try {
       final response = await _apiGateWayService.postData(
@@ -91,7 +97,6 @@ class PaypalRepository {
     }
     return null;
   }
-
 
   /// **📌 Xác nhận thanh toán**
   Future<bool> executePayment(String accessToken, String paymentId, String payerId , String paypalToken) async {
@@ -122,6 +127,4 @@ class PaypalRepository {
       return false;
     }
   }
-
-
 }

@@ -1,3 +1,4 @@
+import 'package:fitness4life/features/Home/presentation/screens/HomeScreen.dart';
 import 'package:flutter/material.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
@@ -14,7 +15,10 @@ class PaymentSuccessScreen extends StatelessWidget {
             const Text("Payment Successful!", style: TextStyle(fontSize: 20)),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen())
+              ),
               child: Text("Go to Home"),
             ),
           ],

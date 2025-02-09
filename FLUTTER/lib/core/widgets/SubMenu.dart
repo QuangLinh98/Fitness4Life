@@ -1,3 +1,5 @@
+import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
+import 'package:fitness4life/features/booking/presentation/screens/ClassesScreen.dart';
 import 'package:fitness4life/features/booking/presentation/screens/WorkoutPackageScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -12,16 +14,18 @@ class SubMenu  extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          buildMenuButton(Icons.calendar_today, 'Schedule',(){}),
+          buildMenuButton(Icons.calendar_today, 'Schedule',(){
+            PageManager.of(context)?.updateIndex(1);
+          }),
           buildMenuButton(Icons.person, 'Trainer',(){}),
           buildMenuButton(Icons.book, 'Class Schedule',(){}),
-          buildMenuButton(Icons.shopping_cart, 'Services',() {
+          buildMenuButton(Icons.credit_card, 'Membership',() {
             Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const WorkoutPackageScreen()),
             );
           }),
-          buildMenuButton(Icons.credit_card, 'Membership',(){}),
+          buildMenuButton(Icons.shopping_cart, 'Services',(){}),
         ],
       ),
     );

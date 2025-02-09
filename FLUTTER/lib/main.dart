@@ -38,7 +38,6 @@ void _handleIncomingLinks(BuildContext context) {
 
 
 void _executePayPalPayment(BuildContext context, String paymentId, String payerId , String paypalToken) async {
-  print("✅ Bắt đầu xác thực thanh toán với Payment ID: $paymentId, Payer ID: $payerId");
   final _paypalService = Provider.of<PaypalService>(context, listen: false); // ✅ Lấy instance của PaypalService
 
   bool success = await _paypalService.executePayment(paymentId, payerId , paypalToken);

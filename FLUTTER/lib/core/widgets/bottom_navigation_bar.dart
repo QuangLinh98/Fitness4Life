@@ -6,6 +6,10 @@ import 'package:flutter/material.dart';
 class PageManager extends StatefulWidget {
   const PageManager({super.key});
 
+  static _PageManagerState? of(BuildContext context) {
+    return context.findAncestorStateOfType<_PageManagerState>();
+  }
+
   @override
   State<PageManager> createState() => _PageManagerState();
 }
@@ -19,7 +23,7 @@ class _PageManagerState extends State<PageManager> {
     AccountScreen(),  // Tab "Account"
   ];
 
-  void _onTabSelected(int index) {
+  void updateIndex(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -30,7 +34,6 @@ class _PageManagerState extends State<PageManager> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-
         children: _pages,
       ),
       bottomNavigationBar: Container(
@@ -49,7 +52,7 @@ class _PageManagerState extends State<PageManager> {
             fontWeight: FontWeight.normal, // Bình thường khi không được chọn
             fontSize: 12,
           ),
-          onTap: _onTabSelected,
+          onTap: (index) => updateIndex(index),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),

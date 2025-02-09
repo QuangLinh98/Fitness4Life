@@ -1,8 +1,5 @@
-import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:fitness4life/api/api_gateway.dart';
-import 'package:fitness4life/config/locator_setup.dart';
 import 'package:fitness4life/features/Home/data/Trainer.dart';
 
 class TrainerRepository {

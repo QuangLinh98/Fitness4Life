@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:fitness4life/features/user/data/models/User.dart';
 import 'package:fitness4life/token/token_manager.dart';

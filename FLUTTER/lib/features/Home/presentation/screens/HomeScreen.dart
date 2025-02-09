@@ -6,8 +6,6 @@ import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
-import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
-import 'package:fitness4life/features/user/presentation/screens/Login_Register/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
