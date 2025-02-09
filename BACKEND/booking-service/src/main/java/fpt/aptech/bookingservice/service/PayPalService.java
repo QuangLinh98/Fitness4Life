@@ -50,107 +50,11 @@ public class PayPalService {
      * @return Đối tượng Payment đã được tạo
      * @throws PayPalRESTException Nếu có lỗi trong quá trình tương tác với PayPal
      */
-//    public Payment createPayment(MembershipSubscriptionDTO subscriptionDTO) throws PayPalRESTException {
-//
-//        System.out.println("✅ Nhận được request từ Flutter: " + subscriptionDTO);
-//
-//        //Kiểm tra sự tôn tại của userId có hợp lệ hay không
-//        UserDTO userExisting = userEurekaClient.getUserById(subscriptionDTO.getUserId());
-//        if (userExisting == null) {
-//            throw new PayPalRESTException("User not found");
-//        }
-//
-//        WorkoutPackage packageExisting = workoutPackageRepository.findById(subscriptionDTO.getPackageId())
-//                .orElseThrow(() -> new RuntimeException("Workout package not found"));
-//
-//        // Khởi tạo giá trị totalAmount ban đầu từ price của package
-//        double initialAmount = packageExisting.getPrice();
-//
-//        // Định dạng lại price (initialAmount) để đảm bảo là một số thập phân với 2 chữ số
-//        String formattedPrice = String.format("%.2f", initialAmount);
-//        double formattedInitialAmount = Double.parseDouble(formattedPrice);
-//
-//        System.out.println("Formatted Init Price: " + formattedInitialAmount);
-//
-//        // Kiểm tra giá trị totalAmount được gửi từ frontend
-//        double finalAmount = subscriptionDTO.getTotalAmount();
-//
-//        System.out.println("Final Amount : " + finalAmount);
-//
-//        // Nếu totalAmount <= 0, sử dụng giá trị price của package để tính toán
-//        if (finalAmount <= 0) {
-//            finalAmount = initialAmount;
-//        }
-//
-//        // Định dạng finalAmount thành 2 chữ số thập phân
-//        String formattedAmount = String.format("%.2f", finalAmount);
-//        System.out.println("Final Amount after discount: " + formattedAmount);
-//
-//        Amount amount = new Amount();
-//        amount.setCurrency(subscriptionDTO.getCurrency());
-//        amount.setTotal(String.valueOf(finalAmount));
-//
-//        // Tạo đối tượng Transaction và thiết lập mô tả và số tiền
-//        Transaction transaction = new Transaction();
-//        transaction.setDescription(subscriptionDTO.getDescription());
-//        transaction.setAmount(amount);
-//
-//        // Tạo danh sách các giao dịch và thêm giao dịch vừa tạo vào danh sách
-//        List<Transaction> transactions = new ArrayList<>();
-//        transactions.add(transaction);
-//
-//        // Tạo đối tượng Payer và thiết lập phương thức thanh toán
-//        Payer payer = new Payer();
-//        payer.setPaymentMethod(PayMethodType.PAYPAL.toString());
-//
-//        // Tạo đối tượng Payment và thiết lập các thuộc tính liên quan
-//        Payment payment = new Payment();
-//        payment.setIntent(subscriptionDTO.getIntent());
-//        payment.setPayer(payer);
-//        payment.setTransactions(transactions);
-//
-//        System.out.println("Payment Request JSON: " + payment.toJSON());  // Log toàn bộ JSON của payment
-//
-//
-//        // Tạo đối tượng RedirectUrls và thiết lập các URL chuyển hướng
-//        RedirectUrls redirectUrls = new RedirectUrls();
-//        redirectUrls.setCancelUrl(subscriptionDTO.getCancelUrl());
-//        redirectUrls.setReturnUrl(subscriptionDTO.getSuccessUrl());
-//        payment.setRedirectUrls(redirectUrls);
-//
-//        System.out.println("✅ Gửi yêu cầu tạo thanh toán đến PayPal...");
-//
-//        // Tạo một Payment mới trên PayPal
-//        Payment createdPayment = payment.create(apiContext);
-//
-//        // Lấy ngày thanh toán là ngày hiện tại
-//        LocalDateTime currentDateTime = LocalDateTime.now();
-//
-//        // Tính toán ngày kết thúc (thêm durationMonth vào ngày bắt đầu)
-//        LocalDateTime endDate = currentDateTime.plusMonths(packageExisting.getDurationMonth());
-//
-//        // Lưu thông tin thanh toán vào cơ sở dữ liệu
-//        MembershipSubscription membershipSubscription = MembershipSubscription.builder()
-//                .packageId(subscriptionDTO.getPackageId())
-//                .userId(subscriptionDTO.getUserId())
-//                .fullName(userExisting.getFullName())
-//                .buyDate(currentDateTime)   //Ngày mua sẽ là ngày thanh toán
-//                .startDate(currentDateTime.toLocalDate())  // Start date là ngày thanh toán thành công
-//                .endDate(endDate.toLocalDate())    // End date là ngày tính toán dựa trên duration
-//                .payMethodType(PayMethodType.valueOf(PayMethodType.PAYPAL.toString()))
-//                .payStatusType(PayStatusType.valueOf(PayStatusType.PENDING.toString()))
-//                .packageName(packageExisting.getPackageName())
-//                .description(subscriptionDTO.getDescription())
-//                .totalAmount(finalAmount)
-//                .paymentId(createdPayment.getId())
-//                .build();
-//        membershipRepository.save(membershipSubscription);
-//        return createdPayment;
-//    }
 
     public ResponseEntity<?> createPayment(@RequestBody MembershipSubscriptionDTO subscriptionDTO) {
         try {
             System.out.println("✅ Nhận được request từ Flutter: " + subscriptionDTO);
+            System.out.println("📥 Giá trị TotalAmount nhận từ Frontend: " + subscriptionDTO.getTotalAmount());
 
             // Kiểm tra userId có tồn tại không
             UserDTO userExisting = userEurekaClient.getUserById(subscriptionDTO.getUserId());
@@ -163,12 +67,16 @@ public class PayPalService {
             WorkoutPackage packageExisting = workoutPackageRepository.findById(subscriptionDTO.getPackageId())
                     .orElseThrow(() -> new RuntimeException("Workout package not found"));
 
-            double finalAmount = packageExisting.getPrice();
-            if (subscriptionDTO.getTotalAmount() > 0) {
-                finalAmount = subscriptionDTO.getTotalAmount();
-            }
+//            double finalAmount = packageExisting.getPrice();
+//            if (subscriptionDTO.getTotalAmount() > 0) {
+//                finalAmount = subscriptionDTO.getTotalAmount();
+//            }
 
-            System.out.println("✅ Final Amount: " + finalAmount);
+            Double totalAmount = subscriptionDTO.getTotalAmount(); // ✅ Lấy từ transactions.amount.total
+            double finalAmount = (totalAmount != null && totalAmount > 0) ? totalAmount : packageExisting.getPrice();
+
+
+            System.out.println("✅ Final Amount gửi đến PayPal: " + finalAmount);
 
             Amount amount = new Amount();
             amount.setCurrency(subscriptionDTO.getCurrency());
@@ -195,8 +103,8 @@ public class PayPalService {
             payment.setRedirectUrls(redirectUrls);
 
             System.out.println("✅ Gửi yêu cầu tạo thanh toán đến PayPal...");
+            System.out.println("📤 Dữ liệu gửi lên PayPal: " + payment.toJSON());
 
-            // 🛑 Cẩn thận! Lệnh này có thể bị lỗi nếu PayPal API không phản hồi
             Payment createdPayment = payment.create(apiContext);
 
             if (createdPayment == null) {
