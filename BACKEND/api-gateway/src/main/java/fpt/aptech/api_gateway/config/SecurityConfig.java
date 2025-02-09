@@ -50,13 +50,14 @@ public class SecurityConfig {
                                         "/api/users/reset-password",
                                         "/api/users/refresh_token",
                                         "/api/booking/qrCode/validate",
-                                        "/uploads/TrainerImage/**"
+                                        "/uploads/TrainerImage/**",
+                                        "/uploads/qrCodeImages/**"
                                 )
                                 .permitAll()
                                 .pathMatchers("/api/users/**").hasAnyAuthority("ADMIN", "USER")  // Cả ADMIN và USER đều có thể truy cập các endpoint này
                                 .pathMatchers("/api/booking/**").hasAnyAuthority("USER","ADMIN")
                                 .pathMatchers("/api/paypal/**").hasAnyAuthority("USER","ADMIN")
-                                .pathMatchers("/api/dashboard/**").hasAnyAuthority("ADMIN", "MANAGER")
+                                .pathMatchers("/api/dashboard/**").hasAnyAuthority("ADMIN", "MANAGER","USER")
                                 .pathMatchers("/api/goal/**").hasAnyAuthority("ADMIN", "USER")
                                 .pathMatchers("/api/deal/**").hasAnyAuthority("ADMIN", "USER")
                                 .pathMatchers("/api/notify/**").hasAnyAuthority("ADMIN", "USER")
