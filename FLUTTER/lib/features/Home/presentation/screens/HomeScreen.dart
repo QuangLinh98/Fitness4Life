@@ -1,3 +1,4 @@
+import 'package:fitness4life/config/constants.dart';
 import 'package:fitness4life/core/widgets/SubMenu.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/Home/data/Trainer.dart';
@@ -302,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //Xử lý Personal Trainers
   Widget buildTrainerAvatar(Trainer trainer) {
     String originalUrl = trainer.photo ?? '';
-    String correctedUrl = originalUrl.replaceAll('http://localhost', 'http://192.168.1.20');
+    String correctedUrl = getFullImageUrl(originalUrl);
 
     // Tách và lấy tên cuối cùng
     String fullName = trainer.fullname ?? "Unknown";
