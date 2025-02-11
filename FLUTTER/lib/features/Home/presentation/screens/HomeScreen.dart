@@ -4,10 +4,11 @@ import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/Home/data/Trainer.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
-import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/smart_deal/presentation/screens/post/Carouse.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
+import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -67,29 +68,29 @@ class _HomeScreenState extends State<HomeScreen> {
                    // Phần "Personal goal this week"
                    buildPersonalGoalSection(),
 
-                   const SizedBox(height: 15),
-                   const Text(
-                     "Upcoming Classes",
-                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                   ),
-                   const SizedBox(height: 6),
-                   roomService.isLoading
-                       ? const Center(child: CircularProgressIndicator())
-                       : roomService.rooms.isNotEmpty
-                       ? SingleChildScrollView(
-                     scrollDirection: Axis.horizontal,
-                     child: Row(
-                       children: roomService.rooms.map((room) {
-                         return Padding(
-                           padding: const EdgeInsets.only(right: 10),
-                           child: buildUpcomingClassCard(room),
-                         );
-                       }).toList(),
-                     ),
-                   )
-                       : const Center(
-                     child: Text("No Rooms available"),
-                   ),
+                   // const SizedBox(height: 15),
+                   // const Text(
+                   //   "Upcoming Classes",
+                   //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   // ),
+                   // const SizedBox(height: 6),
+                   // roomService.isLoading
+                   //     ? const Center(child: CircularProgressIndicator())
+                   //     : roomService.rooms.isNotEmpty
+                   //     ? SingleChildScrollView(
+                   //   scrollDirection: Axis.horizontal,
+                   //   child: Row(
+                   //     children: roomService.rooms.map((room) {
+                   //       return Padding(
+                   //         padding: const EdgeInsets.only(right: 10),
+                   //         child: buildUpcomingClassCard(room),
+                   //       );
+                   //     }).toList(),
+                   //   ),
+                   // )
+                   //     : const Center(
+                   //   child: Text("No Rooms available"),
+                   // ),
 
                    const SizedBox(height: 15),
                    const Text(
@@ -158,146 +159,146 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   //Xử lý Upcoming Classes
-  Widget buildUpcomingClassCard(Room room) {
-    // Format thời gian
-    String formatTime(List<int>? timeList) {
-      if (timeList != null && timeList.length >= 2) {
-        final hour = timeList[0];
-        final minute = timeList[1];
-        final now = DateTime.now();
-        final time = DateTime(now.year, now.month, now.day, hour, minute);
-        return DateFormat('hh:mm a').format(time);
-      }
-      return 'N/A';
-    }
-
-    return SizedBox(
-        width: 320,
-        height: 250,
-        child:  Card(
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 4,
-          //color: const Color(0xFFE6DFFA),
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 8),
-                  decoration: const BoxDecoration(
-                    color: const Color(0xFFB00020), // Màu đỏ cho header
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-
-                // Phần thông tin chi tiết
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Tên phòng
-                      Text(
-                        room.roomname ?? "Unknown Room",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-
-                      // Số người tham gia
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(Icons.people, color: Color(0xFF9747FF), size: 16),
-                          SizedBox(width: 4),
-                          Text(
-                            "0/25",
-                            style: TextStyle(fontSize: 14, color: Color(0xFF9747FF)),
-                          ),
-                        ],
-                      ),
-
-                      //const SizedBox(height: 4),
-                      const Row(
-                        children: [
-                          Icon(Icons.event, color: Colors.grey, size: 16),
-                          SizedBox(width: 8),
-                          Text(
-                            "Studio: Dance",
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      const Row(
-                        children: [
-                          Icon(Icons.person, color: Colors.grey, size: 16),
-                          SizedBox(width: 8),
-                          Text(
-                            "Trainer: Thanh Vi",
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Nút "Đặt lịch"
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFB00020),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          elevation: 2,
-                        ),
-                        onPressed: () {
-                          //Xử lý đặt lịch
-                        },
-                        child: const Text(
-                          "Book now",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )
-    );
-  }
+  // Widget buildUpcomingClassCard(Room room) {
+  //   // Format thời gian
+  //   String formatTime(List<int>? timeList) {
+  //     if (timeList != null && timeList.length >= 2) {
+  //       final hour = timeList[0];
+  //       final minute = timeList[1];
+  //       final now = DateTime.now();
+  //       final time = DateTime(now.year, now.month, now.day, hour, minute);
+  //       return DateFormat('hh:mm a').format(time);
+  //     }
+  //     return 'N/A';
+  //   }
+  //
+  //   return SizedBox(
+  //       width: 320,
+  //       height: 250,
+  //       child:  Card(
+  //         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(12),
+  //         ),
+  //         elevation: 4,
+  //         //color: const Color(0xFFE6DFFA),
+  //         child: Padding(
+  //           padding: const EdgeInsets.only(bottom: 8),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               Container(
+  //                 width: double.infinity,
+  //                 padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 8),
+  //                 decoration: const BoxDecoration(
+  //                   color: const Color(0xFFB00020), // Màu đỏ cho header
+  //                   borderRadius: BorderRadius.only(
+  //                     topLeft: Radius.circular(12),
+  //                     topRight: Radius.circular(12),
+  //                   ),
+  //                 ),
+  //                 child: Text(
+  //                   "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
+  //                   style: const TextStyle(
+  //                     color: Colors.white,
+  //                     fontSize: 16,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //               ),
+  //
+  //               // Phần thông tin chi tiết
+  //               Padding(
+  //                 padding: const EdgeInsets.all(16),
+  //                 child: Column(
+  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     // Tên phòng
+  //                     Text(
+  //                       room.roomname ?? "Unknown Room",
+  //                       style: const TextStyle(
+  //                         fontSize: 18,
+  //                         fontWeight: FontWeight.bold,
+  //                         color: Colors.black87,
+  //                       ),
+  //                     ),
+  //
+  //                     // Số người tham gia
+  //                     const Row(
+  //                       mainAxisAlignment: MainAxisAlignment.end,
+  //                       children: [
+  //                         Icon(Icons.people, color: Color(0xFF9747FF), size: 16),
+  //                         SizedBox(width: 4),
+  //                         Text(
+  //                           "0/25",
+  //                           style: TextStyle(fontSize: 14, color: Color(0xFF9747FF)),
+  //                         ),
+  //                       ],
+  //                     ),
+  //
+  //                     //const SizedBox(height: 4),
+  //                     const Row(
+  //                       children: [
+  //                         Icon(Icons.event, color: Colors.grey, size: 16),
+  //                         SizedBox(width: 8),
+  //                         Text(
+  //                           "Studio: Dance",
+  //                           style: TextStyle(fontSize: 14, color: Colors.grey),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     const SizedBox(height: 4),
+  //                     const Row(
+  //                       children: [
+  //                         Icon(Icons.person, color: Colors.grey, size: 16),
+  //                         SizedBox(width: 8),
+  //                         Text(
+  //                           "Trainer: Thanh Vi",
+  //                           style: TextStyle(fontSize: 14, color: Colors.grey),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //
+  //               // Nút "Đặt lịch"
+  //               Padding(
+  //                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //                 child: Row(
+  //                   mainAxisAlignment: MainAxisAlignment.end,
+  //                   children: [
+  //                     ElevatedButton(
+  //                       style: ElevatedButton.styleFrom(
+  //                         backgroundColor: const Color(0xFFB00020),
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(8),
+  //                         ),
+  //                         elevation: 2,
+  //                       ),
+  //                       onPressed: () {
+  //                         //Xử lý đặt lịch
+  //                       },
+  //                       child: const Text(
+  //                         "Book now",
+  //                         style: TextStyle(
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.bold,
+  //                           color: Colors.white,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       )
+  //   );
+  // }
 
 
   //Xử lý Personal Trainers
@@ -409,7 +410,12 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 height: 32,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    final userId = Provider.of<UserInfoProvider>(context, listen: false).userId;
+                    print('UserId : ${userId}');
+
+                    //Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen(userId: userId )));
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF9747FF),
                     elevation: 0,

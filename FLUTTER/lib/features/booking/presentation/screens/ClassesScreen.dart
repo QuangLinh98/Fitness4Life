@@ -128,6 +128,13 @@ class _ClassScreenState extends State<ClassScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: List.generate(10, (index) {
+                    // Lấy ngày hiện tại và cộng thêm index để có danh sách ngày liên tiếp
+                    DateTime date = DateTime.now().add(Duration(days: index));
+
+                    // Định dạng thứ (EEE) và ngày (dd)
+                    String dayOfWeek = DateFormat('EEE').format(date); // Tue, Wed, Thu...
+                    String dayOfMonth = DateFormat('d').format(date); // 25, 26, 27...
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
@@ -145,7 +152,7 @@ class _ClassScreenState extends State<ClassScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  ['Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu'][index],
+                                  dayOfWeek,
                                   style: TextStyle(
                                     color: index == 0 ? Colors.white : Colors.white,
                                     fontSize: 13,
@@ -154,7 +161,7 @@ class _ClassScreenState extends State<ClassScreen> {
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  (25 + index).toString(),
+                                  dayOfMonth,
                                   style: TextStyle(
                                     color: index == 0 ? Colors.white : Colors.grey.shade300,
                                     fontSize: 14,
@@ -473,31 +480,43 @@ class _ClassScreenState extends State<ClassScreen> {
                         onPressed: (room.availableseats ?? 0) == (room.capacity ?? 0)
                             ? null // Vô hiệu hóa nút nếu đầy
                             : () async {
-                          // Xử lý sự kiện click Book button
-                          final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
-                          bool success = await bookingRoomService.bookingRoom(room.id ?? 0, userId!);
+                          try {
+                            // Xử lý sự kiện click Book button
+                            final bookingRoomService = Provider.of<
+                                BookingRoomService>(context, listen: false);
+                            bool success = await bookingRoomService.bookingRoom(
+                                room.id ?? 0, userId!);
 
-                          if(success) {
-                            //Nếu booking thành công , hiển thị dialog thông báo thành công
-                            CustomDialog.show(
+                            if (success) {
+                              //Nếu booking thành công , hiển thị dialog thông báo thành công
+                              CustomDialog.show(
                                 context,
                                 title: "Success",
                                 content: "Room booked successfully!",
                                 buttonText: "OK",
                                 onButtonPressed: () {
                                   setState(() {
-                                    room.availableseats = (room.availableseats ?? 0 ) + 1; //Cập nhật số ghế
+                                    room.availableseats =
+                                        (room.availableseats ?? 0) + 1; //Cập nhật số ghế
                                   });
-                                }
-                            );
-                          }else{
-                            // Hiển thị dialog thông báo lỗi
-                            CustomDialog.show(
-                              context,
-                              title: "Error",
-                              content: "Failed to book room. Please try again.",
-                              buttonText: "OK",
-                            );
+                                },
+                              );
+                            }
+                          }catch(error){
+                            print("❌ Caught error: $error"); // Log lỗi
+                            print("❌ Error type: ${error.runtimeType}");
+
+                            // Kiểm tra nếu đang ở trong cây widget hợp lệ
+                            if (context.mounted) {
+                              CustomDialog.show(
+                                context,
+                                title: "Error",
+                                content: extractErrorMessage(error),
+                                buttonText: "OK",
+                              );
+                            } else {
+                              print("🚨 Context is no longer valid. Cannot show dialog.");
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -523,6 +542,25 @@ class _ClassScreenState extends State<ClassScreen> {
       ),
     );
   }
+  // Hàm lấy thông báo lỗi từ Exception hoặc JSON response
+  String extractErrorMessage(dynamic error) {
+    if (error is String) {
+      return error; // Nếu lỗi là chuỗi, trả về trực tiếp
+    } else if (error is Exception) {
+      final message = error.toString();
+      if (message.contains("Failed to book room:")) {
+        // Tách lấy message từ "Failed to book room:"
+        return message.split("Failed to book room:")[1].trim();
+      } else if (message.contains("Exception:")) {
+        // Tách bỏ từ "Exception:"
+        return message.split("Exception:")[1].trim();
+      }
+      return message; // Trả về toàn bộ chuỗi nếu không tách được
+    } else {
+      return "An unexpected error occurred. Please try again."; // Thông báo mặc định
+    }
+  }
+
 }
 
 

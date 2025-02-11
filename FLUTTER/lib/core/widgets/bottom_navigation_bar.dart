@@ -1,5 +1,6 @@
 import 'package:fitness4life/features/Home/presentation/screens/HomeScreen.dart';
 import 'package:fitness4life/features/booking/presentation/screens/ClassesScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/HealthScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/AccountScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -20,6 +21,7 @@ class _PageManagerState extends State<PageManager> {
   final List<Widget> _pages = [
     HomeScreen(), // Tab "Home"
     ClassScreen(),  // Tab "Classes"
+    HealthScreen(),  // Tab "Health"
     AccountScreen(),  // Tab "Account"
   ];
 
@@ -39,6 +41,7 @@ class _PageManagerState extends State<PageManager> {
       bottomNavigationBar: Container(
         color: const Color(0xFFB00020),
         child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
           elevation: 0, // Loại bỏ bóng
           backgroundColor: Colors.transparent, // Trong suốt để hiển thị gradient
@@ -61,6 +64,10 @@ class _PageManagerState extends State<PageManager> {
             BottomNavigationBarItem(
               icon: Icon(Icons.fitness_center),
               label: 'Classes',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.health_and_safety),
+              label: 'Health',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),

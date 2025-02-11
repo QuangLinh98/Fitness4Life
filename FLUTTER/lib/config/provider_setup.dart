@@ -17,6 +17,7 @@ import 'package:fitness4life/features/booking/service/MembershipSubscriptionServ
 import 'package:fitness4life/features/booking/service/PaypalService.dart';
 import 'package:fitness4life/features/booking/service/QrService.dart';
 import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
 import 'package:fitness4life/features/smart_deal/service/QuestionService.dart';
@@ -47,4 +48,6 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => QuestionService(locator<QuestionRepository>())),
   ChangeNotifierProvider(create: (_) => CommentService(locator<CommentRepository>())),
 
+  // Thêm GoalSetupState sử dụng để lưu trữ giá trị tamk thời khi thiết lập goal
+  ChangeNotifierProvider(create: (_) => GoalSetupState()),
 ];

@@ -1,5 +1,5 @@
 import 'package:fitness4life/api/api_gateway.dart';
-import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
 
 class GoalRepository {
   final ApiGateWayService _apiGateWayService;

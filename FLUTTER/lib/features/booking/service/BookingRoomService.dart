@@ -21,7 +21,7 @@ class BookingRoomService extends ChangeNotifier {
     }
     catch(e) {
       print("Error booking room: $e");
-      return false;
+      throw Exception("Error booking room: $e");
     }
   }
 

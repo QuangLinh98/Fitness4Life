@@ -170,13 +170,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             title: "Success",
                             content: "Change password successfully",
                             buttonText: "OK",
-                            // onButtonPressed: () {
-                            //   // Điều hướng về trang login
-                            //   Navigator.pushReplacement(
-                            //     context,
-                            //     MaterialPageRoute(builder: (context) => LoginScreen()),
-                            //   );
-                            // },
+                            onButtonPressed: () {
+                              // Điều hướng về trang login
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => LoginScreen()),
+                              );
+                            },
                           );
                         } catch (e) {
                           // Xử lý lỗi từ backend

@@ -1,5 +1,5 @@
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
-import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
 import 'package:flutter/cupertino.dart';
 
 class GoalService extends ChangeNotifier {
