@@ -1,6 +1,6 @@
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/CurrentWeightScreen.dart';
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/TargetWeightScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/TargetValueScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,24 +37,38 @@ class GoalSelectionScreen extends StatelessWidget {
                 children: [
                   _buildGoalItem(
                     context,
-                    "Tăng cơ bắp",
-                    "và loại bỏ chất béo",
+                    "Increase muscle",
+                    "and remove fat",
                     "images/selection2.jpg",
                     "MUSCLE_GAIN",
                   ),
                   _buildGoalItem(
                     context,
-                    "Giảm cân",
-                    "không bị mất cơ",
+                    "Gain Weight",
+                    "Increase body mass with proper diet",
+                    "images/selection2.jpg",
+                    "WEIGHT_GAIN",
+                  ),
+                  _buildGoalItem(
+                    context,
+                    "Losing weight",
+                    "no muscle loss",
                     "images/selection2.jpg",
                     "WEIGHT_LOSS",
                   ),
                   _buildGoalItem(
                     context,
-                    "Cắt nét cơ",
-                    "và giữ dáng",
+                    "Lose fat",
+                    "and stay in shape",
                     "images/selection2.jpg",
-                    "MUSCLE_CUT",
+                    "FAT_LOSS",
+                  ),
+                  _buildGoalItem(
+                    context,
+                    "Maintenance",
+                    "Maintain current weight and body composition",
+                    "images/selection2.jpg",
+                    "MAINTENANCE",
                   ),
                 ],
               ),

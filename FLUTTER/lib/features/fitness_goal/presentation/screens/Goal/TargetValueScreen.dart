@@ -1,18 +1,32 @@
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/ActivityLevelScreen.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/StartDateScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
 
-class TargetWeightScreen extends StatelessWidget {
-  final List<int> weightList = List.generate(100, (index) => index + 30); // Tạo danh sách từ 30kg - 130kg
+class TargetValueScreen extends StatefulWidget {
+  @override
+  _TargetValueScreenState createState() => _TargetValueScreenState();
+}
 
+class _TargetValueScreenState extends State<TargetValueScreen> {
+  final List<int> weightList = List.generate(100, (index) => index + 30); // 30kg - 129kg
+  final List<int> fatPercentageList = List.generate(51, (index) => index + 10); // 10% - 60%
+
+  int selectedValue = 64; // Giá trị mặc định (kg)
+  bool isKgSelected = true; // Mặc định là kg
+
+  @override
+  void initState() {
+    super.initState();
+    final goalSetupState = Provider.of<GoalSetupState>(context, listen: false);
+    selectedValue = goalSetupState.targetValue?.toInt() ?? 64;
+    isKgSelected = goalSetupState.isKgSelected; // Lấy đơn vị đã lưu trước đó
+  }
 
   @override
   Widget build(BuildContext context) {
     final goalSetupState = Provider.of<GoalSetupState>(context);
-    int selectedWeight = goalSetupState.weight?.toInt() ?? 64; // Giá trị mặc định
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -24,7 +38,7 @@ class TargetWeightScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Bước 4 trên 15",
+          "Bước 5 trên 15",
           style: TextStyle(color: Colors.orange, fontSize: 16),
         ),
       ),
@@ -34,8 +48,8 @@ class TargetWeightScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20),
-            Text(
-              "What is your target weight??",
+            const Text(
+              "What is your target value?",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 22,
@@ -43,17 +57,29 @@ class TargetWeightScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            Text(
+            const Text(
               "We need some data to calculate your BMI and create a plan tailored to you.",
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             SizedBox(height: 30),
 
-            // Hiển thị cân nặng được chọn
+            // Chọn giữa kg và %
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildUnitButton("kg", isKgSelected, goalSetupState),
+                SizedBox(width: 10),
+                _buildUnitButton("%", !isKgSelected, goalSetupState),
+              ],
+            ),
+
+            SizedBox(height: 20),
+
+            // Hiển thị giá trị đã chọn
             Center(
               child: Text(
-                "$selectedWeight,0 kg",
-                style: TextStyle(
+                isKgSelected ? "$selectedValue,0 kg" : "$selectedValue %",
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -63,21 +89,29 @@ class TargetWeightScreen extends StatelessWidget {
 
             SizedBox(height: 10),
 
-            // Picker chọn cân nặng
+            // Picker chọn giá trị
             Expanded(
               child: CupertinoPicker(
                 backgroundColor: Colors.black,
                 itemExtent: 40,
                 scrollController: FixedExtentScrollController(
-                  initialItem: weightList.indexOf(selectedWeight),
+                  initialItem: isKgSelected
+                      ? weightList.indexOf(selectedValue)
+                      : fatPercentageList.indexOf(selectedValue),
                 ),
                 onSelectedItemChanged: (index) {
-                  goalSetupState.setWeight(weightList[index].toDouble());
+                  setState(() {
+                    selectedValue = isKgSelected
+                        ? weightList[index]
+                        : fatPercentageList[index];
+                  });
+                  goalSetupState.setTargetValue(selectedValue.toDouble());
                 },
-                children: weightList.map((weight) {
+                children: (isKgSelected ? weightList : fatPercentageList)
+                    .map((value) {
                   return Center(
                     child: Text(
-                      "$weight,0 kg",
+                      isKgSelected ? "$value,0 kg" : "$value %",
                       style: TextStyle(color: Colors.white, fontSize: 22),
                     ),
                   );
@@ -99,14 +133,17 @@ class TargetWeightScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
+                  goalSetupState.setTargetValue(selectedValue.toDouble());
+                  goalSetupState.setUnit(isKgSelected); // Lưu đơn vị vào GoalSetupState
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ActivityLevelScreen(),
+                      builder: (context) => StartDateScreen(),
                     ),
                   );
                 },
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -122,6 +159,34 @@ class TargetWeightScreen extends StatelessWidget {
 
             SizedBox(height: 20),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// **Nút chọn đơn vị kg hoặc %**
+  Widget _buildUnitButton(String label, bool isSelected, GoalSetupState goalSetupState) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isKgSelected = (label == "kg");
+          selectedValue = isKgSelected ? 64 : 20; // Đổi giá trị mặc định khi đổi đơn vị
+        });
+        goalSetupState.setUnit(isKgSelected); // Lưu đơn vị vào GoalSetupState
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.orange : Colors.grey[800],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.black : Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

@@ -1,9 +1,10 @@
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/EndDateScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/TargetWeightScreen.dart';
-import 'package:intl/intl.dart'; // Thư viện hỗ trợ format ngày
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/TargetValueScreen.dart';
+import 'package:intl/intl.dart';
 
 class StartDateScreen extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class StartDateScreen extends StatefulWidget {
 }
 
 class _StartDateScreenState extends State<StartDateScreen> {
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime(2025, 1, 1); // Mặc định 01/01/2025
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class _StartDateScreenState extends State<StartDateScreen> {
           icon: Icon(Icons.arrow_back, color: Colors.orange),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           "Bước 6 trên 15",
           style: TextStyle(color: Colors.orange, fontSize: 16),
         ),
@@ -37,7 +38,7 @@ class _StartDateScreenState extends State<StartDateScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20),
-            Text(
+            const Text(
               "When is your start date?",
               style: TextStyle(
                 color: Colors.white,
@@ -46,7 +47,7 @@ class _StartDateScreenState extends State<StartDateScreen> {
               ),
             ),
             SizedBox(height: 10),
-            Text(
+            const Text(
               "We need to know your start date to plan accurately.",
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
@@ -56,7 +57,7 @@ class _StartDateScreenState extends State<StartDateScreen> {
             Center(
               child: Text(
                 DateFormat("dd/MM/yyyy").format(selectedDate),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -68,18 +69,31 @@ class _StartDateScreenState extends State<StartDateScreen> {
 
             // Picker chọn ngày tháng năm
             Expanded(
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.date,
-                initialDateTime: selectedDate,
-                minimumDate: DateTime(2000),
-                maximumDate: DateTime.now().add(Duration(days: 365 * 5)), // Tối đa 5 năm sau
-                backgroundColor: Colors.black,
-                onDateTimeChanged: (DateTime newDate) {
-                  setState(() {
-                    selectedDate = _adjustValidDate(newDate);
-                  });
-                  goalSetupState.setStartDate(selectedDate.toIso8601String());
-                },
+              child: CupertinoTheme(
+                data: CupertinoThemeData(
+                  brightness: Brightness.dark, // Đảm bảo hiển thị rõ ràng trên nền tối
+                  textTheme: CupertinoTextThemeData(
+                    dateTimePickerTextStyle: TextStyle(
+                      color: Colors.white, // Đảm bảo màu chữ sáng
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date,
+                  initialDateTime: _getValidInitialDate(selectedDate),
+                  minimumDate: DateTime(2020, 1, 1),
+                  maximumDate: DateTime(2030, 12, 31),
+                  backgroundColor: Colors.black, // Đảm bảo nền không gây lỗi hiển thị
+                  onDateTimeChanged: (DateTime newDate) {
+                    if (newDate.year >= 2020 && newDate.year <= 2030) {
+                      setState(() {
+                        selectedDate = newDate;
+                      });
+                      goalSetupState.setStartDate(newDate.toIso8601String());
+                    }
+                  },
+                ),
               ),
             ),
 
@@ -97,14 +111,15 @@ class _StartDateScreenState extends State<StartDateScreen> {
                   ),
                 ),
                 onPressed: () {
+                  print("Start Date before moving: ${goalSetupState.startDate}");
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => TargetWeightScreen(),
+                      builder: (context) => EndDateScreen(),
                     ),
                   );
                 },
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -125,18 +140,10 @@ class _StartDateScreenState extends State<StartDateScreen> {
     );
   }
 
-  /// Hàm kiểm tra và điều chỉnh ngày hợp lệ khi đổi năm
-  DateTime _adjustValidDate(DateTime date) {
-    int year = date.year;
-    int month = date.month;
-    int day = date.day;
-
-    // Nếu ngày không hợp lệ trong tháng, tự động đổi thành ngày cuối cùng hợp lệ
-    int lastDayOfMonth = DateTime(year, month + 1, 0).day;
-    if (day > lastDayOfMonth) {
-      day = lastDayOfMonth;
-    }
-
-    return DateTime(year, month, day);
+  /// Hàm điều chỉnh ngày hợp lệ nếu nằm ngoài phạm vi
+  DateTime _getValidInitialDate(DateTime date) {
+    if (date.year < 2020) return DateTime(2020, date.month, date.day);
+    if (date.year > 2030) return DateTime(2030, date.month, date.day);
+    return date;
   }
 }

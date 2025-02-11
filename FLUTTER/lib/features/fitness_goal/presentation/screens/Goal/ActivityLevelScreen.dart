@@ -1,13 +1,15 @@
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/StartDateScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/SubmitGoalScreen.dart';
 
 class ActivityLevelScreen extends StatelessWidget {
   final List<ActivityLevelModel> activityLevels = [
-    ActivityLevelModel("No exercise or very little", "images/yoga.jpg", 1.2),
-    ActivityLevelModel("Light activity (1-3 days/week)", "images/welcome2.png", 1.375),
-    ActivityLevelModel("Moderate activity (3-5 days/week)", "images/selection2.jpg", 1.55),
-    ActivityLevelModel("High activity (6-7 days/week)", "images/selection3.jpg", 1.725),
-    ActivityLevelModel("Very high activity (athletes, heavy labor)", "images/selection4.jpg", 1.9),
+    ActivityLevelModel("No exercise or very little", "images/yoga.jpg", "SEDENTARY"),
+    ActivityLevelModel("Light activity (1-3 days/week)", "images/welcome2.png", "LIGHTLY_ACTIVE"),
+    ActivityLevelModel("Moderate activity (3-5 days/week)", "images/selection2.jpg", "MODERATELY_ACTIVE"),
+    ActivityLevelModel("High activity (6-7 days/week)", "images/selection3.jpg", "VERY_ACTIVE"),
+    ActivityLevelModel("Very high activity (athletes, heavy labor)", "images/selection4.jpg", "EXTREMELY_ACTIVE"),
   ];
 
   @override
@@ -21,7 +23,7 @@ class ActivityLevelScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: Colors.orange),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           "Bước 5 trên 18",
           style: TextStyle(color: Colors.orange, fontSize: 16),
         ),
@@ -32,7 +34,7 @@ class ActivityLevelScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
-            Text(
+            const Text(
               "Choose your activity level",
               style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
             ),
@@ -54,8 +56,17 @@ class ActivityLevelScreen extends StatelessWidget {
   Widget _buildActivityItem(BuildContext context, ActivityLevelModel activity) {
     return GestureDetector(
       onTap: () {
-        // Lưu lựa chọn và chuyển sang màn hình tiếp theo
-        Navigator.push(context, MaterialPageRoute(builder: (context) => StartDateScreen()));
+        final goalSetupState = Provider.of<GoalSetupState>(context, listen: false);
+
+        // ✅ Lưu `activityLevel` dưới dạng String thay vì `double`
+        goalSetupState.setActivityLevel(activity.levelName);
+
+        print("Selected Activity Level: ${goalSetupState.activityLevel}"); // Debug kiểm tra
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SubmitGoalScreen()),
+        );
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 16),
@@ -76,7 +87,7 @@ class ActivityLevelScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    "Movement index: ${activity.multiplier}",
+                    "Activity Level: ${activity.levelName}",
                     style: TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                 ],
@@ -97,7 +108,7 @@ class ActivityLevelScreen extends StatelessWidget {
 class ActivityLevelModel {
   final String description;
   final String imagePath;
-  final double multiplier;
+  final String levelName; // ✅ Lưu dạng Enum Name thay vì `double`
 
-  ActivityLevelModel(this.description, this.imagePath, this.multiplier);
+  ActivityLevelModel(this.description, this.imagePath, this.levelName);
 }

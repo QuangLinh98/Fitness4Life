@@ -1,37 +1,23 @@
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/ActivityLevelScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/SubmitGoalScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/CurrentValueScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/TargetValueScreen.dart';
+import 'package:intl/intl.dart';
 
-class CurrentWeightScreen extends StatefulWidget {
-  final String goalType;
-
-  CurrentWeightScreen({required this.goalType});
-
+class EndDateScreen extends StatefulWidget {
   @override
-  _CurrentWeightScreenState createState() => _CurrentWeightScreenState();
+  _EndDateScreenState createState() => _EndDateScreenState();
 }
 
-class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
-  final List<int> weightList = List.generate(100, (index) => index + 30);
-  int selectedWeight = 64; // Giá trị mặc định
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final goalSetupState = Provider.of<GoalSetupState>(context, listen: false);
-      if (goalSetupState.weight == null) {
-        goalSetupState.setWeight(selectedWeight.toDouble());
-      }
-    });
-  }
+class _EndDateScreenState extends State<EndDateScreen> {
+  DateTime selectedDate = DateTime(2025, 1, 1); // Mặc định 01/01/2025
 
   @override
   Widget build(BuildContext context) {
-    final goalSetupState = Provider.of<GoalSetupState>(context);
-    selectedWeight = goalSetupState.weight?.toInt() ?? 64;
+    final goalSetupState = Provider.of<GoalSetupState>(context, listen: false);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -42,8 +28,8 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
           icon: Icon(Icons.arrow_back, color: Colors.orange),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          "Bước 3 trên 15",
+        title: const Text(
+          "Bước 7 trên 15",
           style: TextStyle(color: Colors.orange, fontSize: 16),
         ),
       ),
@@ -53,8 +39,8 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20),
-            Text(
-              "What is your current weight?",
+            const Text(
+              "When is your end date?",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 22,
@@ -62,17 +48,17 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
               ),
             ),
             SizedBox(height: 10),
-            Text(
-              "We need some data to calculate your BMI and create a plan tailored to you.",
+            const Text(
+              "We need to know your end date to plan accurately.",
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             SizedBox(height: 30),
 
-            // Hiển thị cân nặng được chọn
+            // Hiển thị ngày tháng năm đã chọn
             Center(
               child: Text(
-                "$selectedWeight,0 kg",
-                style: TextStyle(
+                DateFormat("dd/MM/yyyy").format(selectedDate),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -82,28 +68,33 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
 
             SizedBox(height: 10),
 
-            // Picker chọn cân nặng
+            // Picker chọn ngày tháng năm
             Expanded(
-              child: CupertinoPicker(
-                backgroundColor: Colors.black,
-                itemExtent: 40,
-                scrollController: FixedExtentScrollController(
-                  initialItem: weightList.indexOf(selectedWeight),
-                ),
-                onSelectedItemChanged: (index) {
-                  setState(() {
-                    selectedWeight = weightList[index];
-                  });
-                  goalSetupState.setWeight(weightList[index].toDouble());
-                },
-                children: weightList.map((weight) {
-                  return Center(
-                    child: Text(
-                      "$weight,0 kg",
-                      style: TextStyle(color: Colors.white, fontSize: 22),
+              child: CupertinoTheme(
+                data: const CupertinoThemeData(
+                  brightness: Brightness.dark, // Đảm bảo hiển thị rõ ràng trên nền tối
+                  textTheme: CupertinoTextThemeData(
+                    dateTimePickerTextStyle: TextStyle(
+                      color: Colors.white, // Đảm bảo màu chữ sáng
+                      fontSize: 20,
                     ),
-                  );
-                }).toList(),
+                  ),
+                ),
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date,
+                  initialDateTime: _getValidInitialDate(selectedDate),
+                  minimumDate: DateTime(2020, 1, 1),
+                  maximumDate: DateTime(2030, 12, 31),
+                  backgroundColor: Colors.black, // Đảm bảo nền không gây lỗi hiển thị
+                  onDateTimeChanged: (DateTime newDate) {
+                    if (newDate.year >= 2020 && newDate.year <= 2030) {
+                      setState(() {
+                        selectedDate = newDate;
+                      });
+                      goalSetupState.setEndDate(newDate.toIso8601String());
+                    }
+                  },
+                ),
               ),
             ),
 
@@ -121,15 +112,14 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
                   ),
                 ),
                 onPressed: () {
-                  goalSetupState.setWeight(selectedWeight.toDouble()); // Đảm bảo lưu trước khi chuyển trang
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CurrentValueScreen(),
+                      builder: (context) => ActivityLevelScreen(),
                     ),
                   );
                 },
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -148,5 +138,12 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
         ),
       ),
     );
+  }
+
+  /// Hàm điều chỉnh ngày hợp lệ nếu nằm ngoài phạm vi
+  DateTime _getValidInitialDate(DateTime date) {
+    if (date.year < 2020) return DateTime(2020, date.month, date.day);
+    if (date.year > 2030) return DateTime(2030, date.month, date.day);
+    return date;
   }
 }
