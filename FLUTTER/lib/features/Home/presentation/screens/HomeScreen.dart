@@ -6,12 +6,13 @@ import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/smartDeal/presentation/screens/post/Carouse.dart';
-import 'package:fitness4life/features/smartDeal/service/QuestionService.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
-import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
-import 'package:fitness4life/features/user/presentation/screens/Login_Register/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../../smartDeal/presentation/screens/blog/CarouseBlog.dart';
+import '../../../smartDeal/presentation/screens/blog/LesmillsBlog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,24 +28,24 @@ class _HomeScreenState extends State<HomeScreen> {
     // Gọi các service để lấy dữ liệu
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Gọi fetchTrainers
-      // final trainerService = Provider.of<TrainerService>(context, listen: false);
-      // trainerService.fetchTrainers();
+      final trainerService = Provider.of<TrainerService>(context, listen: false);
+      trainerService.fetchTrainers();
 
-      // // Gọi fetchRooms
-      // final roomService = Provider.of<RoomService>(context, listen: false);
-      // roomService.fetchRooms();
+      // Gọi fetchRooms
+      final roomService = Provider.of<RoomService>(context, listen: false);
+      roomService.fetchRooms();
 
-      // // Gọi fetchGoals
-      // final goalService = Provider.of<GoalService>(context, listen: false);
-      // goalService.fetchGoals();
+      // Gọi fetchGoals
+      final goalService = Provider.of<GoalService>(context, listen: false);
+      goalService.fetchGoals();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // final trainerService = Provider.of<TrainerService>(context);   // Lấy trạng thái từ Provider
-    // final roomService = Provider.of<RoomService>(context);
-    // final goalService = Provider.of<GoalService>(context);
+    final trainerService = Provider.of<TrainerService>(context);   // Lấy trạng thái từ Provider
+    final roomService = Provider.of<RoomService>(context);
+    final goalService = Provider.of<GoalService>(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -66,108 +67,87 @@ class _HomeScreenState extends State<HomeScreen> {
                    // Phần "Personal goal this week"
                    buildPersonalGoalSection(),
 
-                   // const SizedBox(height: 15),
-                   // const Text(
-                   //   "Upcoming Classes",
-                   //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                   // ),
-                   // const SizedBox(height: 6),
-                   // roomService.isLoading
-                   //     ? const Center(child: CircularProgressIndicator())
-                   //     : roomService.rooms.isNotEmpty
-                   //     ? SingleChildScrollView(
-                   //   scrollDirection: Axis.horizontal,
-                   //   child: Row(
-                   //     children: roomService.rooms.map((room) {
-                   //       return Padding(
-                   //         padding: const EdgeInsets.only(right: 10),
-                   //         child: buildUpcomingClassCard(room),
-                   //       );
-                   //     }).toList(),
-                   //   ),
-                   // )
-                   //     : const Center(
-                   //   child: Text("No Rooms available"),
-                   // ),
+                   const SizedBox(height: 15),
+                   const Text(
+                     "Upcoming Classes",
+                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(height: 6),
+                   roomService.isLoading
+                       ? const Center(child: CircularProgressIndicator())
+                       : roomService.rooms.isNotEmpty
+                       ? SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: roomService.rooms.map((room) {
+                         return Padding(
+                           padding: const EdgeInsets.only(right: 10),
+                           child: buildUpcomingClassCard(room),
+                         );
+                       }).toList(),
+                     ),
+                   )
+                       : const Center(
+                     child: Text("No Rooms available"),
+                   ),
 
-                   // const SizedBox(height: 15),
-                   // const Text(
-                   //   "Personal Trainers",
-                   //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                   // ),
-                   // const SizedBox(height: 15),
-                   // trainerService.isLoading
-                   //     ? const Center(child: CircularProgressIndicator())
-                   //     : trainerService.trainers.isNotEmpty
-                   //     ? SingleChildScrollView(
-                   //   scrollDirection: Axis.horizontal,
-                   //   child: Row(
-                   //     children: trainerService.trainers.map((trainer) {
-                   //       return Padding(
-                   //         padding:
-                   //         const EdgeInsets.symmetric(horizontal: 8.0),
-                   //         child: buildTrainerAvatar(trainer),
-                   //       );
-                   //     }).toList(),
-                   //   ),
-                   // )
-                   //     : const Center(
-                   //   child: Text("No trainers available"),
-                   // ),
+                   const SizedBox(height: 15),
+                   const Text(
+                     "Personal Trainers",
+                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(height: 15),
+                   trainerService.isLoading
+                       ? const Center(child: CircularProgressIndicator())
+                       : trainerService.trainers.isNotEmpty
+                       ? SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: trainerService.trainers.map((trainer) {
+                         return Padding(
+                           padding:
+                           const EdgeInsets.symmetric(horizontal: 8.0),
+                           child: buildTrainerAvatar(trainer),
+                         );
+                       }).toList(),
+                     ),
+                   )
+                       : const Center(
+                     child: Text("No trainers available"),
+                   ),
 
-                   // const SizedBox(height: 15),
-                   //
-                   // const Text(
-                   //   "Upcoming Challenges",
-                   //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                   // ),
-                   // const SizedBox(height: 10),
-                   // goalService.isLoading
-                   //     ? const Center(child: CircularProgressIndicator())
-                   //     : goalService.goals.isNotEmpty
-                   //     ? SingleChildScrollView(
-                   //   scrollDirection: Axis.horizontal,
-                   //   child: Row(
-                   //     children: goalService.goals.map((goal) {
-                   //       return Padding(
-                   //         padding:
-                   //         const EdgeInsets.symmetric(horizontal: 8.0),
-                   //         child: buildGoalCard(goal),
-                   //       );
-                   //     }).toList(),
-                   //   ),
-                   // )
-                   //     : const Center(
-                   //   child: Text("No Goal available"),
-                   // ),
+                   const SizedBox(height: 15),
+
+                   const Text(
+                     "Upcoming Challenges",
+                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(height: 10),
+                   goalService.isLoading
+                       ? const Center(child: CircularProgressIndicator())
+                       : goalService.goals.isNotEmpty
+                       ? SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: goalService.goals.map((goal) {
+                         return Padding(
+                           padding:
+                           const EdgeInsets.symmetric(horizontal: 8.0),
+                           child: buildGoalCard(goal),
+                         );
+                       }).toList(),
+                     ),
+                   )
+                       : const Center(
+                     child: Text("No Goal available"),
+                   ),
                    const SizedBox(height: 15),
                    const Carouse(),
-                   // const Text(
-                   //   "Forum Questions",
-                   //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                   // ),
-                   //
-                   // const SizedBox(height: 10),
-                   // questionService.isLoading
-                   //     ? const Center(child: CircularProgressIndicator())
-                   //     : questionService.questions.isNotEmpty
-                   //     ? ListView.builder(
-                   //   shrinkWrap: true,
-                   //   physics: const NeverScrollableScrollPhysics(),
-                   //   itemCount: questionService.questions.length,
-                   //   itemBuilder: (context, index) {
-                   //     final question = questionService.questions[index];
-                   //     return Card(
-                   //       margin: const EdgeInsets.symmetric(vertical: 8),
-                   //       child: ListTile(
-                   //         title: Text(question.title),
-                   //         subtitle: Text(question.content),
-                   //         trailing: Text("Views: ${question.viewCount}"),
-                   //       ),
-                   //     );
-                   //   },
-                   // )
-                   //     : const Center(child: Text("No questions available")),
+                   const SizedBox(height: 15),
+                   const CarouseBlog(),
+                   const SizedBox(height: 15),
+                   const LesmillsBlog(),
+
                  ],
                ),
              ),

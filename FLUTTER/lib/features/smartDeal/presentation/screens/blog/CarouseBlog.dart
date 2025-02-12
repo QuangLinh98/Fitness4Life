@@ -1,54 +1,49 @@
+import 'package:fitness4life/features/smartDeal/presentation/screens/blog/BlogDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fitness4life/features/smartDeal/service/QuestionService.dart';
+import 'package:fitness4life/features/smartDeal/service/BlogService.dart';
 
 import '../../../../../config/constants.dart';
-import 'GetAllPost.dart';
-import 'Posts.dart';
+import 'GetAllBlog.dart';
 
-class Carouse extends StatefulWidget {
-  const Carouse({super.key});
+class CarouseBlog extends StatefulWidget {
+  const CarouseBlog({super.key});
 
   @override
-  _CarouseState createState() => _CarouseState();
+  _CarouseBlogState createState() => _CarouseBlogState();
 }
 
-class _CarouseState extends State<Carouse> {
+class _CarouseBlogState extends State<CarouseBlog> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final questionService = Provider.of<QuestionService>(context, listen: false);
-      questionService.fetchQuestions();
+      final blogService = Provider.of<BlogService>(context, listen: false);
+      blogService.fetchAllBlog();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final questionService = Provider.of<QuestionService>(context);
+    final blogService = Provider.of<BlogService>(context);
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // Lọc chỉ lấy những câu hỏi có status là "APPROVED"
-    final approvedQuestions = questionService.questions
-        .where((question) => question.status == "APPROVED")
-        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Căn hai phần tử về hai bên
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              "Forum Questions",
+              "Blog",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GetAllPost()),
+                  MaterialPageRoute(builder: (context) => GetAllBlog()),
                 );
               },
               child: const Text("View All"),
@@ -57,35 +52,32 @@ class _CarouseState extends State<Carouse> {
         ),
 
         const SizedBox(height: 10),
-        questionService.isLoading
+        blogService.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : approvedQuestions.isNotEmpty
+            : blogService.blogs.isNotEmpty
             ? SizedBox(
           height: 180,
           width: screenWidth,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: approvedQuestions.length > 10 ? 10 : approvedQuestions.length,
+            itemCount: blogService.blogs.length > 10 ? 10 : blogService.blogs.length,
             itemBuilder: (context, index) {
-              final question = approvedQuestions[index];
+              final blog = blogService.blogs[index];
 
               // Kiểm tra và lấy URL ảnh hợp lệ
               String imageUrl = "https://via.placeholder.com/250"; // Ảnh mặc định
-              if (question.questionImages.isNotEmpty) {
-                String url = question.questionImages.first.imageUrl;
+              if (blog.thumbnailUrl.isNotEmpty) {
+                String url = blog.thumbnailUrl.first.imageUrl;
                 if (url.isNotEmpty && (url.startsWith("http://") || url.startsWith("https://"))) {
                   imageUrl = getFullImageUrl(url);
                 }
               }
-
-              print("🔍 Image URL: $imageUrl"); // Debug log kiểm tra URL ảnh
-
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Posts(questionId: question.id),
+                      builder: (context) => Blogdetail(blogId: blog.id!),
                     ),
                   );
                 },
@@ -110,7 +102,7 @@ class _CarouseState extends State<Carouse> {
                             placeholder: (context, url) =>
                             const Center(child: CircularProgressIndicator()),
                             errorWidget: (context, url, error) {
-                              print("❌ Lỗi tải ảnh question: $error - URL: $url");
+                              print("❌ Lỗi tải ảnh: $error - URL: $url");
                               return Container(
                                 height: 100,
                                 width: double.infinity,
@@ -128,21 +120,17 @@ class _CarouseState extends State<Carouse> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                question.title.length > 25
-                                    ? "${question.title.substring(0, 25)}..."
-                                    : question.title,
+                                blog.title.length > 25
+                                    ? "${blog.title.substring(0, 25)}..."
+                                    : blog.title,
                                 style: TextStyle(
-                                  fontSize: question.title.length > 25 ? 14 : 16,
+                                  fontSize: blog.title.length > 25 ? 14 : 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 5),
-                              Text(
-                                "Views: ${question.viewCount}",
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                              ),
                             ],
                           ),
                         ),
@@ -154,7 +142,7 @@ class _CarouseState extends State<Carouse> {
             },
           ),
         )
-            : const Center(child: Text("No approved questions available")),
+            : const Center(child: Text("Không có bài blog nào")),
       ],
     );
   }

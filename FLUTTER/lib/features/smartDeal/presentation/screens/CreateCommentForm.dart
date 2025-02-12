@@ -4,6 +4,8 @@ import 'package:fitness4life/features/smartDeal/service/CommentService.dart';
 import 'package:fitness4life/features/smartDeal/data/models/forum/Comment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../user/service/UserInfoProvider.dart';
+
 class CreateCommentForm extends StatefulWidget {
   final int questionId;
 
@@ -27,18 +29,29 @@ class _CreateCommentFormState extends State<CreateCommentForm> {
     });
 
     final commentService = Provider.of<CommentService>(context, listen: false);
-    final prefs = await SharedPreferences.getInstance();
-    String? userName = prefs.getString('user_fullname');
-    int? userId = prefs.getInt('user_id');
+    final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
 
-    print("có user với id ko ta: ${userName} ${userId}");
+    String? userName = userInfo.userName;
+    int? userId = userInfo.userId;
+
+    // print("Có user với id không ta: ${userName} ${userId}");
+
+    if (userId == null || userName == null) {
+      // print("Lỗi: userId hoặc userName bị null");
+      setState(() {
+        _isSubmitting = false;
+      });
+      return;
+    }
+
     final comment = Comment(
-      userId: userId!,
-      userName: userName!,
+      userId: userId,
+      userName: userName,
       questionId: widget.questionId,
       content: _contentController.text.trim(),
     );
-    print("có data trong comment ko ta: ${comment}");
+
+    // print("Có data trong comment không ta: ${comment}");
 
     bool success = await commentService.CreateComment(comment);
 
@@ -58,7 +71,7 @@ class _CreateCommentFormState extends State<CreateCommentForm> {
         TextField(
           controller: _contentController,
           decoration: InputDecoration(
-            hintText: "Nhập bình luận...",
+            hintText: "Write a comment...",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             suffixIcon: IconButton(
               icon: Icon(Icons.send, color: Colors.teal),

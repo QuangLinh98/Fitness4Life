@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../user/service/UserInfoProvider.dart';
 import '../../data/models/forum/CreateQuestionDTO.dart';
 
 class CreateQuestionScreen extends StatefulWidget {
@@ -55,9 +56,12 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
   }
 
   Future<void> _createQuestion() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? userName = prefs.getString('user_fullname');
-    int? userId = prefs.getInt('user_id');
+    final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
+
+    String? userName = userInfo.userName;
+    int? userId = userInfo.userId;
+
+    // print("Có user với id không ta: ${userName} ${userId}");
 
     if (_formKey.currentState!.validate()) {
       final newQuestion = CreateQuestionDTO(
@@ -77,12 +81,12 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
       bool success = await questionService.CreateQuestion(newQuestion);
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Câu hỏi đã được tạo thành công!")),
+          SnackBar(content: Text("Your question has been successfully created!")),
         );
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Có lỗi xảy ra, vui lòng thử lại!")),
+          SnackBar(content: Text("An error occurred, please try again!")),
         );
       }
     }
@@ -91,7 +95,43 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Tạo câu hỏi mới")),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60), // Chiều cao AppBar
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFB00020), // Đổi màu nền AppBar
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(15), // Bo góc phía dưới
+            ),
+          ),
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      "Create new Post",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 48), // Để căn giữa tiêu đề
+              ],
+            ),
+          ),
+        ),
+      ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Form(
@@ -102,14 +142,14 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
               children: [
                 TextFormField(
                   controller: _titleController,
-                  decoration: InputDecoration(labelText: "Tiêu đề"),
-                  validator: (value) => value!.isEmpty ? "Vui lòng nhập tiêu đề" : null,
+                  decoration: InputDecoration(labelText: "Title"),
+                  validator: (value) => value!.isEmpty ? "Write a title pleass " : null,
                 ),
                 TextFormField(
                   controller: _contentController,
-                  decoration: InputDecoration(labelText: "Nội dung"),
+                  decoration: InputDecoration(labelText: "Content"),
                   maxLines: 4,
-                  validator: (value) => value!.isEmpty ? "Vui lòng nhập nội dung" : null,
+                  validator: (value) => value!.isEmpty ? "Write a content pleass" : null,
                 ),
                 TextFormField(
                   controller: _tagController,
@@ -124,11 +164,11 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
                       child: Text(entry.value),
                     );
                   }).toList(),
-                  decoration: InputDecoration(labelText: "Danh mục"),
-                  validator: (value) => value == null ? "Vui lòng chọn danh mục" : null,
+                  decoration: InputDecoration(labelText: "Category"),
+                  validator: (value) => value == null ? "Please select a category." : null,
                 ),
                 SizedBox(height: 10),
-                Text("Hình ảnh đính kèm:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text("Attached images:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Wrap(
                   spacing: 8,
                   children: _selectedImages
@@ -138,12 +178,12 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
                 ElevatedButton.icon(
                   onPressed: _pickImage,
                   icon: Icon(Icons.add_a_photo),
-                  label: Text("Thêm ảnh"),
+                  label: Text("add images"),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _createQuestion,
-                  child: Text("Tạo câu hỏi"),
+                  child: Text("Create"),
                 ),
               ],
             ),

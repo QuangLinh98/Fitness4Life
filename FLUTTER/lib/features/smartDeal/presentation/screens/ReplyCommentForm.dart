@@ -4,14 +4,18 @@ import 'package:fitness4life/features/smartDeal/service/CommentService.dart';
 import 'package:fitness4life/features/smartDeal/data/models/forum/Comment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../user/service/UserInfoProvider.dart';
+
 class ReplyCommentForm extends StatefulWidget {
   final int questionId;
   final int parentCommentId; // ID của bình luận cha
+  final Function onCloseForm; // Callback để đóng form
 
   const ReplyCommentForm({
     Key? key,
     required this.questionId,
     required this.parentCommentId,
+    required this.onCloseForm, // Nhận callback từ CommentPage
   }) : super(key: key);
 
   @override
@@ -34,9 +38,12 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
 
     try {
       final commentService = Provider.of<CommentService>(context, listen: false);
-      final prefs = await SharedPreferences.getInstance();
-      String? userName = prefs.getString('user_fullname');
-      int? userId = prefs.getInt('user_id');
+      final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
+
+      String? userName = userInfo.userName;
+      int? userId = userInfo.userId;
+
+      // print("Có user với id không ta: ${userName} ${userId}");
 
       if (userName == null || userId == null) {
         setState(() {
@@ -61,6 +68,7 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
         setState(() {
           _isSubmitting = false;
         });
+        widget.onCloseForm(); // Gọi callback để đóng for
       } else {
         print("Gửi bình luận thất bại!");
       }
@@ -81,7 +89,7 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
         TextField(
           controller: _contentController,
           decoration: InputDecoration(
-            hintText: "Nhập câu trả lời...",
+            hintText: "Write a comment...",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             suffixIcon: IconButton(
               icon: Icon(Icons.send, color: Colors.teal),

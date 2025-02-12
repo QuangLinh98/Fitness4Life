@@ -1,9 +1,12 @@
 import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
+import 'package:fitness4life/features/smartDeal/presentation/screens/post/YourPost.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/Password/ChangePasswordScreen.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../smartDeal/presentation/screens/promotion/PromotionScreen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({Key? key}) : super(key: key);
@@ -128,8 +131,18 @@ class _AccountScreenState extends State<AccountScreen> {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 buildOptionItem("Hướng dẫn sử dụng", Icons.help_outline, () {}),
-                buildOptionItem("mã khuyến mãi ", Icons.code, () {}),
-                buildOptionItem("Your Post", Icons.post_add_sharp, () {}),
+                buildOptionItem("mã khuyến mãi ", Icons.code, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PromotionScreen())
+                  );
+                }),
+                buildOptionItem("Your Post", Icons.post_add_sharp, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => YourPost())
+                  );
+                }),
                 buildOptionItem("Liên hệ", Icons.phone, () {}),
                 buildOptionItem("Hợp đồng", Icons.description_outlined, () {}),
                 buildOptionItem("Lịch sử chăm sóc khách hàng", Icons.history, () {}),

@@ -3,6 +3,7 @@ import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
 import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
@@ -13,6 +14,7 @@ import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
 import 'package:fitness4life/features/booking/service/QrService.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/smartDeal/service/CommentService.dart';
+import 'package:fitness4life/features/smartDeal/service/PromotionService.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:fitness4life/features/user/service/PasswordService.dart';
 import 'package:fitness4life/features/user/service/RegisterService.dart';
@@ -21,6 +23,8 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../api/Dashboard_Repository/TrainerRepository.dart';
+import '../api/SmartDeal_Repository/BlogRepository.dart';
+import '../features/smartDeal/service/BlogService.dart';
 import '../features/smartDeal/service/QuestionService.dart';
 import 'locator_setup.dart';
 
@@ -37,4 +41,6 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => PasswordService(locator<PasswordRepository>())),
   ChangeNotifierProvider(create: (_) => QuestionService(locator<QuestionRepository>())),
   ChangeNotifierProvider(create: (_) => CommentService(locator<CommentRepository>())),
+  ChangeNotifierProvider(create: (_) => PromotionService(locator<PromotionRepository>())),
+  ChangeNotifierProvider(create: (_) => BlogService(locator<BlogRepository>())),
 ];

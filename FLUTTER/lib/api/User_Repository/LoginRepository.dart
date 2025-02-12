@@ -1,11 +1,8 @@
-import 'package:dio/dio.dart';
+
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:fitness4life/features/user/data/models/User.dart';
 import 'package:fitness4life/token/token_manager.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../features/user/data/models/GetUser.dart';
 
 class LoginRepository {
   final ApiGateWayService _apiGateWayService;
@@ -40,19 +37,6 @@ class LoginRepository {
         int? userId = payload['userId'];
         // Lưu token vào Secure Storage
         await TokenManager.saveTokens(accessToken, refreshToken);
-
-        // ✅ Lưu data vào SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('user_email', email);
-        await prefs.setInt('user_id', userId!);
-        await prefs.setString('user_fullname', fullname!);
-
-        // 🛠 Log dữ liệu đã lưu
-        // print("✅ Dữ liệu SharedPreferences sau khi đăng nhập:");
-        // print("📌 Email: ${prefs.getString('user_email')}");
-        // print("📌 User ID: ${prefs.getInt('user_id')}");
-        // print("📌 Full Name: ${prefs.getString('user_fullname')}");
-
         // Tạo đối tượng User từ dữ liệu giải mã
         final user = User(
           fullname: fullname ?? "Guest",
@@ -86,18 +70,6 @@ class LoginRepository {
       if(response.statusCode == 200) {
         //Xóa token khởi Secure Store
         await TokenManager.clearTokens();
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.remove('user_email');
-        await prefs.remove('user_id');
-        await prefs.remove('user_fullname');
-
-        // 🛠 Log dữ liệu sau khi xóa
-        // print("🚫 Đã xóa thông tin người dùng khỏi SharedPreferences.");
-        // print("📌 Email: ${prefs.getString('user_email')}");
-        // print("📌 User ID: ${prefs.getInt('user_id')}");
-        // print("📌 Full Name: ${prefs.getString('user_fullname')}");
-
         print("User successfully logged out");
       }else {
         // Xử lý các mã lỗi khác

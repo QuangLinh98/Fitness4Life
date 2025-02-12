@@ -5,6 +5,7 @@ import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/TrainerRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
 import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
@@ -12,6 +13,7 @@ import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:get_it/get_it.dart';
 
+import '../api/SmartDeal_Repository/BlogRepository.dart';
 import '../api/SmartDeal_Repository/CommentRepository.dart';
 
 final GetIt locator = GetIt.instance;
@@ -53,7 +55,15 @@ void setUpLocator() {
 
   // Đăng ký QuestionRepository
   locator.registerLazySingleton(() => QuestionRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký CommentRepository
   locator.registerLazySingleton(() => CommentRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký PromotionRepository
+  locator.registerLazySingleton(() => PromotionRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký BlogRepository
+  locator.registerLazySingleton(() => BlogRepository(locator<ApiGateWayService>()));
 
 
 }
