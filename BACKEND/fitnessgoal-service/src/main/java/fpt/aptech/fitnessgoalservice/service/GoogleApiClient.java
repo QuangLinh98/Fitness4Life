@@ -16,7 +16,7 @@ public class GoogleApiClient {
 
     //Gửi yêu cầu tới API Google và nhận chế độ ăn
     public String getDietPlanFromGoogle(String content) {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBcq8pKpZThqnHat9FCkkkG3UPK1WzWmXg";
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCltshmEO8ByUZYJe6n1lfAtfB3DmQnfUc";
 
         //Gửi yêu cầu POST đến Google API
         HttpHeaders headers = new HttpHeaders();

@@ -1,6 +1,7 @@
 package fpt.aptech.fitnessgoalservice.service;
 
 import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
+import fpt.aptech.fitnessgoalservice.dtos.UserPoinDTO;
 import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.models.UserPoint;
 import fpt.aptech.fitnessgoalservice.repository.UserPointRepository;
@@ -30,9 +31,49 @@ public class UserPointService {
     }
 
     //Handle get Point now
-    public int getPoints(long userId) {
-        return  pointRepository.findByUserId(userId)
-                .map(UserPoint::getTotalPoints)
-                .orElse(0);
+//    public int getPoints(long userId) {
+//        return  pointRepository.findByUserId(userId)
+//                .map(UserPoint::getTotalPoints)
+//                .orElse(0);
+//    }
+
+    public UserPoinDTO getUserPoint(long userId) {
+        UserPoint findUserPoint = pointRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("UserNotFound" ));
+        UserPoinDTO userPoinDTO = new UserPoinDTO();
+        if (findUserPoint!=null) {
+            userPoinDTO.setUserId(userId);
+            userPoinDTO.setTotalPoints(findUserPoint.getTotalPoints());
+        }
+        return userPoinDTO;
+    }
+    public UserPoinDTO approvePoint(long userId, int point) {
+        UserPoint findUserPoint = pointRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("UserNotFound"));
+        if (findUserPoint!=null) {
+            int totalPoints = findUserPoint.getTotalPoints();
+            switch (point) {
+                case 500:
+                case 1000:
+                case 2000:
+                case 3000:
+                case 4000:
+                case 5000:
+                    if (totalPoints >= point) {
+                        totalPoints -= point;
+                        findUserPoint.setTotalPoints(totalPoints);
+                        pointRepository.save(findUserPoint);
+                    } else {
+                        throw new RuntimeException("NotEnoughPointsToDeduct");
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("InvalidPointId");
+            }
+        }
+        UserPoinDTO userPoinDTO = new UserPoinDTO();
+        userPoinDTO.setUserId(userId);
+        userPoinDTO.setTotalPoints(findUserPoint.getTotalPoints());
+        return userPoinDTO;
     }
 }

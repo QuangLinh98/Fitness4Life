@@ -52,6 +52,11 @@ public class CalculationService {
         return bmr * multiplier;
     }
 
+    public double calculateBMI(double weight, UserDTO userDTO) {
+        double heightInMeters = userDTO.getProfileUserDTO().getHeightValue() / 100.0;
+        return weight / (heightInMeters * heightInMeters);
+    }
+
     //Phương thức tính toán tỷ lệ % hoàn thành mục tiêu của user
     public double calulateGoalProgress(Goal goal) {
         double progress = 0;

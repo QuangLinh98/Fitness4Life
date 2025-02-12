@@ -119,6 +119,4 @@ public class NotifyService {
         // Gửi thông báo thông qua NotifyProducer
         notifyProducer.sendNotify(notifyDTO);
     }
-
-
 }

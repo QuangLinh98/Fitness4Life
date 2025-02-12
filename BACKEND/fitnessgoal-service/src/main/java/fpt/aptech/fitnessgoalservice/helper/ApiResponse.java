@@ -58,4 +58,11 @@ public class ApiResponse<T> {
         return new ApiResponse<>(null,message,
                 500,null);
     }
+
+    public static <T> ApiResponse<T> conflict(String message) {
+        return new ApiResponse<>(null, message, 409, null);
+    }
+    public static <T> ApiResponse<T> resourceLocked(String message) {
+        return new ApiResponse<>(null, message, 423, null); // 423 is rarely used and can be repurposed
+    }
 }

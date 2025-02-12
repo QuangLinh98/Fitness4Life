@@ -55,60 +55,69 @@ public class GoalService {
 
     //Handle create Goal
     public Goal createGoal(GoalDTO goalDTO) {
-        UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
-        if (existingUser == null) {
-            throw new RuntimeException("User not found");
+        try {
+            System.out.println("✅ Nhận được request từ Flutter: " + goalDTO);
+
+            UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
+            if (existingUser == null) {
+                throw new RuntimeException("User not found");
+            }
+            // Lấy thông tin cân nặng và giá trị hiện tại
+            Double weight = goalDTO.getWeight();
+            Double currentValue = goalDTO.getCurrentValue();
+
+            // Chỉ xử lý đồng bộ khi mục tiêu là WEIGHT_LOSS hoặc WEIGHT_GAIN
+            if (goalDTO.getGoalType() == GoalType.WEIGHT_LOSS || goalDTO.getGoalType() == GoalType.WEIGHT_GAIN) {
+                if (weight == null && currentValue == null) {
+                    throw new RuntimeException("For weight-related goals, at least one of weight or currentValue must be provided.");
+                }
+
+                // Nếu chỉ có currentValue
+                if (weight == null) {
+                    weight = currentValue; // Gán weight bằng currentValue
+                }
+
+                // Nếu chỉ có weight
+                if (currentValue == null) {
+                    currentValue = weight; // Gán currentValue bằng weight
+                }
+
+                // Kiểm tra tính hợp lệ
+                if (weight <= 0 || currentValue <= 0) {
+                    throw new RuntimeException("Weight and currentValue must be greater than 0 for weight-related goals.");
+                }
+            }
+            // Lấy giá trị activityLevel(hệ số hoạt động)
+            String activityLevel = goalDTO.getActivityLevel().name();
+            //Tính TDEE
+            double tdee = calculationService.calculateTdee(weight, existingUser, activityLevel);
+
+            //Tính calo mục tiêu
+            double targetCalories = goalDTO.getGoalType().calculateTargetCalories(tdee);
+            Goal goal = Goal.builder()
+                    .userId(goalDTO.getUserId())
+                    .fullName(existingUser.getFullName())
+                    .goalType(goalDTO.getGoalType())
+                    .targetValue(goalDTO.getTargetValue())
+                    .currentValue(goalDTO.getCurrentValue())
+                    .weight(weight)
+                    .startDate(goalDTO.getStartDate())
+                    .endDate(goalDTO.getEndDate())
+                    .goalStatus(GoalStatus.PLANNING)
+                    .activityLevel(goalDTO.getActivityLevel())
+                    .targetCalories(targetCalories)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            Goal savedGoal = goalRepository.save(goal);
+            //Sau khi tạo goal hệ thống sẽ gợi ý chế độ ăn bằng cách gọi lại hàm
+            exerciseDietSuggestionsService.generateDietPlan(existingUser, savedGoal);
+            return savedGoal;
+        }catch (Exception e) {
+            // In lỗi ra khi có ngoại lệ
+            System.out.println("❌ Error during goal creation: " + e.getMessage());
+            e.printStackTrace(); // In chi tiết lỗi để giúp debug
+            throw e; // Ném lại exception nếu cần
         }
-        // Lấy thông tin cân nặng và giá trị hiện tại
-        Double weight = goalDTO.getWeight();
-        Double currentValue = goalDTO.getCurrentValue();
-
-        // Chỉ xử lý đồng bộ khi mục tiêu là WEIGHT_LOSS hoặc WEIGHT_GAIN
-        if (goalDTO.getGoalType() == GoalType.WEIGHT_LOSS || goalDTO.getGoalType() == GoalType.WEIGHT_GAIN) {
-            if (weight == null && currentValue == null) {
-                throw new RuntimeException("For weight-related goals, at least one of weight or currentValue must be provided.");
-            }
-
-            // Nếu chỉ có currentValue
-            if (weight == null) {
-                weight = currentValue; // Gán weight bằng currentValue
-            }
-
-            // Nếu chỉ có weight
-            if (currentValue == null) {
-                currentValue = weight; // Gán currentValue bằng weight
-            }
-
-            // Kiểm tra tính hợp lệ
-            if (weight <= 0 || currentValue <= 0) {
-                throw new RuntimeException("Weight and currentValue must be greater than 0 for weight-related goals.");
-            }
-        }
-        // Lấy giá trị activityLevel(hệ số hoạt động)
-        String activityLevel = goalDTO.getActivityLevel().name();
-        //Tính TDEE
-        double tdee = calculationService.calculateTdee(weight, existingUser, activityLevel);
-
-        //Tính calo mục tiêu
-        double targetCalories = goalDTO.getGoalType().calculateTargetCalories(tdee);
-        Goal goal = Goal.builder()
-                .userId(goalDTO.getUserId())
-                .fullName(existingUser.getFullName())
-                .goalType(goalDTO.getGoalType())
-                .targetValue(goalDTO.getTargetValue())
-                .currentValue(goalDTO.getCurrentValue())
-                .weight(weight)
-                .startDate(goalDTO.getStartDate())
-                .endDate(goalDTO.getEndDate())
-                .goalStatus(GoalStatus.PLANNING)
-                .activityLevel(goalDTO.getActivityLevel())
-                .targetCalories(targetCalories)
-                .createdAt(LocalDateTime.now())
-                .build();
-        Goal savedGoal = goalRepository.save(goal);
-        //Sau khi tạo goal hệ thống sẽ gợi ý chế độ ăn bằng cách gọi lại hàm
-        exerciseDietSuggestionsService.generateDietPlan(existingUser, savedGoal);
-        return savedGoal;
     }
 
     //PHương thức kiểm tra tất cả những mục tiêu có endDate = currentDate và chưa hoàn thành mục tiêu sẽ gửi thông báo

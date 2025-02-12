@@ -1,5 +1,8 @@
 package fpt.aptech.fitnessgoalservice.controller;
 
+import fpt.aptech.fitnessgoalservice.dtos.UserDTO;
+import fpt.aptech.fitnessgoalservice.dtos.UserPoinDTO;
+import fpt.aptech.fitnessgoalservice.eureka_Client.UserEurekaClient;
 import fpt.aptech.fitnessgoalservice.helper.ApiResponse;
 import fpt.aptech.fitnessgoalservice.models.*;
 import fpt.aptech.fitnessgoalservice.service.*;
@@ -18,7 +21,8 @@ public class PublicController {
     private final ProgressService progressService;
     private final ExerciseDietSuggestionsService dietPlanService;
     private final UserPointService pointService;
-    //private final CalculationService calculationService;
+    private final CalculationService calculationService;
+    private final UserEurekaClient userEurekaClient;
 
     @GetMapping("all")
     public ResponseEntity<?>GetAllGoal() {
@@ -100,6 +104,21 @@ public class PublicController {
 //        }
 //    }
 
+    @GetMapping("/bmi")
+    public ResponseEntity<Double> calculateBMI(
+            @RequestParam double weight,
+            @RequestParam Long userId) {
+        // Lấy thông tin người dùng từ service
+        UserDTO userDTO = userEurekaClient.getUserById(userId);
+        if (userDTO == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Gọi service để tính BMI
+        double bmi = calculationService.calculateBMI(weight, userDTO);
+        return ResponseEntity.ok(bmi);
+    }
+
     //============================ Diet Plan ===========================
     @GetMapping("dietPlan/all")
     public ResponseEntity<?>GetAllDietPlans() {
@@ -124,15 +143,15 @@ public class PublicController {
     }
 
     //============================ User Point ===========================
-    @GetMapping("userPoint/{userId}")
+
+    @GetMapping("/userPoint/{userId}")
     public ResponseEntity<?> getUserPoints(@PathVariable long userId) {
         try {
-            int points = pointService.getPoints(userId);
+            UserPoinDTO points = pointService.getUserPoint(userId);
             return ResponseEntity.status(200).body(ApiResponse.success(points,"Get user points successfully"));
         }
         catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ")+ e.getMessage());
-
         }
     }
 

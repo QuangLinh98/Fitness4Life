@@ -15,7 +15,6 @@ public class NotifyProducer {
     //Chuyển đổi đối tương thành JSon
     private final ObjectMapper objectMapper;
 
-
     public void sendNotify(NotifyDTO notifyDTO) {
         try {
             //Lấy dữ liệu trên session

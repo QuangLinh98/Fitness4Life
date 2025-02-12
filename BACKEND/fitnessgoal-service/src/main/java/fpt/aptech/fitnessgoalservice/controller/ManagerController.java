@@ -14,6 +14,7 @@ import fpt.aptech.fitnessgoalservice.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -35,6 +36,7 @@ public class ManagerController {
     private final NotifyService notifyService;
     private final HttpServletRequest request;
     private final ObjectMapper objectMapper;
+    private final UserPointService userPointService;
 
     @PostMapping("add")
     public ResponseEntity<?> AddGoal(@RequestBody GoalDTO goalDTO) {
@@ -175,5 +177,23 @@ public class ManagerController {
         }
     }
 
-
+    @PostMapping("/approvePoint/{userId}")
+    public ResponseEntity<?> approvePoint(@PathVariable Long userId,@RequestParam int point) {
+        try {
+            UserPoinDTO result = userPointService.approvePoint(userId, point);
+            return ResponseEntity.ok(ApiResponse.success(result, "Change points successfully"));
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("UserNotFound")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("user not found"));
+            }
+            if (ex.getMessage().contains("NotEnoughPointsToDeduct")) {
+                return ResponseEntity.status(409).body(ApiResponse.conflict("Not Enough Points To Deduct"));
+            }
+            if (ex.getMessage().contains("InvalidPointId")) {
+                return ResponseEntity.status(423).body(ApiResponse.resourceLocked("Invalid PointId"));
+            }
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
+        }
+    }
 }
