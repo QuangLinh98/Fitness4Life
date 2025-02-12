@@ -1,4 +1,8 @@
+import 'package:fitness4life/features/fitness_goal/data/Goal/CreateGoal.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/GoalSuccessScreen.dart';
+import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
+import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +11,7 @@ class SubmitGoalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final goalState = Provider.of<GoalSetupState>(context);
+    final goalService = Provider.of<GoalService>(context);
 
     // Xác định đơn vị đo lường (kg hoặc %)
     bool isKgSelected = goalState.isKgSelected;
@@ -45,7 +50,14 @@ class SubmitGoalScreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
                 ),
                 onPressed: () async {
-                  //await goalState.submitGoal(context);
+                  try {
+                    await _submitGoal(context, goalService, goalState);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Goal submitted successfully!')));
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to submit goal: $e')));
+                  }
                 },
                 child: const Text(
                   "Confirm & Send",
@@ -97,4 +109,54 @@ class SubmitGoalScreen extends StatelessWidget {
       ),
     );
   }
+
+  /// Tạo và gửi GoalDTO
+  Future<void> _submitGoal(BuildContext context, GoalService goalService, GoalSetupState goalState) async {
+    // Lấy thông tin userId
+    final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
+    int? userId = userInfo.userId;
+
+    // Tạo GoalDTO từ GoalSetupState
+    GoalDTO goalDTO = GoalDTO(
+      userId: userId!,
+      goalType: _getGoalTypeFromString(goalState.goalType ?? "MUSCLE_GAIN"), // Mặc định nếu không có
+      targetValue: goalState.targetValue ?? 0.0,
+      currentValue: goalState.currentValue ?? 0.0,
+      weight: goalState.weight ?? 0.0,
+      startDate: _parseDate(goalState.startDate), // Thêm giá trị mặc định nếu không có
+      endDate: _parseDate(goalState.endDate),
+      activityLevel: _getActivityLevelFromString(goalState.activityLevel), // Mặc định là sedentary nếu không có
+      //createdAt: DateTime.now(),
+    );
+
+    // Loại bỏ goalStatus và createdAt trước khi gửi
+    Map<String, dynamic> goalData = Map.from(goalDTO.toJson());
+    goalData.remove('goalStatus');
+    goalData.remove('createdAt');
+
+    // Gọi API để gửi GoalDTO xuống backend
+    await goalService.submitGoal(goalDTO);
+
+    // Nếu gửi thành công, chuyển đến SuccessScreen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => GoalSuccessScreen()),  // Chuyển đến màn hình thành công
+    );
+  }
+
+  GoalType _getGoalTypeFromString(String goalType) {
+    return GoalType.values.firstWhere((e) => e.toString().split('.').last == goalType, orElse: () => GoalType.MUSCLE_GAIN);
+  }
+
+  ActivityLevel _getActivityLevelFromString(String activityLevel) {
+    return ActivityLevel.values.firstWhere((e) => e.toString().split('.').last == activityLevel, orElse: () => ActivityLevel.SEDENTARY);
+  }
+
+  DateTime _parseDate(String? date) {
+    if (date == null || date == "No selection") {
+      return DateTime.now(); // Hoặc có thể trả về giá trị mặc định khác
+    }
+    return DateTime.parse(date);
+  }
+
 }

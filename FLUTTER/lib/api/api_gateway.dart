@@ -109,10 +109,12 @@ class ApiGateWayService {
             'Accept': 'application/json',
           },
           validateStatus: (status) {
+            print("Response status: $status");
             return status != null && status < 500; // Cho phép 4xx phản hồi
           },
         ),
       );
+      print("Response from backend: ${response.data}");
       return response;
     } catch (e) {
       print("Error in postData: $e");
