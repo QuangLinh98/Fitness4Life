@@ -135,12 +135,12 @@ class SubmitGoalScreen extends StatelessWidget {
     goalData.remove('createdAt');
 
     // Gọi API để gửi GoalDTO xuống backend
-    await goalService.submitGoal(goalDTO);
+    await goalService.submitGoal(context,goalDTO);
 
     // Nếu gửi thành công, chuyển đến SuccessScreen
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => GoalSuccessScreen()),  // Chuyển đến màn hình thành công
+      MaterialPageRoute(builder: (context) => GoalSuccessScreen(goalId: goalState.goalId!)),  // Chuyển đến màn hình thành công
     );
   }
 

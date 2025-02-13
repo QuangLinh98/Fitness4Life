@@ -11,7 +11,9 @@ class Goal {
   String? goalStatus;
   String? activityLevel;
   double? targetCalories;
+  List<ExerciseDietSuggestions> dietPlans;
   DateTime? createdAt;
+
 
   Goal({
     this.id,
@@ -26,11 +28,17 @@ class Goal {
     this.goalStatus,
     this.activityLevel,
     this.targetCalories,
+    required this.dietPlans,
     this.createdAt,
   });
 
   // Factory để parse từ JSON
   factory Goal.fromJson(Map<String, dynamic> json) {
+    var dietPlansJson = json['dietPlans'] as List?;  // Kiểm tra dietPlans có phải là null không
+    List<ExerciseDietSuggestions> dietPlans = dietPlansJson == null
+        ? []  // Nếu dietPlans là null, gán danh sách rỗng
+        : dietPlansJson.map((i) => ExerciseDietSuggestions.fromJson(i)).toList();
+
     return Goal(
       id: json['id'],
       userId: json['userId'],
@@ -44,6 +52,7 @@ class Goal {
       goalStatus: json['goalStatus'],
       activityLevel: json['activityLevel'],
       targetCalories: json['targetCalories'],
+      dietPlans: dietPlans,
       createdAt: _parseLocalDateTime(json['createdAt']),
     );
   }
@@ -102,6 +111,20 @@ class Goal {
       localDateTime[4],
       localDateTime[5],
       (localDateTime.length > 6 ? localDateTime[6] ~/ 1000000 : 0),
+    );
+  }
+}
+
+class ExerciseDietSuggestions {
+  final String dietPlan;
+  final String workoutPlan;
+
+  ExerciseDietSuggestions({required this.dietPlan, required this.workoutPlan});
+
+  factory ExerciseDietSuggestions.fromJson(Map<String, dynamic> json) {
+    return ExerciseDietSuggestions(
+      dietPlan: json['dietPlan'],
+      workoutPlan: json['workoutPlan'],
     );
   }
 }

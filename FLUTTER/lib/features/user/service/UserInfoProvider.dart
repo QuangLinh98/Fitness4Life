@@ -4,7 +4,6 @@ class UserInfoProvider extends ChangeNotifier {
   String? _userName;
   int? _userId;
 
-
   String? get userName => _userName;
   int? get userId => _userId;
 
@@ -21,6 +20,7 @@ class UserInfoProvider extends ChangeNotifier {
   void setUserInfo(String name, int id) {
     _userName = name;
     _userId = id;
+
     notifyListeners();
   }
 

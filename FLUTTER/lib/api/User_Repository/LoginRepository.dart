@@ -83,10 +83,20 @@ class LoginRepository {
         //Xóa token khởi Secure Store
         await TokenManager.clearTokens();
 
+        // 🛑 Xóa thông tin người dùng trong UserInfoProvider
+        final userInfoProvider = Provider.of<UserInfoProvider>(navigatorKey.currentContext!, listen: false);
+        userInfoProvider.logout(); // Xóa userName và userId khỏi UserInfoProvider
+
+
         // 🛑 Xóa userId khỏi SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('user_id');
         print("✅ Removed userId from SharedPreferences");
+
+        // Kiểm tra lại thông tin trong UserInfoProvider
+        print("UserInfoProvider after logout:");
+        print("User ID: ${userInfoProvider.userId}");
+        print("User Name: ${userInfoProvider.userName}");
 
         print("User successfully logged out");
 

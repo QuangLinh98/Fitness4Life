@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/CreateGoal.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
@@ -35,31 +37,54 @@ class GoalRepository {
     }
   }
 
-  Future<void> submitGoal(GoalDTO goalDTO) async {
-    try{
-      if(goalDTO.userId == null) {
-        throw Exception("userId is required to submit goal");
-      }
-      print("Data being sent to backend: ${goalDTO.toJson()}");
-
-      final request = await _apiGateWayService.postData(
-          '/goal/add',
-          data: goalDTO.toJson()
-      );
-
-      print('Send request to backend : ${request.data}');
-      if (request.statusCode == 201) {
-        // Xử lý thành công, trả về thông báo hoặc dữ liệu
-        print("Goal created successfully");
+  // Sửa phương thức submitGoal trong repository để trả về Goal
+  Future<Goal> submitGoal(GoalDTO goalDTO) async {
+    try {
+      final response = await _apiGateWayService.postData('/goal/add',
+          data: goalDTO.toJson());
+      if (response.statusCode == 201) {
+        return Goal.fromJson(response.data['data']); // Trả về Goal với id
       } else {
-        // Xử lý lỗi nếu cần thiết
-        print("Error creating goal: ${request.statusCode}");
-        throw Exception("Failed to create goal: ${request.statusCode}");
+        throw Exception('Failed to create goal');
       }
-    }catch (e, stackTrace) {
+    } catch (e) {
       print("Error submitting goal: $e");
-      print("StackTrace: $stackTrace");
-      throw Exception("Error submitting goal: $e");
+      rethrow;
+    }
+  }
+
+  //Get Goal By Id
+  Future<Goal> getGoalById(int goalId) async {
+    try {
+      final response = await _apiGateWayService.getData('/goal/$goalId');
+      print('Goal response : ${response.data}');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        print("Goal response :  $data");
+        return Goal.fromJson(data);
+      } else {
+        throw Exception("Failed to load goal");
+      }
+    } catch (e) {
+      print("Error fetching goal from backend: $e");
+      rethrow;
+    }
+  }
+
+  //Get User of BMI
+  Future<double> fetchBMI(double weight, int userId) async {
+    try {
+      final response = await _apiGateWayService.getData(
+          '/goal/bmi?weight=$weight&userId=$userId');
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return data['data'];// Trả về giá trị BMI
+      } else {
+        throw Exception('Error calculating BMI');
+      }
+    } catch (e) {
+      throw Exception('Error fetching BMI from backend: $e');
     }
   }
 }

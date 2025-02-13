@@ -5,6 +5,7 @@ import 'package:fitness4life/features/Home/data/Trainer.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/GoalSuccessScreen.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/smart_deal/presentation/screens/post/Carouse.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
@@ -411,10 +412,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 32,
                 child: ElevatedButton(
                   onPressed: () {
-                    final userId = Provider.of<UserInfoProvider>(context, listen: false).userId;
-                    print('UserId : ${userId}');
+                    final goalId = goal.id;
 
-                    //Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen(userId: userId )));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => GoalSuccessScreen(goalId: goalId!)));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF9747FF),
