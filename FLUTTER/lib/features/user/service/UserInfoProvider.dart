@@ -4,6 +4,7 @@ class UserInfoProvider extends ChangeNotifier {
   String? _userName;
   int? _userId;
 
+
   String? get userName => _userName;
   int? get userId => _userId;
 
