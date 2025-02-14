@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../smart_deal/presentation/screens/RewardProgramPage.dart';
 import '../../../smart_deal/presentation/screens/post/YourPost.dart';
 import '../../../smart_deal/presentation/screens/promotion/PromotionScreen.dart';
 
@@ -171,7 +172,12 @@ class _AccountScreenState extends State<AccountScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                buildOptionItem("User Guide", Icons.help_outline, () {}),
+                buildOptionItem("User Guide", Icons.help_outline, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RewardProgramPage())
+                  );
+                }),
                 buildOptionItem("Your Discount", Icons.code, () {
                   Navigator.push(
                       context,

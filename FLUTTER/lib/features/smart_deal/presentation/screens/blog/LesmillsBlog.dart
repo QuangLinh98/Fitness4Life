@@ -5,6 +5,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitness4life/features/smart_deal/service/BlogService.dart';
 
 import '../../../../../config/constants.dart';
+import 'BlogDetail.dart';
+import 'GetAllBlog.dart';
 
 class LesmillsBlog extends StatefulWidget {
   const LesmillsBlog({super.key});
@@ -26,7 +28,7 @@ class _LesmillsBlogState extends State<LesmillsBlog> {
       blogService.fetchAllBlog();
     });
 
-    _pageController = PageController(viewportFraction: 0.95);
+    _pageController = PageController(viewportFraction: 1);
 
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_pageController.hasClients) {
@@ -67,9 +69,10 @@ class _LesmillsBlogState extends State<LesmillsBlog> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
-              onPressed: () {
-                // Chuyển hướng đến trang xem tất cả bài viết
-              },
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GetAllBlog()),
+              ),
               child: const Text("View All"),
             ),
           ],
@@ -98,7 +101,7 @@ class _LesmillsBlogState extends State<LesmillsBlog> {
                   shrinkWrap: true, // Tránh overflow
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, // 2 cột
-                    childAspectRatio: 0.8, // Điều chỉnh tỉ lệ rộng/cao
+                    childAspectRatio: 0.9, // Điều chỉnh tỉ lệ rộng/cao
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
@@ -116,7 +119,12 @@ class _LesmillsBlogState extends State<LesmillsBlog> {
 
                     return GestureDetector(
                       onTap: () {
-                        // Xử lý khi nhấn vào một bài blog
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Blogdetail(blogId: blog.id!),
+                          ),
+                        );
                       },
                       child: Card(
                         elevation: 5,

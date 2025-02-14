@@ -43,6 +43,7 @@ dependencies:
   cached_network_image: ^3.3.0
   image_picker: ^0.8.4+4 #  thêm mới
   url_launcher: ^6.1.10 # smartdeal ko dùng thư viện này!
+  carousel_slider: ^5.0.0
 #  uni_links: ^0.5.1   #để lắng nghe khi PayPal redirect về fitness4life://paypal_success
 
 

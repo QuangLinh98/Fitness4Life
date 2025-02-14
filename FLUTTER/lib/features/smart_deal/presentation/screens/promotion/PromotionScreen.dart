@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../user/service/UserInfoProvider.dart';
 import '../../../data/models/promotion/Point.dart';
 import '../../../service/PromotionService.dart';
+import '../RewardProgramPage.dart';
 
 class PromotionScreen extends StatefulWidget {
   @override
@@ -33,56 +34,56 @@ class _PromotionScreenState extends State<PromotionScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100), // Điều chỉnh chiều cao phù hợp
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFB00020),
-                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
-                ),
-                child: SafeArea(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            "Exclusive Deals List",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFB00020),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+              ),
+              child: SafeArea(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          "Exclusive Deals & Rewards",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      SizedBox(width: 48),
-                    ],
-                  ),
+                    ),
+                    SizedBox(width: 48),
+                  ],
                 ),
               ),
-              TabBar(
-                indicatorColor: const Color(0xFFB00020),
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey,
-                controller: _tabController,
-                tabs: [
-                  Tab(text: "Tất cả"),
-                  Tab(text: "Khả dụng"),
-                  Tab(text: "Không khả dụng"),
-                ],
-              ),
-            ],
-          ),
+            ),
+            TabBar(
+              indicatorColor: const Color(0xFFB00020),
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.grey,
+              controller: _tabController,
+              tabs: [
+                Tab(text: "Introduction"),
+                Tab(text: "Your Coupons"),
+                Tab(text: "Redeem Points"),
+              ],
+            ),
+          ],
         ),
+      ),
       body: Column(
         children: [
           Padding(
@@ -94,7 +95,7 @@ class _PromotionScreenState extends State<PromotionScreen>
                     return promotionService.isLoading
                         ? const CircularProgressIndicator()
                         : Text(
-                      "Điểm của bạn: ${userInfo.userPoint}",
+                      "Your Points: ${userInfo.userPoint}",
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     );
                   },
@@ -106,9 +107,9 @@ class _PromotionScreenState extends State<PromotionScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildTabContent("Tất cả"),
-                _buildAvailablePromotions(), // Hiển thị danh sách khuyến mãi
-                _buildTabContent("Không khả dụng"),
+                _buildIntroductionTab("Introduction"),
+                _buildYourCouponsTab(),
+                _buildRedeemPointsTab("Redeem Points"),
               ],
             ),
           ),
@@ -117,7 +118,20 @@ class _PromotionScreenState extends State<PromotionScreen>
     );
   }
 
-  Widget _buildAvailablePromotions() {
+  Widget _buildIntroductionTab(String tabName) {
+    if (tabName == "Introduction") {
+      return RewardProgramPage();
+    } else {
+      return Center(
+        child: Text(
+          "Danh mục $tabName chưa được cập nhật!",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+  }
+
+  Widget _buildYourCouponsTab() {
     final promotionService = Provider.of<PromotionService>(context);
 
     if (promotionService.isLoading) {
@@ -129,7 +143,7 @@ class _PromotionScreenState extends State<PromotionScreen>
     if (availablePromotions.isEmpty) {
       return Center(
         child: Text(
-          "Không có ưu đãi nào vào lúc này",
+          "You have no available coupons at the moment.",
           style: TextStyle(color: Colors.red, fontSize: 16),
         ),
       );
@@ -149,21 +163,21 @@ class _PromotionScreenState extends State<PromotionScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Mã: ${promo.promotionCode}",
+                  "Code: ${promo.promotionCode}",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  "Số lượng: ${promo.promotionAmount}",
+                  "Discount Amount: ${promo.promotionAmount}",
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  "Bắt đầu: ${promo.startDate}",
+                  "Valid From: ${promo.startDate}",
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 Text(
-                  "Kết thúc: ${promo.endDate}",
+                  "Expires On: ${promo.endDate}",
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
@@ -174,12 +188,45 @@ class _PromotionScreenState extends State<PromotionScreen>
     );
   }
 
-  Widget _buildTabContent(String title) {
-    return Center(
-      child: Text(
-        "Dữ liệu tab $title",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
+  Widget _buildRedeemPointsTab(tabName) {
+    if (tabName == "Redeem Points") {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Redeem Your Points",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Convert your points into discount coupons and save on your next purchase.",
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: Implement redeem logic
+              },
+              child: Text("Redeem Now"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFB00020),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: Text(
+          "Danh mục $tabName chưa được cập nhật!",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+
   }
 }

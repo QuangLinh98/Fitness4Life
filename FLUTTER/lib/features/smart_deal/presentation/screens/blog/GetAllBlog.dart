@@ -3,6 +3,7 @@ import 'package:fitness4life/features/smart_deal/service/BlogService.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../../config/constants.dart';
+import 'BlogDetail.dart';
 
 class GetAllBlog extends StatelessWidget {
   @override
@@ -60,7 +61,16 @@ class GetAllBlog extends StatelessWidget {
             final displayImages =
             imageUrls.length > 4 ? imageUrls.sublist(0, 4) : imageUrls;
 
-            return Card(
+            return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Blogdetail(blogId: blog.id!),
+                    ),
+                  );
+                },
+                child: Card(
               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -128,6 +138,7 @@ class GetAllBlog extends StatelessWidget {
                   ],
                 ),
               ),
+            )
             );
           },
         ),
