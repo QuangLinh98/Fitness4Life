@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:fitness4life/api/api_gateway.dart';
-import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/booking/data/BookingRoom.dart';
 
 class BookingRoomRepository {
@@ -22,8 +19,9 @@ class BookingRoomRepository {
 
         // Gửi request POST
         final response = await _apiGateWayService.postData(url, data: payload);
+        print('Response book : ${response.data}');
 
-        // Kiểm tra statusCode
+      // Kiểm tra statusCode
         if (response.statusCode == 201) {
           return true;
         } else {
@@ -35,6 +33,7 @@ class BookingRoomRepository {
         throw Exception("Error booking room: $e");
       }
     }
+
 
     Future<List<BookingRoom>> getBookedRooms(int userId) async {
       try{

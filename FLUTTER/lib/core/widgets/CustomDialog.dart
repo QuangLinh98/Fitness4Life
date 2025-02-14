@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class CustomDialog {
@@ -13,7 +15,7 @@ class CustomDialog {
       builder: (context) {
         return AlertDialog(
           title: Text(title),
-          content: Text(content),
+          content: Text(content.isNotEmpty ? content : "An unexpected error occurred."),
           actions: [
             TextButton(
               onPressed: () {
@@ -29,4 +31,5 @@ class CustomDialog {
       },
     );
   }
+
 }

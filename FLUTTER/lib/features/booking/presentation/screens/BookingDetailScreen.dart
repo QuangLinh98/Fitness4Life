@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fitness4life/config/constants.dart';
 import 'package:fitness4life/features/booking/service/QrService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -45,29 +47,28 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("This is booking detail"),
+        title: const Center(
+          child: Text('QR Code'),
+        ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // Hiển thị trạng thái chờ
-          : qrData != null
+          ? const Center(child: CircularProgressIndicator())
+          : (qrData != null && qrData!.qrCodeUrl != null && qrData!.qrCodeUrl!.isNotEmpty)
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Booking ID: ${widget.bookingId}"),
-            const SizedBox(height: 16),
-            Image.network(
-              qrData!.qrCodeUrl, // Hiển thị mã QR từ URL
-              width: 200,
-              height: 200,
-              errorBuilder: (context, error, stackTrace) => const Text("Failed to load QR code"),
+            CachedNetworkImage(
+              imageUrl: getFullImageUrl(qrData!.qrCodeUrl),
+              width: 300,
+              height: 300,
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.broken_image, size: 50, color: Colors.grey),
             ),
           ],
         ),
       )
-          : const Center(
-        child: Text("No QR Code found for this booking"),
-      ),
+          : const Center(child: Text("No QR Code found for this booking")),
     );
   }
 }

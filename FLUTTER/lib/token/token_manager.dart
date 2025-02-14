@@ -12,12 +12,12 @@ class TokenManager {
     try {
       await _storage.write(key: _accessTokenKey, value: accessToken);
       await _storage.write(key: _refreshTokenKey, value: refreshToken);
-      // print("Tokens saved securely.");
+      print("Tokens saved securely.");
 
       // Xác minh lưu trữ
       final savedAccessToken = await _storage.read(key: _accessTokenKey);
       final savedRefreshToken = await _storage.read(key: _refreshTokenKey);
-      // print("Verification - AccessToken: $savedAccessToken, RefreshToken: $savedRefreshToken");
+      print("Verification - AccessToken: $savedAccessToken, RefreshToken: $savedRefreshToken");
     } catch (e) {
       print("Failed to save tokens: $e");
     }
@@ -61,13 +61,13 @@ class TokenManager {
   static Future<void> clearTokens() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
-    // print("Tokens cleared securely.");
+    print("Tokens cleared securely.");
   }
 
   //Trích xuất thông tin trong token
   void decodeToken(String token) {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    // print("Decoded Token: $decodedToken");
+    print("Decoded Token: $decodedToken");
   }
 
   // Kiểm tra token có hợp lệ hay không (chưa hết hạn)

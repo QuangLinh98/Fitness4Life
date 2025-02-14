@@ -1,5 +1,6 @@
 import 'package:fitness4life/api/api_gateway.dart';
-import 'package:fitness4life/features/fitness_goal/data/Goal.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/CreateGoal.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
 
 class GoalRepository {
   final ApiGateWayService _apiGateWayService;
@@ -31,6 +32,34 @@ class GoalRepository {
       print("Error fetching goals: $e");
       print("StackTrace: $stackTrace");
       throw Exception("Error fetching goals: $e");
+    }
+  }
+
+  Future<void> submitGoal(GoalDTO goalDTO) async {
+    try{
+      if(goalDTO.userId == null) {
+        throw Exception("userId is required to submit goal");
+      }
+      print("Data being sent to backend: ${goalDTO.toJson()}");
+
+      final request = await _apiGateWayService.postData(
+          '/goal/add',
+          data: goalDTO.toJson()
+      );
+
+      print('Send request to backend : ${request.data}');
+      if (request.statusCode == 201) {
+        // Xử lý thành công, trả về thông báo hoặc dữ liệu
+        print("Goal created successfully");
+      } else {
+        // Xử lý lỗi nếu cần thiết
+        print("Error creating goal: ${request.statusCode}");
+        throw Exception("Failed to create goal: ${request.statusCode}");
+      }
+    }catch (e, stackTrace) {
+      print("Error submitting goal: $e");
+      print("StackTrace: $stackTrace");
+      throw Exception("Error submitting goal: $e");
     }
   }
 }

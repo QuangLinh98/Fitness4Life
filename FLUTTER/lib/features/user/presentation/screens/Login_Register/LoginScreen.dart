@@ -164,13 +164,13 @@ class LoginScreen extends StatelessWidget {
                       emailController.text,
                       passwordController.text
                   );
-                  // print("Email: ${emailController.text}");
-                  // print("Password: ${passwordController.text}");
+                  print("Email: ${emailController.text}");
+                  print("Password: ${passwordController.text}");
 
 
                   //Xử lý khi login thành công
                   if(loginService.loggedInUser != null) {
-                    // print("User Fullname: ${loginService.loggedInUser!.fullname}");
+                    print("User Fullname: ${loginService.loggedInUser!.fullname}");
 
                     // Cập nhật fullname vào UserInfoProvider
                     Provider.of<UserInfoProvider>(context, listen: false)

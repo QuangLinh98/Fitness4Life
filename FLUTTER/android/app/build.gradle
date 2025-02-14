@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+    namespace = "com.example.uni_links"
     namespace = "com.example.fitness4life"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "25.1.8937393"

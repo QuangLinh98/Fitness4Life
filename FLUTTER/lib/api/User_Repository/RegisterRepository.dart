@@ -1,5 +1,4 @@
 import 'package:fitness4life/api/api_gateway.dart';
-import 'package:fitness4life/features/user/data/models/CreateUserDTO.dart';
 
 class RegisterRepository {
   final ApiGateWayService _apiGateWayService;

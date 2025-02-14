@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:fitness4life/features/booking/data/QR.dart';
