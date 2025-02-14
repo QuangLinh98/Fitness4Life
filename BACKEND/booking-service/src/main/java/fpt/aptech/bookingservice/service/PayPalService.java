@@ -67,11 +67,6 @@ public class PayPalService {
             WorkoutPackage packageExisting = workoutPackageRepository.findById(subscriptionDTO.getPackageId())
                     .orElseThrow(() -> new RuntimeException("Workout package not found"));
 
-//            double finalAmount = packageExisting.getPrice();
-//            if (subscriptionDTO.getTotalAmount() > 0) {
-//                finalAmount = subscriptionDTO.getTotalAmount();
-//            }
-
             Double totalAmount = subscriptionDTO.getTotalAmount(); // ✅ Lấy từ transactions.amount.total
             double finalAmount = (totalAmount != null && totalAmount > 0) ? totalAmount : packageExisting.getPrice();
 

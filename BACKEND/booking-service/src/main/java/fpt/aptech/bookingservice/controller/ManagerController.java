@@ -86,7 +86,7 @@ public class ManagerController {
             //BookingRoomQRCodeDTO responseDTO = new BookingRoomQRCodeDTO(newBooking.getId(), newBooking.getCheckInQRCode());
             return ResponseEntity.status(201).body(ApiResponse.success(newBooking, "Booking room successfully"));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server: " + e.getMessage()));
+            return ResponseEntity.status(400).body(ApiResponse.badRequest(e.getMessage()));
         }
     }
 
