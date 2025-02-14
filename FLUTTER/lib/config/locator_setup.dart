@@ -15,6 +15,8 @@ import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:get_it/get_it.dart';
 
+import '../api/SmartDeal_Repository/BlogRepository.dart';
+import '../api/SmartDeal_Repository/PromotionRepository.dart';
 import '../api/SmartDeal_Repository/QuestionRepository.dart';
 
 final GetIt locator = GetIt.instance;
@@ -23,7 +25,7 @@ void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
 
-    baseUrl: "http://192.168.1.3:9000/api", // API Gateway URL
+    baseUrl: "http://172.29.160.1:9000/api", // API Gateway URL
     connectTimeout: const Duration(milliseconds: 10000), // Thời gian timeout kết nối
     receiveTimeout: const Duration(milliseconds: 10000), // Thời gian timeout nhận dữ liệu
   )));
@@ -66,5 +68,13 @@ void setUpLocator() {
 
   // Đăng ký QuestionRepository
   locator.registerLazySingleton(() => QuestionRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký CommentRepository
   locator.registerLazySingleton(() => CommentRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký PromotionRepository
+  locator.registerLazySingleton(() => PromotionRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký BlogRepository
+  locator.registerLazySingleton(() => BlogRepository(locator<ApiGateWayService>()));
 }

@@ -1,9 +1,10 @@
-import 'package:fitness4life/features/smart_deal/data/models/forum/Comment.dart';
-import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
-import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
+import 'package:fitness4life/features/smart_deal/data/models/forum/Comment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../user/service/UserInfoProvider.dart';
 
 class CreateCommentForm extends StatefulWidget {
   final int questionId;
@@ -33,8 +34,10 @@ class _CreateCommentFormState extends State<CreateCommentForm> {
     String? userName = userInfo.userName;
     int? userId = userInfo.userId;
 
+    // print("Có user với id không ta: ${userName} ${userId}");
+
     if (userId == null || userName == null) {
-      print("Lỗi: userId hoặc userName bị null");
+      // print("Lỗi: userId hoặc userName bị null");
       setState(() {
         _isSubmitting = false;
       });
@@ -48,7 +51,7 @@ class _CreateCommentFormState extends State<CreateCommentForm> {
       content: _contentController.text.trim(),
     );
 
-    print("Có data trong comment không ta: ${comment}");
+    // print("Có data trong comment không ta: ${comment}");
 
     bool success = await commentService.CreateComment(comment);
 
@@ -61,16 +64,14 @@ class _CreateCommentFormState extends State<CreateCommentForm> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: [
         TextField(
           controller: _contentController,
           decoration: InputDecoration(
-            hintText: "Enter comment...",
+            hintText: "Write a comment...",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             suffixIcon: IconButton(
               icon: Icon(Icons.send, color: Colors.teal),

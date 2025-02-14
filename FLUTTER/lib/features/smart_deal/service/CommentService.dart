@@ -31,7 +31,7 @@ class CommentService extends ChangeNotifier {
     try {
       bool success = await _commentRepository.createComment(comment);
       if (success) {
-        await Future.delayed(Duration(milliseconds: 1000)); // Đợi 2 giây trước khi làm mới
+        await Future.delayed(Duration(milliseconds: 600)); // Đợi 2 giây trước khi làm mới
         await fetchCommentFlowQuestion(comment.questionId!); // Làm mới danh sách bình luận
       }
       return success;

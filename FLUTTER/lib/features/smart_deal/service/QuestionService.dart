@@ -1,4 +1,5 @@
 import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
+import 'package:fitness4life/features/smart_deal/data/models/forum/CreateQuestionDTO.dart';
 import 'package:fitness4life/features/smart_deal/data/models/forum/Question.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -59,5 +60,15 @@ class QuestionService extends ChangeNotifier {
       notifyListeners();
     }
   }
+  // Future<bool> handleVote(int questionId, int userId, String voteType) async {
+  //   try {
+  //     await _questionRepository.voteQuestion(questionId, userId, voteType);
+  //     return true;
+  //   } catch (e) {
+  //     debugPrint("Lỗi khi vote: $e");
+  //     return false;
+  //   }
+  // }
+
 
 }

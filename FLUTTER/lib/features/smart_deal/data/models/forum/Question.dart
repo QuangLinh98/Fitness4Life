@@ -35,14 +35,6 @@ class Question {
   });
 
   factory Question.fromJson(Map<String, dynamic> json) {
-    // print("ID question: ${json['id']}"); // In ra trường id
-    // print("Author question: ${json['author']}"); // In ra trường author
-    // print("AuthorId question: ${json['authorId']}"); // In ra trường authorId
-    // print("ViewCount question: ${json['viewCount']}"); // In ra trường viewCount
-    // In ra toàn bộ các trường trong json
-    json.forEach((key, value) {
-      print('$key: $value');
-    });
     return Question(
       id: json['id'],
       author: json['author'],
@@ -63,4 +55,5 @@ class Question {
     );
   }
 }
+
 

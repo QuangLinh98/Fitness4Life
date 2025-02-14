@@ -1,5 +1,5 @@
-import 'package:fitness4life/features/smart_deal/data/models/forum/Comment.dart';
 import 'package:fitness4life/features/smart_deal/data/models/forum/GetComment.dart';
+import '../../features/smart_deal/data/models/forum/Comment.dart';
 import '../api_gateway.dart';
 
 class CommentRepository{

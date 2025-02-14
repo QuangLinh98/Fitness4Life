@@ -29,6 +29,10 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../api/Dashboard_Repository/TrainerRepository.dart';
+import '../api/SmartDeal_Repository/BlogRepository.dart';
+import '../api/SmartDeal_Repository/PromotionRepository.dart';
+import '../features/smart_deal/service/BlogService.dart';
+import '../features/smart_deal/service/PromotionService.dart';
 import 'locator_setup.dart';
 
 //Quản lý các phụ thuộc của ứng dụng
@@ -47,7 +51,8 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => PaypalService(locator<PaypalRepository>())),
   ChangeNotifierProvider(create: (_) => QuestionService(locator<QuestionRepository>())),
   ChangeNotifierProvider(create: (_) => CommentService(locator<CommentRepository>())),
-
+  ChangeNotifierProvider(create: (_) => PromotionService(locator<PromotionRepository>())),
+  ChangeNotifierProvider(create: (_) => BlogService(locator<BlogRepository>())),
   // Thêm GoalSetupState sử dụng để lưu trữ giá trị tamk thời khi thiết lập goal
   ChangeNotifierProvider(create: (_) => GoalSetupState()),
 ];

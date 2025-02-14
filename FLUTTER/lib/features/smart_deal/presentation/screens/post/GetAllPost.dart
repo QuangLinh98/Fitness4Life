@@ -1,8 +1,9 @@
-import 'package:fitness4life/config/constants.dart';
-import 'package:fitness4life/features/smart_deal/service/QuestionService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fitness4life/features/smart_deal/service/QuestionService.dart';
+import '../../../../../config/constants.dart';
+import '../../../../user/service/UserInfoProvider.dart';
 import '../CreateQuestionScreen.dart';
 import 'Posts.dart';
 
@@ -11,31 +12,64 @@ class GetAllPost extends StatelessWidget {
   Widget build(BuildContext context) {
     final questionService = Provider.of<QuestionService>(context);
 
-    // Sắp xếp bài viết theo thời gian từ mới đến cũ
     final sortedQuestions = List.from(questionService.questions)
+        .where((q) => q.status == "APPROVED")
+        .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Post List"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Quay lại trang trước
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add), // Biểu tượng dấu cộng
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CreateQuestionScreen()),
-              ); // Điều hướng sang trang tạo bài viết
-            },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60), // Chiều cao AppBar
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFB00020),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(15), // Bo góc phía dưới
+            ),
           ),
-        ],
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Nút Back
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
 
+                  // Tiêu đề căn giữa
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "Community Posts",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Nút dấu cộng
+                  IconButton(
+                    icon: Icon(Icons.add, color: Colors.white), // Biểu tượng dấu cộng
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CreateQuestionScreen()),
+                      ); // Điều hướng sang trang tạo bài viết
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
       body: Container(
         color: Colors.grey[100],

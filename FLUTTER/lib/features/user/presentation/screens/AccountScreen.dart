@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../smart_deal/presentation/screens/post/YourPost.dart';
+import '../../../smart_deal/presentation/screens/promotion/PromotionScreen.dart';
+
 class AccountScreen extends StatefulWidget {
   final int userId;
   const AccountScreen({super.key,  this.userId = 102});
@@ -169,8 +172,18 @@ class _AccountScreenState extends State<AccountScreen> {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 buildOptionItem("User Guide", Icons.help_outline, () {}),
-                buildOptionItem("Your Discount ", Icons.code, () {}),
-                buildOptionItem("Your Post", Icons.post_add_sharp, () {}),
+                buildOptionItem("Your Discount", Icons.code, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PromotionScreen())
+                  );
+                }),
+                buildOptionItem("Your Post", Icons.post_add_sharp, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => YourPost())
+                  );
+                }),
                 buildOptionItem("Contact", Icons.phone, () {}),
                 buildOptionItem("Contract", Icons.description_outlined, () {}),
                 buildOptionItem("Customer Care History", Icons.history, () {}),

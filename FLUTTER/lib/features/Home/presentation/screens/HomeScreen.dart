@@ -13,6 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
+import '../../../smart_deal/presentation/screens/blog/CarouseBlog.dart';
+import '../../../smart_deal/presentation/screens/blog/LesmillsBlog.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,10 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
       final goalService = Provider.of<GoalService>(context, listen: false);
       goalService.fetchGoals();
 
-      final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
-      String? userName = userInfo.userName;
-      int? userId = userInfo.userId;
-      print("data của userInfo name = ${userName} id = ${userId}");
+      // final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
+      // String? userName = userInfo.userName;
+      // int? userId = userInfo.userId;
+      // print("data của userInfo name = ${userName} id = ${userId}");
     });
   }
 
@@ -149,9 +152,11 @@ class _HomeScreenState extends State<HomeScreen> {
                    ),
 
                    const SizedBox(height: 15),
-
-                   //Hiển thị Blog
                    const Carouse(),
+                   const SizedBox(height: 15),
+                   const CarouseBlog(),
+                   const SizedBox(height: 15),
+                   const LesmillsBlog(),
                  ],
                ),
              ),
