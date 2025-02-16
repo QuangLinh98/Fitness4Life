@@ -24,7 +24,6 @@ final GetIt locator = GetIt.instance;
 void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
-
     baseUrl: "http://172.29.160.1:9000/api", // API Gateway URL
     connectTimeout: const Duration(milliseconds: 10000), // Thời gian timeout kết nối
     receiveTimeout: const Duration(milliseconds: 10000), // Thời gian timeout nhận dữ liệu

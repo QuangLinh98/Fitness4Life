@@ -28,6 +28,11 @@ class UserInfoProvider extends ChangeNotifier {
     _userPoint = point;
     notifyListeners();
   }
+  // thêm
+  void resetPoint(){
+    _userPoint = 0;
+    notifyListeners();
+  }
 
   void logout() {
     _userName = null;

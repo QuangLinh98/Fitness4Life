@@ -42,7 +42,7 @@ void _executePayPalPayment(BuildContext context, String paymentId, String payerI
 
   bool success = await _paypalService.executePayment(paymentId, payerId , paypalToken);
 
-  if (success) {
+  if (success ) {
     navigatorKey.currentState?.pushReplacementNamed('/paypal_success');
   } else {
     ScaffoldMessenger.of(context).showSnackBar(

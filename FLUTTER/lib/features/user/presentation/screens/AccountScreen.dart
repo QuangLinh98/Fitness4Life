@@ -233,6 +233,9 @@ class _AccountScreenState extends State<AccountScreen> {
       final loginService = Provider.of<LoginService>(context, listen: false);
       await loginService.logout();
 
+      //thêm
+      Provider.of<UserInfoProvider>(context, listen: false).resetPoint();
+
       // Điều hướng về màn hình đăng nhập
       Navigator.pushReplacement(
           context,

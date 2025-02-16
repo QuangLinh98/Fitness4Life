@@ -28,7 +28,6 @@ class _ClassScreenState extends State<ClassScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       userId = prefs.getInt('user_id');
-      print('UserId : ${userId}');
     });
   }
 
