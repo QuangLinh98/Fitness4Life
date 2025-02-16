@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 @RestController
-@RequestMapping("/api/forums")
+@RequestMapping("/api/deal/forums")
 @RequiredArgsConstructor
 public class ForumController {
     private final QuestionService questionService;
@@ -68,6 +68,22 @@ public class ForumController {
     public ResponseEntity<?> getQuestionById(@PathVariable Long id) {
         try {
             Optional<Question> question = questionService.findById(id);
+            if (question.isPresent()) {
+                return ResponseEntity.ok(ApiResponse.success(question, "Get question successfully"));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.notfound("Question not found"));
+            }
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.errorServer("Unexpected error: " + ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/questions/getOne/{id}")
+    public ResponseEntity<?> getOneQuestionById(@PathVariable Long id) {
+        try {
+            Optional<QuestionResponseDTO> question = questionService.getOneQuestionById(id);
             if (question.isPresent()) {
                 return ResponseEntity.ok(ApiResponse.success(question, "Get question successfully"));
             } else {

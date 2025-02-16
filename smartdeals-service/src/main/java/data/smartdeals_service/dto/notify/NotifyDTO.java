@@ -1,4 +1,4 @@
-package fpt.aptech.fitnessgoalservice.dtos;
+package data.smartdeals_service.dto.notify;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

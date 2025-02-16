@@ -14,4 +14,36 @@
   "packageName" : [ "CLASSIC" ],
   "code" : "76A26627",
   "points" : 500
+}, {
+  "id" : "85A33E24",
+  "title" : "tết đến xuân san",
+  "description" : "xxxxx",
+  "discountType" : [ "PERCENTAGE", "FIXED", "COMBO", "SERVICE" ],
+  "discountValue" : 1000,
+  "startDate" : null,
+  "endDate" : null,
+  "isActive" : true,
+  "applicableService" : [ "ALL" ],
+  "minValue" : 5000,
+  "customerType" : [ "NEW" ],
+  "createdBy" : "admin",
+  "packageName" : [ "CLASSIC", "CLASSIC_PLUS", "PRESIDENT" ],
+  "code" : "B24E882F",
+  "points" : 5000
+}, {
+  "id" : "961AC57B",
+  "title" : "quà tặng sau tết",
+  "description" : "giảm mạnh ABC và các khóa học",
+  "discountType" : [ "PERCENTAGE" ],
+  "discountValue" : 10.0,
+  "startDate" : null,
+  "endDate" : null,
+  "isActive" : true,
+  "applicableService" : [ "GYM", "MASSAGE" ],
+  "minValue" : 50.0,
+  "customerType" : [ "NEW", "RETURNING" ],
+  "createdBy" : "Admin",
+  "packageName" : [ "CLASSIC" ],
+  "code" : "EDFC743E",
+  "points" : 1000
 } ]

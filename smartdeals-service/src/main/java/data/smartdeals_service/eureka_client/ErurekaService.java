@@ -18,5 +18,8 @@ public interface ErurekaService {
 
     @GetMapping("/api/users/manager/all")
     List<UserDTO> getAllUser();
+
+    @GetMapping("/api/users/manager/userByEmail/{email}")
+    UserDTO getUserByEmail(@PathVariable String email);
 }
 

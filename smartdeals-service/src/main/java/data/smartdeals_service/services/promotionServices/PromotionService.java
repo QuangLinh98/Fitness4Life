@@ -221,11 +221,15 @@ public class PromotionService {
         userPromotion.setEndDate(endDate);
         userPromotionRepository.save(userPromotion);
     }
-    public void sendCodeToUser(String code, Long userId) {
-        UserDTO user = erurekaService.getUserById(userId);
+    public void sendCodeToUser(String code, String email) {
+//        UserDTO user = erurekaService.getUserById(userId);
+        UserDTO user = erurekaService.getUserByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
         try {
             sendPromotionEmail(user.getEmail(), code);
-            saveUserPromotion(userId, code);
+            saveUserPromotion(user.getId(), code);
 
         } catch (Exception e) {
             e.printStackTrace();

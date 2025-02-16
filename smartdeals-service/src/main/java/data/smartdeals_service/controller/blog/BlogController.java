@@ -244,7 +244,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/blogs")
+@RequestMapping("/api/deal/blogs")
 public class BlogController {
     private final BlogService blogService;
     private final CommentService commentService;

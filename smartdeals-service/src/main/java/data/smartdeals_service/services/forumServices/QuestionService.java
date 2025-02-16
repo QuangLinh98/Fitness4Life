@@ -83,16 +83,21 @@ public class QuestionService {
         return savedQuestion;
     }
 
-public List<QuestionResponseDTO> findAllQuestions() {
-    List<Question> questions = questionRepository.findAll();
-    return questions.stream()
-            .map(QuestionResponseDTO::new)
-            .toList();
-}
+    public List<QuestionResponseDTO> findAllQuestions() {
+        List<Question> questions = questionRepository.findAll();
+        return questions.stream()
+                .map(QuestionResponseDTO::new)
+                .toList();
+    }
 
     public Optional<Question> findById(Long id) {
         return questionRepository.findById(id);
     }
+    public Optional<QuestionResponseDTO> getOneQuestionById(Long id) {
+        Optional<Question> question = questionRepository.findById(id);
+        return question.map(QuestionResponseDTO::new);
+    }
+
     @Transactional
     public Question updateQuestion(Long id, UpdateQuestionDTO updateQuestionDTO) throws IOException {
         Question questionById = questionRepository.findById(id).orElse(null);

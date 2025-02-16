@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/promotions")
+@RequestMapping("/api/deal/promotions")
 @RequiredArgsConstructor
 public class PromotionController {
     private final PromotionService promotionService;
@@ -147,10 +147,10 @@ public class PromotionController {
     }
 
     @PostMapping("/send-code-to-user")
-    public ResponseEntity<?> sendCodeToUser(@RequestParam String code, @RequestParam Long userId) {
+    public ResponseEntity<?> sendCodeToUser(@RequestParam String code, @RequestParam String email) {
         try {
-            promotionService.sendCodeToUser(code, userId);
-            return ResponseEntity.ok("Code has been sent to user with ID: " + userId);
+            promotionService.sendCodeToUser(code, email);
+            return ResponseEntity.ok("Code has been sent to user with ID: " + email);
         }catch (Exception ex) {
             if (ex.getMessage().contains("CodeIsAlreadyInSend")) {
                 return ResponseEntity.status(401).body(ApiResponse.badRequest("Code Is Already In Send"));
