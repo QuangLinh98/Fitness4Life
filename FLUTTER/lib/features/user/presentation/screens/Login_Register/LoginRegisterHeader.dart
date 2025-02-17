@@ -58,7 +58,7 @@ class _LoginRegisterHeaderState extends State<LoginRegisterHeader> {
           left: 16,
           right: 16,
           child: userName != null
-              ? goalService.isLoading
+              ? goalService.goals.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : SingleChildScrollView(
                       scrollDirection: Axis.horizontal,

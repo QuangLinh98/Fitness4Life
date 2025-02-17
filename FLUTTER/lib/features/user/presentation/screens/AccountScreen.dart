@@ -9,6 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../smart_deal/presentation/screens/RewardProgramPage.dart';
+import '../../../smart_deal/presentation/screens/post/YourPost.dart';
+import '../../../smart_deal/presentation/screens/promotion/PromotionScreen.dart';
+
 class AccountScreen extends StatefulWidget {
   final int userId;
   const AccountScreen({super.key,  this.userId = 102});
@@ -129,17 +133,17 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                         const SizedBox(height: 4),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children:[
-                            Text(
-                              "Membership: ${membership.membershipLevel}",
-                              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              "${NumberFormat('#,###').format(membership.amount)} USD",
-                              style: const TextStyle(color: Colors.white, fontSize: 16),
-                            ),
-                          ]
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children:[
+                              Text(
+                                "Membership: ${membership.membershipLevel}",
+                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                "${NumberFormat('#,###').format(membership.amount)} USD",
+                                style: const TextStyle(color: Colors.white, fontSize: 16),
+                              ),
+                            ]
                         ),
 
                         const SizedBox(height: 8),
@@ -168,17 +172,32 @@ class _AccountScreenState extends State<AccountScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                buildOptionItem("User Guide", Icons.help_outline, () {}),
-                buildOptionItem("Your Discount ", Icons.code, () {}),
-                buildOptionItem("Your Post", Icons.post_add_sharp, () {}),
+                buildOptionItem("User Guide", Icons.help_outline, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RewardProgramPage())
+                  );
+                }),
+                buildOptionItem("Your Discount", Icons.code, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PromotionScreen())
+                  );
+                }),
+                buildOptionItem("Your Post", Icons.post_add_sharp, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => YourPost())
+                  );
+                }),
                 buildOptionItem("Contact", Icons.phone, () {}),
                 buildOptionItem("Contract", Icons.description_outlined, () {}),
                 buildOptionItem("Customer Care History", Icons.history, () {}),
                 buildOptionItem("Change password", Icons.lock_outline, ()  {
-                     Navigator.push(
-                         context,
-                         MaterialPageRoute(builder: (context) => const ChangePasswordScreen())
-                     );
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ChangePasswordScreen())
+                  );
                 }),
                 buildOptionItem("Logout", Icons.logout, ()async {
                   await handleLogout(context);

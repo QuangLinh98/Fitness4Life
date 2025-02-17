@@ -8,7 +8,10 @@ import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dar
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/TrainerRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
+import 'package:fitness4life/api/Goal_Repository/ProgressRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/BlogRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
 import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
 import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
@@ -22,7 +25,7 @@ final GetIt locator = GetIt.instance;
 void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
-    baseUrl: "http://192.168.1.45:9000/api", // API Gateway URL
+    baseUrl: "http://192.168.1.38:9000/api", // API Gateway URL
     connectTimeout: const Duration(milliseconds: 10000), // Thời gian timeout kết nối
     receiveTimeout: const Duration(milliseconds: 10000), // Thời gian timeout nhận dữ liệu
   )));
@@ -36,8 +39,11 @@ void setUpLocator() {
   // Đăng ký RoomRepository
   locator.registerLazySingleton(() => RoomRepository(locator<ApiGateWayService>()));
 
-  // Đăng ký RoomRepository
+  // Đăng ký GoalRepository
   locator.registerLazySingleton(() => GoalRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký ProgressRepository
+  locator.registerLazySingleton(() => ProgressRepository(locator<ApiGateWayService>()));
 
   // Đăng ký BookingRepository
   locator.registerLazySingleton(() => BookingRoomRepository(locator<ApiGateWayService>()));
@@ -62,6 +68,13 @@ void setUpLocator() {
 
   // Đăng ký PayPalRepository
   locator.registerLazySingleton(() => PaypalRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký BlogRepository
+  locator.registerLazySingleton(() => BlogRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký BlogRepository
+  locator.registerLazySingleton(() => PromotionRepository(locator<ApiGateWayService>()));
+
 
   // Đăng ký QuestionRepository
   locator.registerLazySingleton(() => QuestionRepository(locator<ApiGateWayService>()));

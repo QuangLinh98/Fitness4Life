@@ -1,5 +1,6 @@
 import 'package:fitness4life/config/constants.dart';
 import 'package:fitness4life/core/widgets/SubMenu.dart';
+import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/Home/data/Trainer.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
@@ -7,6 +8,8 @@ import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/GoalSuccessScreen.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
+import 'package:fitness4life/features/smart_deal/presentation/screens/blog/CarouseBlog.dart';
+import 'package:fitness4life/features/smart_deal/presentation/screens/blog/LesmillsBlog.dart';
 import 'package:fitness4life/features/smart_deal/presentation/screens/post/Carouse.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
@@ -125,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                    ),
                    const SizedBox(height: 10),
-                   goalService.isLoading
+                   goalService.goals.isEmpty
                        ? const Center(child: CircularProgressIndicator())
                        : goalService.goals.isNotEmpty
                        ? SingleChildScrollView(
@@ -148,6 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                    //Hiển thị Blog
                    const Carouse(),
+                   const SizedBox(height: 15),
+                   const CarouseBlog(),
+                   const SizedBox(height: 15),
+                   const LesmillsBlog(),
                  ],
                ),
              ),
@@ -413,8 +420,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     final goalId = goal.id;
-
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => GoalSuccessScreen(goalId: goalId!)));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GoalSuccessScreen(goalId: goalId!),
+                      ),
+                    );
+                   // Navigator.push(context, MaterialPageRoute(builder: (context) => GoalSuccessScreen(goalId: goalId!)));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF9747FF),

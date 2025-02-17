@@ -7,7 +7,6 @@ class BookingRoomService extends ChangeNotifier {
   final BookingRoomRepository _bookingRoomRepository;
 
   List<BookingRoom> bookedRooms = [];
-  //List<Room> get bookedRooms => _bookedRooms;
 
   BookingRoomService(this._bookingRoomRepository);
 

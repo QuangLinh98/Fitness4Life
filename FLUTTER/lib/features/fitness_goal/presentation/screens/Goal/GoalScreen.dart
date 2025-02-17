@@ -1,7 +1,9 @@
 import 'dart:ui';
 
+import 'package:fitness4life/core/widgets/CustomConfirmDialog.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/GoalSuccessScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/HealthScreen.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Progress/ProgressScreen.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -32,7 +34,7 @@ class _GoalScreenState extends State<GoalScreen> {
     final goalService = Provider.of<GoalService>(context);
 
     return Scaffold(
-      body: goalService.isLoading
+      body: goalService.goals.isEmpty
           ? Center(child: CircularProgressIndicator()) // Loading indicator while data is fetching
           : ListView.builder(
         itemCount: goalService.goals.length, // Total number of goals
@@ -40,6 +42,16 @@ class _GoalScreenState extends State<GoalScreen> {
           final goal = goalService.goals[index];
           return buildGoalCard(goal); // Build a card for each goal
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HealthScreen()),
+          );
+        },
+        backgroundColor: Color(0xFFB00020),
+        child: Icon(Icons.add), // Icon inside the Floating Action Button
       ),
     );
   }
@@ -61,10 +73,18 @@ class _GoalScreenState extends State<GoalScreen> {
     return GestureDetector(
       onTap: () {
         // Khi người dùng chạm vào card, chuyển đến ProgressScreen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProgressScreen()),
-        );
+        final int? goalId = goal.id; // Kiểm tra nếu goal có tồn tại
+
+        if (goalId != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProgressScreen(goalId: goalId, goal: goal)),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Goal ID is missing!')),
+          );
+        }
       },
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -82,6 +102,14 @@ class _GoalScreenState extends State<GoalScreen> {
                 // Left section - Icon/Image
                 Row(
                   children: [
+                    IconButton(
+                      icon: Icon(Icons.remove_circle, color: Colors.red),
+                      onPressed: () {
+                        // Show the confirmation dialog when the Minus button is clicked
+                        _showConfirmDialog(context, goal.id!);
+                      },
+                    ),
+
                     Expanded(
                       child: Card(
                         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -96,22 +124,6 @@ class _GoalScreenState extends State<GoalScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Left section - Icon/Image
-                                Container(
-                                  width: 80,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF9747FF).withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.fitness_center,
-                                    color: Color(0xFF9747FF),
-                                    size: 30,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-
                                 // Middle section - Title and Date
                                 Flexible(
                                   child: Column(
@@ -260,6 +272,27 @@ class _GoalScreenState extends State<GoalScreen> {
           ),
         ),
       ),
+
+    );
+
+  }
+
+  void _showConfirmDialog(BuildContext context, int goalId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CustomConfirmDialog(
+          title: "Confirm Delete",
+          content: "Are you sure you want to delete this goal?",
+          onCancel: () {
+            Navigator.pop(context);
+          },
+          onConfirm: () {
+            Provider.of<GoalService>(context, listen: false).deleteGoalById(goalId);
+            Navigator.pop(context);
+          },
+        );
+      },
     );
   }
 

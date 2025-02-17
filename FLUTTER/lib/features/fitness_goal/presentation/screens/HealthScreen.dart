@@ -17,6 +17,15 @@ class _HealthScreenState extends State<HealthScreen> {
     final userName = Provider.of<UserInfoProvider>(context).userName ?? "";
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.orange),
+          onPressed: () => Navigator.pop(context),
+        ),
+
+      ),
       body: Stack(
         children: [
           Positioned.fill(

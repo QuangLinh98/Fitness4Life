@@ -87,4 +87,19 @@ class GoalRepository {
       throw Exception('Error fetching BMI from backend: $e');
     }
   }
+
+  //Delete Goal By Id
+  Future<void> deleteGoalById(int goalId) async {
+    try{
+      final request = await _apiGateWayService.deleteData('/goal/delete/$goalId');
+      if (request.statusCode == 200) {
+        print("Delete goal successfully");
+      } else {
+        throw Exception("Failed to delete goal");
+      }
+    }catch (e) {
+      print("Error delete goal: $e");
+      rethrow;
+    }
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/CreateGoal.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/GoalSuccessScreen.dart';
@@ -7,13 +8,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class SubmitGoalScreen extends StatelessWidget {
+class SubmitGoalScreen extends StatefulWidget {
+  @override
+  _SubmitGoalScreenState createState() => _SubmitGoalScreenState();
+}
+
+class _SubmitGoalScreenState extends State<SubmitGoalScreen> {
+  bool _isSubmitting = false; // Trạng thái loader
+
   @override
   Widget build(BuildContext context) {
     final goalState = Provider.of<GoalSetupState>(context);
     final goalService = Provider.of<GoalService>(context);
 
-    // Xác định đơn vị đo lường (kg hoặc %)
     bool isKgSelected = goalState.isKgSelected;
 
     return Scaffold(
@@ -31,7 +38,6 @@ class SubmitGoalScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
 
-            // Hiển thị thông tin với đơn vị tương ứng
             buildInfoRow("Goal type", goalState.goalType ?? "No selection"),
             buildInfoRow("Target value", formatValue(goalState.targetValue, isKgSelected)),
             buildInfoRow("Current value", formatValue(goalState.currentValue, isKgSelected)),
@@ -42,14 +48,18 @@ class SubmitGoalScreen extends StatelessWidget {
 
             SizedBox(height: 30),
 
-            // Nút Submit
+            // Nút Submit với Loader
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
                 ),
-                onPressed: () async {
+                onPressed: _isSubmitting ? null : () async { // Vô hiệu hóa nếu đang gửi dữ liệu
+                  setState(() {
+                    _isSubmitting = true; // Bắt đầu hiển thị loader
+                  });
+
                   try {
                     await _submitGoal(context, goalService, goalState);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -57,9 +67,17 @@ class SubmitGoalScreen extends StatelessWidget {
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Failed to submit goal: $e')));
+                  } finally {
+                    setState(() {
+                      _isSubmitting = false; // Tắt loader khi xong
+                    });
                   }
                 },
-                child: const Text(
+                child: _isSubmitting
+                    ? CircularProgressIndicator( // Hiển thị loader
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                )
+                    : const Text(
                   "Confirm & Send",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
@@ -68,11 +86,12 @@ class SubmitGoalScreen extends StatelessWidget {
 
             SizedBox(height: 20),
 
-            // Nút quay lại chỉnh sửa
             Center(
               child: TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  if (!_isSubmitting) { // Ngăn người dùng quay lại khi đang submit
+                    Navigator.pop(context);
+                  }
                 },
                 child: Text("Come back edit", style: TextStyle(fontSize: 16, color: Colors.blue)),
               ),
@@ -83,20 +102,18 @@ class SubmitGoalScreen extends StatelessWidget {
     );
   }
 
-  /// Hiển thị đơn vị kg hoặc %
+  /// Các hàm hỗ trợ (không thay đổi)
   String formatValue(double? value, bool isKg) {
     if (value == null) return "No data";
     return isKg ? "$value kg" : "$value %";
   }
 
-  /// Định dạng ngày từ DateTime ISO sang dạng dễ đọc
   String formatDate(String? isoDate) {
     if (isoDate == null) return "No selection";
     DateTime date = DateTime.parse(isoDate);
     return DateFormat("dd/MM/yyyy").format(date);
   }
 
-  /// Hàm build widget hiển thị thông tin
   Widget buildInfoRow(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
@@ -110,38 +127,35 @@ class SubmitGoalScreen extends StatelessWidget {
     );
   }
 
-  /// Tạo và gửi GoalDTO
   Future<void> _submitGoal(BuildContext context, GoalService goalService, GoalSetupState goalState) async {
-    // Lấy thông tin userId
     final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
     int? userId = userInfo.userId;
 
-    // Tạo GoalDTO từ GoalSetupState
     GoalDTO goalDTO = GoalDTO(
       userId: userId!,
-      goalType: _getGoalTypeFromString(goalState.goalType ?? "MUSCLE_GAIN"), // Mặc định nếu không có
+      goalType: _getGoalTypeFromString(goalState.goalType ?? "MUSCLE_GAIN"),
       targetValue: goalState.targetValue ?? 0.0,
       currentValue: goalState.currentValue ?? 0.0,
       weight: goalState.weight ?? 0.0,
-      startDate: _parseDate(goalState.startDate), // Thêm giá trị mặc định nếu không có
+      startDate: _parseDate(goalState.startDate),
       endDate: _parseDate(goalState.endDate),
-      activityLevel: _getActivityLevelFromString(goalState.activityLevel), // Mặc định là sedentary nếu không có
-      //createdAt: DateTime.now(),
+      activityLevel: _getActivityLevelFromString(goalState.activityLevel),
     );
 
-    // Loại bỏ goalStatus và createdAt trước khi gửi
     Map<String, dynamic> goalData = Map.from(goalDTO.toJson());
     goalData.remove('goalStatus');
     goalData.remove('createdAt');
 
-    // Gọi API để gửi GoalDTO xuống backend
-    await goalService.submitGoal(context,goalDTO);
+    await goalService.submitGoal(context, goalDTO);
 
-    // Nếu gửi thành công, chuyển đến SuccessScreen
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => GoalSuccessScreen(goalId: goalState.goalId!)),  // Chuyển đến màn hình thành công
-    );
+      MaterialPageRoute(
+        builder: (context) => GoalSuccessScreen(goalId: goalState.goalId!),
+      ),
+    ).then((_) {
+      PageManager.of(context)?.updateIndex(2);
+    });
   }
 
   GoalType _getGoalTypeFromString(String goalType) {
@@ -154,9 +168,9 @@ class SubmitGoalScreen extends StatelessWidget {
 
   DateTime _parseDate(String? date) {
     if (date == null || date == "No selection") {
-      return DateTime.now(); // Hoặc có thể trả về giá trị mặc định khác
+      return DateTime.now();
     }
     return DateTime.parse(date);
   }
-
 }
+

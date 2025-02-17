@@ -5,7 +5,10 @@ import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
+import 'package:fitness4life/api/Goal_Repository/ProgressRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/BlogRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
+import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
 import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
@@ -19,7 +22,10 @@ import 'package:fitness4life/features/booking/service/QrService.dart';
 import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
+import 'package:fitness4life/features/fitness_goal/service/ProgressService.dart';
+import 'package:fitness4life/features/smart_deal/service/BlogService.dart';
 import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
+import 'package:fitness4life/features/smart_deal/service/PromotionService.dart';
 import 'package:fitness4life/features/smart_deal/service/QuestionService.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:fitness4life/features/user/service/PasswordService.dart';
@@ -36,6 +42,7 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => TrainerService(locator<TrainerRepository>())),
   ChangeNotifierProvider(create: (_) => RoomService(locator<RoomRepository>())),
   ChangeNotifierProvider(create: (_) => GoalService(locator<GoalRepository>())),
+  ChangeNotifierProvider(create: (_) => ProgressService(locator<ProgressRepository>())),
   ChangeNotifierProvider(create: (_) => BookingRoomService(locator<BookingRoomRepository>())),
   ChangeNotifierProvider(create: (_) => QrService(locator<QrRepository>(), locator<BookingRoomRepository>())),
   ChangeNotifierProvider(create: (_) => LoginService(locator<LoginRepository>())),
@@ -47,6 +54,10 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => PaypalService(locator<PaypalRepository>())),
   ChangeNotifierProvider(create: (_) => QuestionService(locator<QuestionRepository>())),
   ChangeNotifierProvider(create: (_) => CommentService(locator<CommentRepository>())),
+  ChangeNotifierProvider(create: (_) => BlogService(locator<BlogRepository>())),
+  ChangeNotifierProvider(create: (_) => PromotionService(locator<PromotionRepository>())),
+
+
 
   // Thêm GoalSetupState sử dụng để lưu trữ giá trị tamk thời khi thiết lập goal
   ChangeNotifierProvider(create: (_) => GoalSetupState()),

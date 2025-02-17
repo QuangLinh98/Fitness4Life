@@ -20,7 +20,7 @@ class OtpVerificationScreen extends StatefulWidget {
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final List<TextEditingController> _otpControllers = List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
-  int _remainingTime = 300; // 5 phút (300 giây)
+  int _remainingTime = 300; // 5 phút
   late Timer _timer;
   bool _isResending = false;
 
@@ -201,7 +201,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 widget.mode == "resetPassword"
                      ? "Enter the OTP sent to your email to reset your password"
                      : "Enter the OTP sent to your email to verify your account",
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

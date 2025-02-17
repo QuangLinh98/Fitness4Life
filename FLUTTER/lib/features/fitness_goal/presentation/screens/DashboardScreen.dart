@@ -116,7 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   }
 
   Widget _buildGoalsTab() {
-    return Center(
+    return const Center(
       child: Text(
         'Goals Tab Content',
         style: TextStyle(fontSize: 20, color: Colors.red),

@@ -542,6 +542,7 @@ class _ClassScreenState extends State<ClassScreen> {
       ),
     );
   }
+
   // Hàm lấy thông báo lỗi từ Exception hoặc JSON response
   String extractErrorMessage(dynamic error) {
     if (error is String) {

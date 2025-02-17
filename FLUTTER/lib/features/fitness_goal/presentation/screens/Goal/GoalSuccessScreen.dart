@@ -1,3 +1,7 @@
+import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
+import 'package:fitness4life/features/booking/presentation/screens/ClassesScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/DashboardScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/GoalScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
@@ -50,18 +54,6 @@ class _GoalSuccessScreenState extends State<GoalSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (goal == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Goal Submission Successful'),
-          backgroundColor: Colors.green,
-        ),
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     // Tính toán chỉ số BMI và xác định màu sắc của thanh BMI
     double bmiValue = bmi ?? 0.0;
     String bmiStatus = 'Normal'; // Mặc định
@@ -92,7 +84,7 @@ class _GoalSuccessScreenState extends State<GoalSuccessScreen> {
         ),
         backgroundColor: Colors.black,
       ),
-      backgroundColor: Colors.black,  // Đặt nền của body thành màu đen
+      backgroundColor: Colors.black,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -142,7 +134,8 @@ class _GoalSuccessScreenState extends State<GoalSuccessScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Chuyển đến màn hình tiếp theo hoặc thực hiện hành động khác
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
+                  debugPrint("Current widget context: ${context.widget}");
                 },
                 child: Text('Continue'),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),

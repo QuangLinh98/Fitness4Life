@@ -25,6 +25,12 @@ class _PageManagerState extends State<PageManager> {
     DashboardScreen(),  // Tab "Health"
     AccountScreen(),  // Tab "Account"
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
 
   void updateIndex(int index) {
     setState(() {
