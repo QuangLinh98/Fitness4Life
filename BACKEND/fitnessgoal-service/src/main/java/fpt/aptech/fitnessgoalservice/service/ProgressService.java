@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -27,6 +28,7 @@ public class ProgressService {
 
     //Handle get all progress data
     public List<Progress> getAllProgress() {
+        System.out.println("request nhận được từ ");
         return progressRepository.findAll();
     }
 
@@ -62,11 +64,11 @@ public class ProgressService {
         double targetCalories = existingGoal.getTargetCalories();
         double caloriesConsumed = progressDTO.getCaloriesConsumed();
         if (caloriesConsumed > targetCalories) {
-            newProgress.setMessage("Ban đa vuot qua " + (caloriesConsumed - targetCalories) + " calo.Hay giam luong calo nap vao.");
+            newProgress.setMessage("You have passed " + (caloriesConsumed - targetCalories) + " calories.Or reduce calorie intake.");
         } else if (caloriesConsumed < targetCalories) {
-            newProgress.setMessage("Ban can bo sung them " + (targetCalories - caloriesConsumed) + " calo đe đat muc tieu.");
+            newProgress.setMessage("You need to add more " + (targetCalories - caloriesConsumed) + " calories to reach daily calorie goal.");
         } else {
-            newProgress.setMessage("Ban da tieu thu dung luong calo de dat muc tieu.");
+            newProgress.setMessage("You have consumed the calories to reach your daily calorie goal.");
         }
 
         //Cập nhật giá trị currentValue trong Goal dựa vào metricName
@@ -341,5 +343,9 @@ public class ProgressService {
         }
 
         return result;
+    }
+
+    public List<Progress> getProgressByGoalId(int goalId) {
+        return progressRepository.findByGoalId(goalId);
     }
 }

@@ -92,6 +92,12 @@ public class PublicController {
         }
     }
 
+    @GetMapping("/progress/{goalId}")
+    public ResponseEntity<?> getProgressListByGoalId(@PathVariable int goalId) {
+        List<Progress> progressList = progressService.getProgressByGoalId(goalId);
+        return ResponseEntity.ok(progressList);
+    }
+
     //============================ TDEE ===========================
 //    @GetMapping("/tdee/{userId}/{goalId}")
 //    public ResponseEntity<?>GetTdee(@PathVariable long userId, @PathVariable int goalId) {
@@ -105,7 +111,7 @@ public class PublicController {
 //    }
 
     @GetMapping("/bmi")
-    public ResponseEntity<Double> calculateBMI(
+    public ResponseEntity<?> calculateBMI(
             @RequestParam double weight,
             @RequestParam Long userId) {
         // Lấy thông tin người dùng từ service
@@ -116,7 +122,7 @@ public class PublicController {
 
         // Gọi service để tính BMI
         double bmi = calculationService.calculateBMI(weight, userDTO);
-        return ResponseEntity.ok(bmi);
+        return ResponseEntity.status(200).body(ApiResponse.success(bmi,"Get BMI successfully") );
     }
 
     //============================ Diet Plan ===========================

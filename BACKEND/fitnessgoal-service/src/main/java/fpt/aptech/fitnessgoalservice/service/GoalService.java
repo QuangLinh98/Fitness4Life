@@ -50,6 +50,7 @@ public class GoalService {
 
     //Handle get one goal by id
     public Goal getGoalById(int id) {
+        System.out.println("✅ Nhận được request từ Flutter: " + id);
         return goalRepository.findById(id).orElseThrow(() -> new RuntimeException("Goal not found"));
     }
 

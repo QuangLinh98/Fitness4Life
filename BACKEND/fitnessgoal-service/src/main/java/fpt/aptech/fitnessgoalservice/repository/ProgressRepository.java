@@ -16,4 +16,6 @@ public interface ProgressRepository extends JpaRepository<Progress, Integer> {
     List<Progress> findByUserIdAndGoalIdAndTrackingDateBetween(int userId, int goalId, LocalDate startDate, LocalDate endDate);
 
     boolean existsByGoalIdAndMessageContaining(int goalId, String message);
+
+    List<Progress> findByGoalId(int goalId);
 }
