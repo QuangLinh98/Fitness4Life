@@ -51,6 +51,7 @@ public class JwtService {
         String token = Jwts
                 .builder() // Bắt đầu xây dựng JWT
                 .subject(user.getUsername()) // Đặt "subject" là username của người dùng
+                .claim("id", user.getId())
                 .claim("role", user.getRole()) // Thêm thông tin role của người dùng vào claims
                 .claim("fullName", user.getFullName()) // Thêm thông tin fullName
                 .issuedAt(new Date(System.currentTimeMillis())) // Thiết lập ngày phát hành token

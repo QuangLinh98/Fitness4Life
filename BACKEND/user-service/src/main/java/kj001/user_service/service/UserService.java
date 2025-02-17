@@ -79,13 +79,15 @@ public class UserService {
         if (existingUser.isEmpty()) {
             return null;
         }
+        User user = existingUser.get();
+
         Profile profile = existingUser.get().getProfile();
         //Chuyển đổi entity thanh dto
-        ProfileUserDTO profileUserDTO = new ProfileUserDTO(
-                profile.getAge(),
-                profile.getHeightValue()
-        );
+        ProfileUserDTO profileUserDTO = (profile != null) ?
+                new ProfileUserDTO(profile.getAge(), profile.getHeightValue()) : null;
+
         UserDTO userDTO = UserDTO.builder()
+                .id(user.getId())
                 .fullName(existingUser.get().getFullName())
                 .email(existingUser.get().getEmail())
                 .gender(existingUser.get().getGender())
@@ -93,6 +95,7 @@ public class UserService {
                 .build();
         return userDTO;
     }
+
 
     //Phương thức Register User
     @Transactional

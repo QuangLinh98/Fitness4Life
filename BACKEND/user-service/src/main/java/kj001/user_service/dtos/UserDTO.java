@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class UserDTO {
+    private Long id;
     private String fullName;
     private String email;
     @Enumerated(EnumType.STRING)
