@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import 'CreateProgressScreen.dart';
+
 
 class ProgressScreen extends StatefulWidget {
   final int goalId;
@@ -63,6 +65,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ),
         backgroundColor: const Color(0xFFB00020),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CreateProgressScreen(goalId: widget.goalId),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: progressService.isLoading
           ? const Center(child: CircularProgressIndicator())
