@@ -43,6 +43,7 @@ class GoalRepository {
       final response = await _apiGateWayService.postData('/goal/add',
           data: goalDTO.toJson());
       if (response.statusCode == 201) {
+        print('Goal : ${response.data}');
         return Goal.fromJson(response.data['data']); // Trả về Goal với id
       } else {
         throw Exception('Failed to create goal');

@@ -53,35 +53,60 @@ class _LoginRegisterHeaderState extends State<LoginRegisterHeader> {
         ),
 
         // Kiểm tra trạng thái người dùng và hiển thị widget tương ứng
+        // Positioned(
+        //   top: 100,
+        //   left: 16,
+        //   right: 16,
+        //   child: userName != null
+        //       ? goalService.goals.isEmpty
+        //           ? const Center(child: CircularProgressIndicator())
+        //           : SingleChildScrollView(
+        //               scrollDirection: Axis.horizontal,
+        //               child: Row(
+        //                 children: goalService.goals.isNotEmpty
+        //                     ? goalService.goals.map((goal) {
+        //                         return Padding(
+        //                           padding: const EdgeInsets.symmetric(
+        //                               horizontal: 8.0),
+        //                           child: buildGoalCard(goal),
+        //                         );
+        //                       }).toList()
+        //                     : [
+        //                         Padding(
+        //                           padding: const EdgeInsets.symmetric(
+        //                               horizontal: 8.0),
+        //                           child:
+        //                               buildEmptyGoalCard(), // Hiển thị hiệu ứng khi không có mục tiêu
+        //                         ),
+        //                       ],
+        //               ),
+        //             )
+        //       : buildLoginRegister(context),  //Chưa đăng nhập
+        // ),
         Positioned(
           top: 100,
           left: 16,
           right: 16,
           child: userName != null
-              ? goalService.goals.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: goalService.goals.isNotEmpty
-                            ? goalService.goals.map((goal) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: buildGoalCard(goal),
-                                );
-                              }).toList()
-                            : [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child:
-                                      buildEmptyGoalCard(), // Hiển thị hiệu ứng khi không có mục tiêu
-                                ),
-                              ],
-                      ),
-                    )
-              : buildLoginRegister(context),  //Chưa đăng nhập
+              ? (goalService.isLoading
+                  ? buildLoginRegister(
+                      context) // Nếu đang tải, hiển thị Login/Register
+                  : (goalService.goals.isEmpty
+                      ? buildLoginRegister(context) // Nếu không có goals, hiển thị animation
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: goalService.goals.map((goal) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: buildGoalCard(goal),
+                              );
+                            }).toList(),
+                          ),
+                        )))
+              : buildLoginRegister(
+                  context), // Nếu chưa đăng nhập, hiển thị Login/Register
         ),
       ],
     );
@@ -270,43 +295,4 @@ class _LoginRegisterHeaderState extends State<LoginRegisterHeader> {
     );
   }
 
-  //Xử lý Goal card empty hiển thị animation
-  Widget buildEmptyGoalCard() {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      elevation: 10,
-      //color: const Color(0xFF1E1B2E),
-      child: Container(
-        width: 350,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Hiển thị hoạt hình Lottie
-            Lottie.asset(
-              'animations/Animation.json', // Đường dẫn file JSON
-              width: 150,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(height: 2),
-            // Hiển thị thông báo
-            const Text(
-              "No goals available",
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

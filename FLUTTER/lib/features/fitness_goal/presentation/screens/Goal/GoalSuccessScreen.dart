@@ -59,6 +59,7 @@ class _GoalSuccessScreenState extends State<GoalSuccessScreen> {
     String bmiStatus = 'Normal'; // Mặc định
     Color bmiColor = Colors.green; // Mặc định
 
+
     if (bmiValue < 18.5) {
       bmiStatus = 'Underweight';
       bmiColor = Colors.orange;

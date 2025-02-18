@@ -14,7 +14,6 @@ class ProgressRepository {
   Future<List<Progress>> getProgressByGoalId(int goalId) async {
     try {
       final response = await _apiGateWayService.getData('/goal/progress/$goalId');
-      print("API Response: ${response.data}");
 
       if (response.data != null && response.data is List) {
         return (response.data as List).map((json) {

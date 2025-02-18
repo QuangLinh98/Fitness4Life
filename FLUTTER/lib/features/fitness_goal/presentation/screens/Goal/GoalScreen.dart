@@ -151,17 +151,17 @@ class _GoalScreenState extends State<GoalScreen> {
                                             "$startDate - $endDate",
                                             style: const TextStyle(
                                               color: Colors.white70,
-                                              fontSize: 14,
+                                              fontSize: 16,
                                             ),
                                           ),
                                         ],
                                       ),
                                       const SizedBox(height: 4),
-                                      const Text(
-                                        "7 Spaces left",
+                                       Text(
+                                         "Status : ${goal.goalStatus!}",
                                         style: TextStyle(
                                           color: Colors.white54,
-                                          fontSize: 11,
+                                          fontSize: 15,
                                         ),
                                       ),
                                     ],

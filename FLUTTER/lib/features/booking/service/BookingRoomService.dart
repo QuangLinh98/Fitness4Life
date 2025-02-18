@@ -7,11 +7,13 @@ class BookingRoomService extends ChangeNotifier {
   final BookingRoomRepository _bookingRoomRepository;
 
   List<BookingRoom> bookedRooms = [];
+  bool isLoading = false;
 
   BookingRoomService(this._bookingRoomRepository);
 
   //Xử lý booking room
   Future<bool> bookingRoom(int roomId , int userId) async {
+    isLoading = true;
     try{
         await _bookingRoomRepository.bookRoom(roomId, userId);
         //notifyListeners();
@@ -26,6 +28,7 @@ class BookingRoomService extends ChangeNotifier {
 
   //Xử lý lấy room theo userId
   Future<void> fetchBookedRooms(int userId) async {
+    isLoading = true;
     try {
       bookedRooms = await _bookingRoomRepository.getBookedRooms(userId);
       notifyListeners(); // Cập nhật UI

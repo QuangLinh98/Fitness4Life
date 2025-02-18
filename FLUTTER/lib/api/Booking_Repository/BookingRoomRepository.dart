@@ -19,7 +19,6 @@ class BookingRoomRepository {
 
         // Gửi request POST
         final response = await _apiGateWayService.postData(url, data: payload);
-        print('Response book : ${response.data}');
 
       // Kiểm tra statusCode
         if (response.statusCode == 201) {

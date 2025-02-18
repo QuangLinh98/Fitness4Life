@@ -1,10 +1,12 @@
+import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:fitness4life/core/widgets/CustomDialog.dart'; // Import CustomDialog
 import 'package:fitness4life/features/fitness_goal/data/Progress/ProgressDTO.dart';
 import 'package:fitness4life/features/fitness_goal/service/ProgressService.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'ProgressScreen.dart';
+import 'package:http/http.dart' as http;
 
 class CreateProgressScreen extends StatefulWidget {
   final int goalId;
@@ -26,13 +28,13 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     selectedMetric = MetricName.WEIGHT;
     trackingDateController.text = trackingDate.toIso8601String().split('T')[0];
   }
 
-  Future<void> _submitProgress() async {
+  /// **Hàm xử lý khi nhấn nút Save**
+  void saveProgress() async {
     setState(() {
       isLoading = true;
     });
@@ -42,7 +44,6 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
       final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
       int? userId = userInfo.userId;
 
-      // Cập nhật trackingDate từ TextFormField trước khi gửi
       trackingDate = trackingDateController.text.isNotEmpty
           ? DateTime.tryParse(trackingDateController.text) ?? DateTime.now()
           : DateTime.now();
@@ -56,29 +57,67 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
         weight: double.tryParse(weightController.text),
         caloriesConsumed: double.tryParse(caloriesController.text) ?? 0,
       );
-      print("Dữ liệu gửi lên backend: ${progress.toJson()}");
+
+      print("🚀 Dữ liệu gửi lên backend: ${progress.toJson()}");
       await progressService.createProgress(progress);
 
       if (progressService.errorMessage.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Progress created successfully!")),
-        );
-        // ✅ Chuyển về ProgressScreen sau khi tạo thành công
-        Navigator.pop(context, true); // ✅ Quay lại màn hình trước (ProgressScreen)
-
+        if (context.mounted) {
+          CustomDialog.show(
+            context,
+            title: "Success",
+            content: "Your progress has been saved successfully!",
+            buttonText: "OK",
+            onButtonPressed: () {
+              Navigator.pop(context, true);
+            },
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(progressService.errorMessage)),
-        );
+        print("❌ API Error: ${progressService.errorMessage}");
+        if (context.mounted) {
+          CustomDialog.show(
+            context,
+            title: "Error",
+            content: progressService.errorMessage,
+            buttonText: "OK",
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred: $e")),
-      );
+      print("🚨 Exception: ${extractErrorMessage(e)}");
+      if (context.mounted) {
+        CustomDialog.show(
+          context,
+          title: "Error",
+          content: extractErrorMessage(e),
+          buttonText: "OK",
+        );
+      }
     } finally {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+
+  /// **Hàm lấy lỗi từ backend hoặc Exception**
+  String extractErrorMessage(dynamic error) {
+    if (error is String) {
+      return error; // Nếu lỗi là chuỗi, trả về trực tiếp
+    } else if (error is Exception) {
+      final message = error.toString();
+      if (message.contains("Failed to create progress:")) {
+        // Tách lấy message từ "Failed to book room:"
+        return message.split("Failed to create progress:")[1].trim();
+      } else if (message.contains("Exception:")) {
+        // Tách bỏ từ "Exception:"
+        return message.split("Exception:")[1].trim();
+      }
+      return message; // Trả về toàn bộ chuỗi nếu không tách được
+    } else {
+      return "An unexpected error occurred. Please try again."; // Thông báo mặc định
     }
   }
 
@@ -102,7 +141,7 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
               items: MetricName.values.map((MetricName metric) {
                 return DropdownMenuItem<MetricName>(
                   value: metric,
-                  child: Text(metric.toString().split('.').last), // Hiển thị tên enum
+                  child: Text(metric.toString().split('.').last),
                 );
               }).toList(),
               onChanged: (MetricName? newValue) {
@@ -111,7 +150,6 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
                 });
               },
             ),
-
             const SizedBox(height: 16),
             TextFormField(
               controller: caloriesController,
@@ -119,7 +157,7 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
                 labelText: 'Calories consumed',
                 border: OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -155,7 +193,6 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2100),
                 );
-
                 if (pickedDate != null) {
                   setState(() {
                     trackingDate = pickedDate;
@@ -177,8 +214,21 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: isLoading ? null : _submitProgress,
-                  child: isLoading ? CircularProgressIndicator(color: Colors.white) : Text('Save'),
+                  onPressed: isLoading ? null : saveProgress,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : const Text('Save'),
                 ),
               ],
             ),

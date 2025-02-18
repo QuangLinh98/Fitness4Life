@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-enum GoalType { MUSCLE_GAIN, WEIGHT_LOSS, MUSCLE_CUT } // Các giá trị GoalType
+enum GoalType { WEIGHT_LOSS , WEIGHT_GAIN, MUSCLE_GAIN, FAT_LOSS, MAINTENANCE } // Các giá trị GoalType
 //enum GoalStatus { PENDING, COMPLETED, IN_PROGRESS } // Các giá trị GoalStatus
 enum ActivityLevel { SEDENTARY, LIGHTLY_ACTIVE, MODERATELY_ACTIVE, VERY_ACTIVE, EXTREMELY_ACTIVE } // Các giá trị ActivityLevel
 
