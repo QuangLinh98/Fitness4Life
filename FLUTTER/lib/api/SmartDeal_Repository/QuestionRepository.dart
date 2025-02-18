@@ -59,7 +59,7 @@ class QuestionRepository {
     try {
       List<MultipartFile> images = await Future.wait(
         question.imageQuestionUrl.map((image) async {
-          return MultipartFile.fromBytes(image, filename: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg');
+          return MultipartFile.fromBytes(image, filename: 'image.jpg');
         }),
       );
       final url = '/deal/forums/questions/create';
@@ -76,7 +76,7 @@ class QuestionRepository {
         'imageQuestionUrl': images,
       });
       Response response = await _apiGateWayService.postDataWithFormData(url,formData: formData,);
-      debugPrint("✅ API Response: ${response.data}");
+      // debugPrint("✅ API Response: ${response.data}");
       return response;
     } catch (e) {
       print("❌ Lỗi khi tạo câu hỏi: $e");

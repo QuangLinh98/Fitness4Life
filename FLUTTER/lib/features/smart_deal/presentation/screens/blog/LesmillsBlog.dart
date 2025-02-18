@@ -82,7 +82,7 @@ class _LesmillsBlogState extends State<LesmillsBlog> {
             ? const Center(child: CircularProgressIndicator())
             : blogService.blogs.isNotEmpty
             ? SizedBox(
-          height: screenHeight * 0.5, // Chiều cao linh hoạt
+          height: screenHeight * 0.6, // Chiều cao linh hoạt
           width: screenWidth,
           child: PageView.builder(
             controller: _pageController,

@@ -6,6 +6,7 @@ import 'package:fitness4life/features/user/presentation/screens/Login_Register/L
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import 'package:uni_links/uni_links.dart';
+import 'core/widgets/LanguageProvider.dart';
 import 'features/booking/presentation/screens/PaymentSuccessScreen.dart';
 import 'features/booking/service/PaypalService.dart';
 
@@ -15,10 +16,15 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //để đảm bảo Flutter đã sẵn sàng làm việc với các plugin native (như flutter_secure_storage).
   setUpLocator(); // Thiết lập các Dependency ở file Locator_setup
 
+  // thêm mới
   runApp(MultiProvider(
-    providers: providers, // Sử dụng danh sách Providers từ file provider_setup.dart
+    providers: [
+      ...providers, // Các provider khác của bạn
+      ChangeNotifierProvider(create: (_) => LanguageProvider()), // Thêm LanguageProvider
+    ],
     child: MyApp(),
-  ),);
+  ));
+
 }
 
 // void _handleIncomingLinks(BuildContext context) {

@@ -4,11 +4,11 @@ import 'package:fitness4life/features/user/presentation/screens/Login_Register/L
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/RegisterScreen.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+
+import '../../../../../core/widgets/LanguageProvider.dart';
 
 class LoginRegisterHeader extends StatefulWidget {
   const LoginRegisterHeader({Key? key}) : super(key: key);
@@ -40,18 +40,40 @@ class _LoginRegisterHeaderState extends State<LoginRegisterHeader> {
           height: 150,
           color: const Color(0xFFB00020),
           padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
-          child: Center(
-            child: Text(
-              userName != null ? 'Hello, $userName!' : 'Hello customers !',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Căn hai bên
+            children: [
+              Expanded(
+                child: Center( // Căn giữa Text trong Row
+                  child: Text(
+                    userName != null ? 'Hello, $userName!' : 'Hello customers!',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
-            ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.language,
+                    color: Provider.of<LanguageProvider>(context).isVietnamese
+                        ? Colors.green // Nếu Tiếng Việt -> xanh lá
+                        : Colors.blue,  // Nếu English -> xanh dương
+                  ),
+                  onPressed: () {
+                    // Đổi ngôn ngữ khi nhấn vào
+                    Provider.of<LanguageProvider>(context, listen: false)
+                        .toggleLanguage();
+                  },
+                ),
+              ),
+            ],
           ),
         ),
-
         // Kiểm tra trạng thái người dùng và hiển thị widget tương ứng
         Positioned(
           top: 100,

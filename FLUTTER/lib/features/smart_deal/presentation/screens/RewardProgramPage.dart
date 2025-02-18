@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../../core/widgets/LanguageProvider.dart'; // Đảm bảo import đúng file của bạn
 
 class RewardProgramPage extends StatefulWidget {
   const RewardProgramPage({super.key});
@@ -9,10 +11,11 @@ class RewardProgramPage extends StatefulWidget {
 }
 
 class _RewardProgramPageState extends State<RewardProgramPage> {
-  bool isVietnamese = true;
-
   @override
   Widget build(BuildContext context) {
+    // ✅ Lấy trạng thái ngôn ngữ một lần duy nhất
+    final isVietnamese = Provider.of<LanguageProvider>(context).isVietnamese;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -20,20 +23,6 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isVietnamese = !isVietnamese;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                  ),
-                  child: Text(isVietnamese ? "English" : "Tiếng Việt"),
-                ),
-              ),
               Text(
                 isVietnamese
                     ? "Tham gia các thử thách tập luyện để tích điểm và đổi quà!"
@@ -42,8 +31,7 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
               ),
               const SizedBox(height: 10),
               CachedNetworkImage(
-                imageUrl:
-                "https://images.pexels.com/photos/4168092/pexels-photo-4168092.jpeg",
+                imageUrl: "https://images.pexels.com/photos/4168092/pexels-photo-4168092.jpeg",
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -54,13 +42,13 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              _buildStep(isVietnamese
+              _buildStep(context, isVietnamese
                   ? "1. Hoàn thành các bài tập hàng ngày để nhận điểm."
                   : "1. Complete daily workouts to earn points."),
-              _buildStep(isVietnamese
+              _buildStep(context, isVietnamese
                   ? "2. Tham gia thử thách hàng tuần để nhận phần thưởng lớn."
                   : "2. Join weekly challenges to earn big rewards."),
-              _buildStep(isVietnamese
+              _buildStep(context, isVietnamese
                   ? "3. Sử dụng điểm để đổi mã giảm giá, khóa tập thử và quà tặng đặc biệt."
                   : "3. Redeem points for discount vouchers, trial classes, and special gifts."),
               const SizedBox(height: 20),
@@ -69,29 +57,21 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              _buildRewardItem(
-                  isVietnamese
-                      ? "Giảm 20% gói tập Gym 3 tháng"
-                      : "20% off 3-month Gym package",
-                  "500 điểm",
+              _buildRewardItem(context,
+                  isVietnamese ? "Giảm 20% gói tập Gym 3 tháng" : "20% off 3-month Gym package",
+                  isVietnamese ? "500 điểm" : "500 points",
                   "https://images.pexels.com/photos/3253501/pexels-photo-3253501.jpeg"),
-              _buildRewardItem(
-                  isVietnamese
-                      ? "1 tuần tập thử Yoga miễn phí"
-                      : "1 week free Yoga trial",
-                  "300 điểm",
-                  "https://images.pexels.com/photos/3823081/pexels-photo-3823081.jpeg"),
-              _buildRewardItem(
-                  isVietnamese
-                      ? "Voucher mua sắm đồ thể thao"
-                      : "Sports shopping voucher",
-                  "700 điểm",
+              _buildRewardItem(context,
+                  isVietnamese ? "1 tuần tập thử Yoga miễn phí" : "1 week free Yoga trial",
+                  isVietnamese ? "300 điểm" : "300 points",
+                  "https://images.pexels.com/photos/3253501/pexels-photo-3253501.jpeg"),
+              _buildRewardItem(context,
+                  isVietnamese ? "Voucher mua sắm đồ thể thao" : "Sports shopping voucher",
+                  isVietnamese ? "700 điểm" : "700 points",
                   "https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg"),
-              _buildRewardItem(
-                  isVietnamese
-                      ? "Khóa học Kickboxing miễn phí"
-                      : "Free Kickboxing course",
-                  "600 điểm",
+              _buildRewardItem(context,
+                  isVietnamese ? "Khóa học Kickboxing miễn phí" : "Free Kickboxing course",
+                  isVietnamese ? "600 điểm" : "600 points",
                   "https://images.pexels.com/photos/4761793/pexels-photo-4761793.jpeg"),
               const SizedBox(height: 20),
               Center(
@@ -99,13 +79,10 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                   child: Text(
-                    isVietnamese
-                        ? "Bắt đầu tích điểm ngay"
-                        : "Start earning points now",
+                    isVietnamese ? "Bắt đầu tích điểm ngay" : "Start earning points now",
                     style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
@@ -117,7 +94,7 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
     );
   }
 
-  Widget _buildStep(String stepText) {
+  Widget _buildStep(BuildContext context, String stepText) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -131,7 +108,8 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
     );
   }
 
-  Widget _buildRewardItem(String title, String points, String imageUrl) {
+  Widget _buildRewardItem(BuildContext context, String title, String points, String imageUrl) {
+    final isVietnamese = Provider.of<LanguageProvider>(context).isVietnamese;
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -139,8 +117,7 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
       child: Row(
         children: [
           ClipRRect(
-            borderRadius:
-            const BorderRadius.horizontal(left: Radius.circular(10)),
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               height: 80,
@@ -155,12 +132,13 @@ class _RewardProgramPageState extends State<RewardProgramPage> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 5),
-                Text("Yêu cầu: $points",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(
+                  isVietnamese ? "Yêu cầu: $points" : "Required: $points",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               ],
             ),
           ),

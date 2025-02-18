@@ -36,28 +36,6 @@ class PromotionOfUserDTO {
     required this.isUsed,
     required this.createdBy,
   });
-
-  // factory PromotionOfUserDTO.fromJson(Map<String, dynamic> json) {
-  //   final dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
-  //   return PromotionOfUserDTO(
-  //     id: json['id'],
-  //     userId: json['userId'],
-  //     title: json['title'],
-  //     description: json['description'],
-  //     discountValue: (json['discountValue'] as num).toDouble(),
-  //     discountType: List<String>.from(json['discountType'] ?? []),
-  //     applicableService: List<String>.from(json['applicableService'] ?? []),
-  //     customerType: List<String>.from(json['customerType'] ?? []),
-  //     packageName: List<String>.from(json['packageName'] ?? []),
-  //     minValue: (json['minValue'] as num).toDouble(),
-  //     code: json['code'],
-  //     promotionAmount: json['promotionAmount'],
-  //     startDate: dateFormat.parse(json['startDate']),
-  //     endDate: dateFormat.parse(json['endDate']),
-  //     isUsed: json['isUsed'],
-  //     createdBy: json['createdBy'],
-  //   );
-  // }
   factory PromotionOfUserDTO.fromJson(Map<String, dynamic> json) {
     final dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     return PromotionOfUserDTO(
@@ -79,8 +57,6 @@ class PromotionOfUserDTO {
       createdBy: json['createdBy'] ?? 'Unknown',
     );
   }
-
-
   Map<String, dynamic> toJson() {
     final dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     return {

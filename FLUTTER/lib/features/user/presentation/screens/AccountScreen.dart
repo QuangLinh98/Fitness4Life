@@ -156,14 +156,11 @@ class _AccountScreenState extends State<AccountScreen> {
                           "Expiration Date: ${membership.formattedExpirationDate}",
                           style: const TextStyle(color: Colors.white70, fontSize: 14),
                         ),
-
                         const SizedBox(height: 4),
-
                       ],
                     );
                   },
                 ),
-
               ),
             ),
 
@@ -172,12 +169,7 @@ class _AccountScreenState extends State<AccountScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                buildOptionItem("User Guide", Icons.help_outline, () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RewardProgramPage())
-                  );
-                }),
+                buildOptionItem("User Guide", Icons.help_outline, () {}),
                 buildOptionItem("Your Discount", Icons.code, () {
                   Navigator.push(
                       context,

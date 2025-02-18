@@ -3,6 +3,9 @@ import 'package:fitness4life/features/booking/presentation/screens/ClassesScreen
 import 'package:fitness4life/features/fitness_goal/presentation/screens/HealthScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/AccountScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'LanguageProvider.dart';
 
 class PageManager extends StatefulWidget {
   const PageManager({super.key});
@@ -33,6 +36,8 @@ class _PageManagerState extends State<PageManager> {
 
   @override
   Widget build(BuildContext context) {
+    final isVietnamese = Provider.of<LanguageProvider>(context).isVietnamese;
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -56,27 +61,26 @@ class _PageManagerState extends State<PageManager> {
             fontSize: 12,
           ),
           onTap: (index) => updateIndex(index),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: const Icon(Icons.home),
+              label: isVietnamese ? 'Trang chủ' : 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.fitness_center),
-              label: 'Classes',
+              icon: const Icon(Icons.fitness_center),
+              label: isVietnamese ? 'Lớp học' : 'Classes',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.health_and_safety),
-              label: 'Health',
+              icon: const Icon(Icons.health_and_safety),
+              label: isVietnamese ? 'Sức khỏe' : 'Health',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Account',
+              icon: const Icon(Icons.account_circle),
+              label: isVietnamese ? 'Tài khoản' : 'Account',
             ),
           ],
         ),
       ),
     );
   }
-
 }

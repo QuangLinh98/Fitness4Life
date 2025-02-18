@@ -24,10 +24,10 @@
 
             <!-- Cho phép mở URL PayPal -->
             <intent-filter>
+                <data android:scheme="https"/>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https"/>
             </intent-filter>
 
             <intent-filter>
