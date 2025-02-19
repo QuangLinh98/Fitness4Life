@@ -51,7 +51,8 @@ public class SecurityConfig {
                                         "/api/users/refresh_token",
                                         "/api/booking/qrCode/validate",
                                         "/uploads/TrainerImage/**",
-                                        "/uploads/qrCodeImages/**"
+                                        "/uploads/qrCodeImages/**",
+                                        "/api/booking/packages"
                                 )
                                 .permitAll()
                                 .pathMatchers("/api/users/**").hasAnyAuthority("ADMIN", "USER")  // Cả ADMIN và USER đều có thể truy cập các endpoint này
@@ -106,7 +107,7 @@ public class SecurityConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(List.of("*"));
+        corsConfig.setAllowedOrigins(List.of("http://localhost:3000"));
         corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type" , "Accept"));
         corsConfig.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "PUT", "DELETE"));
         corsConfig.setAllowCredentials(true); // Cho phép gửi thông tin xác thực
