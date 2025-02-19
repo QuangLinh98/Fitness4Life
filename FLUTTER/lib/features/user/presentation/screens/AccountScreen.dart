@@ -14,8 +14,7 @@ import '../../../smart_deal/presentation/screens/post/YourPost.dart';
 import '../../../smart_deal/presentation/screens/promotion/PromotionScreen.dart';
 
 class AccountScreen extends StatefulWidget {
-  final int userId;
-  const AccountScreen({super.key,  this.userId = 102});
+  const AccountScreen({super.key});
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -31,8 +30,11 @@ class _AccountScreenState extends State<AccountScreen> {
     super.initState();
     // Gọi các service để lấy dữ liệu
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
       final membershipService = Provider.of<MembershipSubscriptionService>(context, listen: false);
-      membershipService.getMembershipSubscription(widget.userId); // 🔹 Chỉ gọi API, không dùng setState()
+      if (userInfo.userId != null) {
+        membershipService.getMembershipSubscription(userInfo.userId!);
+      }
     });
   }
 

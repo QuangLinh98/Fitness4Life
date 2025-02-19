@@ -1,18 +1,21 @@
 import 'package:fitness4life/api/Booking_Repository/BookingRoomRepository.dart';
+import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/booking/data/BookingRoom.dart';
 import 'package:flutter/cupertino.dart';
 
 class BookingRoomService extends ChangeNotifier {
   final BookingRoomRepository _bookingRoomRepository;
+  final RoomRepository _roomRepository;
 
   List<BookingRoom> bookedRooms = [];
   bool isLoading = false;
 
-  BookingRoomService(this._bookingRoomRepository);
+  BookingRoomService(this._bookingRoomRepository, this._roomRepository);
 
   //Xử lý booking room
   Future<bool> bookingRoom(int roomId , int userId) async {
+    print('Có lọt vào service hay không ');
     isLoading = true;
     try{
         await _bookingRoomRepository.bookRoom(roomId, userId);
@@ -44,6 +47,20 @@ class BookingRoomService extends ChangeNotifier {
 
        // Loại bỏ phòng đã hủy khỏi danh sách hiện tại
        bookedRooms.removeWhere((room) => room.id == id);
+
+       // Tìm phòng tương ứng và giảm số ghế trống
+       final room = await _roomRepository.getRoomById(id);
+       if (room != null) {
+         room!.availableseats = (room.availableseats ?? 0) - 1;
+         await _roomRepository.updateRoom(id, room);
+       } else {
+         print("Room with ID $id not found.");
+       }
+
+       // Cập nhật lại danh sách phòng đã đặt
+       await _roomRepository.getAllRooms();
+
+       notifyListeners();
 
        // Cập nhật giao diện người dùng
        notifyListeners();

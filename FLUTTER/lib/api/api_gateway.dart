@@ -145,9 +145,21 @@ class ApiGateWayService {
   }
 
   // Phương thức PUT
-  Future<Response> putData(String endpoint, {Map<String, dynamic>? data}) async {
-    return await _dio.put(endpoint, data: data);
+  Future<Response?> putData(String endpoint, {Map<String, dynamic>? data}) async {
+    try {
+      print("Sending PUT request to: $endpoint");
+      print("Data: ${data.toString()}");
+
+      final response = await _dio.put(endpoint, data: data);
+
+      print("Response: ${response.data}");
+      return response;
+    } catch (e) {
+      print("Error in PUT request: $e");
+      return null; // Trả về null nếu có lỗi
+    }
   }
+
 
   // Phương thức DELETE
   Future<Response> deleteData(String endpoint, {Map<String, dynamic>? data}) async {

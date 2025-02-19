@@ -4,6 +4,7 @@ import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/booking/data/BookingRoom.dart';
 import 'package:fitness4life/features/booking/presentation/screens/BookingDetailScreen.dart';
 import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
+import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -20,17 +21,6 @@ class ClassScreen extends StatefulWidget {
 
 class _ClassScreenState extends State<ClassScreen> {
   bool isBooked = false; // Biến trạng thái: true => hiển thị booked classes
-  int? userId; // Biến lưu userId lấy từ SharedPreferences
-
-
-  /// Hàm lấy `userId` từ SharedPreferences
-  Future<void> _loadUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userId = prefs.getInt('user_id');
-      print('UserId : ${userId}');
-    });
-  }
 
   final List<String> images = [
     'images/cycling.jpg',
@@ -44,20 +34,24 @@ class _ClassScreenState extends State<ClassScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _loadUserId();
     // Gọi các service để lấy dữ liệu
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
       // Gọi fetchRooms
       final roomService = Provider.of<RoomService>(context, listen: false);
       roomService.fetchRooms();
 
       //Gọi bookingRoom
       final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
-      bookingRoomService.bookingRoom(widget.roomId, userId!);
+      if (userInfo.userId != null) {
+        bookingRoomService.bookingRoom(widget.roomId, userInfo.userId!);
+      }
 
       //Gọi booked room by userId
       final bookedRoomService = Provider.of<BookingRoomService>(context, listen: false);
-      bookedRoomService.fetchBookedRooms(userId!);
+      if (userInfo.userId != null) {
+        bookingRoomService.fetchBookedRooms(userInfo.userId!);
+      }
 
       //Gọi cancel booking room
       final cancelBooking = Provider.of<BookingRoomService>(context, listen: false);
@@ -384,6 +378,9 @@ class _ClassScreenState extends State<ClassScreen> {
 
   //Card hiển thị tất cả room
   Widget buildUpcomingClassCard(Room room, int index) {
+    final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
+    final userId = userInfo.userId;
+
     // Format thời gian
     String formatTime(List<int>? timeList) {
       if (timeList != null && timeList.length >= 2) {
@@ -394,6 +391,22 @@ class _ClassScreenState extends State<ClassScreen> {
         return DateFormat('hh:mm a').format(time);
       }
       return 'N/A';
+    }
+
+    // Kiểm tra nếu endTime đã qua thời gian thực tế
+    DateTime now = DateTime.now();
+    bool isRoomExpired = false;
+
+    if (room.endtimeList != null && room.endtimeList!.length >= 2) {
+      DateTime endTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        room.endtimeList![0], // Giờ
+        room.endtimeList![1], // Phút
+      );
+
+      isRoomExpired = now.isAfter(endTime); // 🔥 Kiểm tra nếu endTime đã qua
     }
 
     // Sử dụng chỉ số index để ánh xạ hình ảnh
@@ -477,7 +490,7 @@ class _ClassScreenState extends State<ClassScreen> {
                       ),
                       // Nút "Book" hoặc "Full"
                       ElevatedButton(
-                        onPressed: (room.availableseats ?? 0) == (room.capacity ?? 0)
+                        onPressed: (isRoomExpired || (room.availableseats ?? 0) == (room.capacity ?? 0))
                             ? null // Vô hiệu hóa nút nếu đầy
                             : () async {
                           try {
