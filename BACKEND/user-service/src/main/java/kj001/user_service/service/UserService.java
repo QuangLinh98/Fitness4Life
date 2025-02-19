@@ -13,6 +13,7 @@ import kj001.user_service.repository.OtpRepository;
 import kj001.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -94,6 +95,30 @@ public class UserService {
                 .profileUserDTO(profileUserDTO)
                 .build();
         return userDTO;
+    }
+
+    public User findByEmail(String email) {
+        // Validate the email input
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email must not be null or empty.");
+        }
+        try {
+            // Attempt to find the user by email
+            Optional<User> userOptional = userRepository.findByEmail(email);
+
+            // Handle case where user is not found
+            return userOptional.orElseThrow(() ->
+                    new UsernameNotFoundException("User with email '" + email + "' not found.")
+            );
+
+        } catch (IllegalArgumentException ex) {
+            // Rethrow validation-related exceptions
+            throw ex;
+
+        } catch (Exception ex) {
+            // Catch and rethrow unexpected exceptions
+            throw new RuntimeException("An unexpected error occurred while fetching the user: " + ex.getMessage(), ex);
+        }
     }
 
 
