@@ -50,6 +50,7 @@ public class BookingRoomService {
 
     //Handle booking room
     public BookingRoom saveBookRoom(BooKingRoomDTO booKRoomDTO) {
+        System.out.println("Nhận request từ Flutter : "+ booKRoomDTO);
         //Kiểm tra room có tồn tại hay không
         RoomDTO roomExiting = roomEurekaClient.getRoomById(booKRoomDTO.getRoomId());
         if (roomExiting == null) {

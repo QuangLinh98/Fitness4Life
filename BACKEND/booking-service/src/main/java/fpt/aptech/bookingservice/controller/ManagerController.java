@@ -75,7 +75,6 @@ public class ManagerController {
     //@PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<?> addBookingRoom(@Valid @RequestBody BooKingRoomDTO booKingRoomDTO,
                                             BindingResult bindingResult) {
-        System.out.println("Received Request: " + booKingRoomDTO);
         try {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
@@ -90,15 +89,6 @@ public class ManagerController {
         }
     }
 
-//    @PutMapping("/confirmBookingRoom/{id}")
-//    public ResponseEntity<String> confirmBooking(@PathVariable int id) {
-//        try {
-//            bookingRoomService.confirmBookingRoom(id);
-//            return ResponseEntity.ok("Booking confirmed successfully");
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-//        }
-//    }
 
     @PutMapping("/cancelBookingRoom/{id}")
     public ResponseEntity<?> cancelBooking(@PathVariable int id) {

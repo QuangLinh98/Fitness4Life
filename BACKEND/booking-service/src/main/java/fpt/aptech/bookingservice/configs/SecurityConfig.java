@@ -31,7 +31,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/booking/qrCode/validate",
                                 "/uploads/qrCodeImages/**",
-                                "/api/booking/package/**")
+                                "/api/booking/package/**",
+                                "/api/booking/packages")
                         .permitAll()
                         .anyRequest()
                         .authenticated() // Yêu cầu tất cả endpoint cần xác thực
