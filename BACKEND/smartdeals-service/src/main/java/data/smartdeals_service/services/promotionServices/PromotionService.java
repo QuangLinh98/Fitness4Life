@@ -342,49 +342,72 @@ public class PromotionService {
     // method create promotion and subtract point
     @Transactional
     public boolean redeemDiscountCode (Long userId, int point, String promotionId) {
-        PromotionPointDTO getOnePromotion = getPromotionByIdInJson(promotionId);
-        if(getOnePromotion != null) {
-            int totalPoint = getOnePromotion.getPoints();
-            switch (point){
-                case 500:
-                case 1000:
-                case 2000:
-                    if (totalPoint >= point){
-                        // create promotion
-                        Promotion promotion = promotionRepository.findPromotionByCode(getOnePromotion.getCode());
-                        if(promotion == null) {
-                            Promotion newPromotion = new Promotion();
-                            newPromotion.setTitle(getOnePromotion.getTitle());
-                            newPromotion.setDescription(getOnePromotion.getDescription());
-                            newPromotion.setDiscountType(getOnePromotion.getDiscountType());
-                            newPromotion.setDiscountValue(getOnePromotion.getDiscountValue());
-                            newPromotion.setCustomerType(getOnePromotion.getCustomerType());
-                            newPromotion.setApplicableService(getOnePromotion.getApplicableService());
-                            newPromotion.setStartDate(LocalDateTime.now());
-                            newPromotion.setEndDate(calculateEndDate(LocalDateTime.now()));
-                            newPromotion.setIsActive(getOnePromotion.getIsActive());
-                            newPromotion.setMinValue(getOnePromotion.getMinValue());
-                            newPromotion.setCreatedBy(getOnePromotion.getCreatedBy());
-                            newPromotion.setCreatedDate(LocalDateTime.now());
-                            newPromotion.setPackageName(getOnePromotion.getPackageName());
-                            newPromotion.setCode(getOnePromotion.getCode());
-                            promotionRepository.save(newPromotion);
+        try{
+            PromotionPointDTO getOnePromotion = getPromotionByIdInJson(promotionId);
+            System.out.println("Request nhận tư flutter : " + getOnePromotion);
+            if(getOnePromotion != null) {
+                int totalPoint = getOnePromotion.getPoints();
+                switch (point){
+                    case 500:
+                    case 1000:
+                    case 1500:
+                    case 2000:
+                    case 2500:
+                    case 3000:
+                    case 3500:
+                    case 4000:
+                    case 4500:
+                    case 5000:
+                    case 5500:
+                    case 6000:
+                    case 6500:
+                    case 7000:
+                    case 7500:
+                    case 8000:
+                    case 8500:
+                    case 9000:
+                    case 9500:
+                    case 10000:
+                        if (totalPoint >= point){
+                            // create promotion
+                            Promotion promotion = promotionRepository.findPromotionByCode(getOnePromotion.getCode());
+                            if(promotion == null) {
+                                Promotion newPromotion = new Promotion();
+                                newPromotion.setTitle(getOnePromotion.getTitle());
+                                newPromotion.setDescription(getOnePromotion.getDescription());
+                                newPromotion.setDiscountType(getOnePromotion.getDiscountType());
+                                newPromotion.setDiscountValue(getOnePromotion.getDiscountValue());
+                                newPromotion.setCustomerType(getOnePromotion.getCustomerType());
+                                newPromotion.setApplicableService(getOnePromotion.getApplicableService());
+                                newPromotion.setStartDate(LocalDateTime.now());
+                                newPromotion.setEndDate(calculateEndDate(LocalDateTime.now()));
+                                newPromotion.setIsActive(getOnePromotion.getIsActive());
+                                newPromotion.setMinValue(getOnePromotion.getMinValue());
+                                newPromotion.setCreatedBy(getOnePromotion.getCreatedBy());
+                                newPromotion.setCreatedDate(LocalDateTime.now());
+                                newPromotion.setPackageName(getOnePromotion.getPackageName());
+                                newPromotion.setCode(getOnePromotion.getCode());
+                                promotionRepository.save(newPromotion);
+                            }
+                            // create promotionUser
+                            saveUserPromotion(userId,getOnePromotion.getCode());
+                            // subtract point
+                            pointServiceClient.approvePoint(userId, point);
+                        }else {
+                            throw new RuntimeException("NotEnoughPointsToDeduct");
                         }
-                        // create promotionUser
-                        saveUserPromotion(userId,getOnePromotion.getCode());
-                        // subtract point
-                        pointServiceClient.approvePoint(userId, point);
-                    }else {
-                        throw new RuntimeException("NotEnoughPointsToDeduct");
-                    }
-                    break;
-                default:
-                    throw new RuntimeException("InvalidPointId");
+                        break;
+                    default:
+                        throw new RuntimeException("InvalidPointId");
+                }
+            }else {
+                return false;
             }
-        }else {
-            return false;
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return true;
+
     }
     private LocalDateTime calculateEndDate(LocalDateTime startDate) {
         Duration duration = Duration.ofHours(5);

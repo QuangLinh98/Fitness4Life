@@ -16,7 +16,12 @@ public class FeignClientInterceptor implements RequestInterceptor {
         String url = requestTemplate.url(); // Lấy URL của request
 
         // Kiểm tra nếu URL thuộc endpoint không cần xác thực khi gửi feign client
-        if (url.startsWith("/api/dashboard/room")) {
+//        if (url.startsWith("/api/dashboard/room")) {
+//            System.out.println("Skipping Authorization for URL: " + url);
+//            return; // Bỏ qua thêm Authorization header
+//        }
+
+        if (url.startsWith("/api/goal/approvePoint/**")) {
             System.out.println("Skipping Authorization for URL: " + url);
             return; // Bỏ qua thêm Authorization header
         }

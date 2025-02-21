@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/promotionOfUser")
+@RequestMapping("/api/deal/promotionOfUser")
 @RequiredArgsConstructor
 public class PromotionOfUser {
     private final PromotionService promotionService;
