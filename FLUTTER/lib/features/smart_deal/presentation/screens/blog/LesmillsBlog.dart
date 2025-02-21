@@ -186,7 +186,7 @@ class _LesmillsBlogState extends State<LesmillsBlog> {
             },
           ),
         )
-            : const Center(child: Text("Không có bài blog nào")),
+            : const Center(child: Text("No blogs available")),
       ],
     );
   }

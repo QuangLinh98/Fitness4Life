@@ -16,15 +16,40 @@ class RoomService extends ChangeNotifier {
     notifyListeners();
     try{
       rooms = await _roomRepository.getAllRooms();
-      // Update availableSeats for each room
-      // for (var room in rooms) {
-      //   room.availableseats = (room.capacity! - room.bookedSeats).toInt(); // Update availableSeats based on booking
-      // }
     }
     catch(e) {
       print("Error fetching room: $e");
     }
     finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  //Get room By Package
+  Future<void> fetchRoomsByPackage(int packageId) async {
+    isLoading = true;
+    notifyListeners();
+    try{
+      rooms = await _roomRepository.getAllRoomsByPackage(packageId);
+    }
+    catch(e) {
+      print("Error fetching room by packageId: $e");
+    }
+    finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchRoomsByBranchId(int branchId) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      rooms = await _roomRepository.getRoomsByBranchId(branchId);
+    } catch (e) {
+      print("Error fetching rooms by branchId: $e");
+    } finally {
       isLoading = false;
       notifyListeners();
     }
@@ -39,7 +64,6 @@ class RoomService extends ChangeNotifier {
       throw Exception("Error updating room: $e");
     }
   }
-  
   
   Future<void> getRoomById(int roomId) async {
     isLoading = true;

@@ -1,5 +1,7 @@
 import 'package:fitness4life/core/widgets/CustomDialog.dart';
+import 'package:fitness4life/features/Home/data/Branch.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
+import 'package:fitness4life/features/Home/service/BranchService.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/booking/data/BookingRoom.dart';
 import 'package:fitness4life/features/booking/presentation/screens/BookingDetailScreen.dart';
@@ -22,7 +24,7 @@ class ClassScreen extends StatefulWidget {
 class _ClassScreenState extends State<ClassScreen> {
   bool isBooked = false; // Biến trạng thái: true => hiển thị booked classes
   int? selectedBranchId;
-  final List<int> branchIds = [1, 2, 3, 4, 5];
+
 
   final List<String> images = [
     'images/cycling.jpg',
@@ -42,6 +44,10 @@ class _ClassScreenState extends State<ClassScreen> {
       // Gọi fetchRooms
       final roomService = Provider.of<RoomService>(context, listen: false);
       roomService.fetchRooms();
+
+      // Gọi fetchRooms
+      final branchService = Provider.of<BranchService>(context, listen: false);
+      branchService.fetchBranchs();
 
       //Gọi bookingRoom
       final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
@@ -76,6 +82,7 @@ class _ClassScreenState extends State<ClassScreen> {
       body: Container(
         child:  Column(
           children: [
+            _buildFilterForm(),
             Container(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               color: const Color(0xFFB00020),
@@ -598,6 +605,47 @@ class _ClassScreenState extends State<ClassScreen> {
     }
   }
 
+  Widget _buildFilterForm() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      color: const Color(0xFFB00020),
+      child: Consumer<BranchService>(
+        builder: (context, branchService, child) {
+          if (branchService.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (branchService.branchs.isEmpty) {
+            return const Text("No branches available", style: TextStyle(color: Colors.white));
+          }
+          return DropdownButtonFormField<int>(
+            decoration: InputDecoration(
+              labelText: "Select Branch",
+              labelStyle: const TextStyle(color: Colors.white),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            value: selectedBranchId,
+            items: branchService.branchs.map((Branch branch) {
+              return DropdownMenuItem<int>(
+                value: branch.id,
+                child: Text(branch.branchName),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedBranchId = value;
+              });
+              if (value != null) {
+                final roomService = Provider.of<RoomService>(context, listen: false);
+                roomService.fetchRoomsByBranchId(value);
+              }
+            },
+          );
+        },
+      ),
+    );
+  }
 }
 
 

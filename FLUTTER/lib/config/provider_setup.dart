@@ -3,6 +3,7 @@ import 'package:fitness4life/api/Booking_Repository/MembershipSubscriptionReposi
 import 'package:fitness4life/api/Booking_Repository/PaypalRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/QrRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/WorkoutPackageRepository.dart';
+import 'package:fitness4life/api/Dashboard_Repository/BranchRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/ProgressRepository.dart';
@@ -13,6 +14,7 @@ import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
 import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
 import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
+import 'package:fitness4life/features/Home/service/BranchService.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
 import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
@@ -40,6 +42,7 @@ import 'locator_setup.dart';
 //Quản lý các phụ thuộc của ứng dụng
 List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => TrainerService(locator<TrainerRepository>())),
+  ChangeNotifierProvider(create: (_) => BranchService(locator<BranchRepository>())),
   ChangeNotifierProvider(create: (_) => RoomService(locator<RoomRepository>())),
   ChangeNotifierProvider(create: (_) => GoalService(locator<GoalRepository>())),
   ChangeNotifierProvider(create: (_) => ProgressService(locator<ProgressRepository>())),
