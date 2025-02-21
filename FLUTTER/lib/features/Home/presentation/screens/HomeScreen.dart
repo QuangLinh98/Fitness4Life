@@ -126,8 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
                    //Hiển thị Blog
                    const Carouse(),
                    const SizedBox(height: 15),
-                   //const CarouseBlog(),
-                   const SizedBox(height: 15),
                    const LesmillsBlog(),
                  ],
                ),
@@ -145,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String correctedUrl = getFullImageUrl(originalUrl);
 
     // Tách và lấy tên cuối cùng
-    String fullName = trainer.fullname ?? "Unknown";
+    String fullName = trainer.fullName ?? "Unknown";
     List<String> nameParts = fullName.split(' '); // Tách chuỗi theo dấu cách
     String lastName = nameParts.isNotEmpty ? nameParts.last : fullName;
 

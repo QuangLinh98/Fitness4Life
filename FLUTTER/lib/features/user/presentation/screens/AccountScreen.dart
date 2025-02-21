@@ -175,10 +175,10 @@ class _AccountScreenState extends State<AccountScreen> {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 buildOptionItem("User Guide", Icons.help_outline, () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RewardProgramPage())
-                  );
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(builder: (context) => RewardProgramPage())
+                  // );
                 }),
                 buildOptionItem("Your Discount", Icons.code, () {
                   Navigator.push(

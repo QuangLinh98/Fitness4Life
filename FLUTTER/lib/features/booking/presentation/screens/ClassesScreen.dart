@@ -21,6 +21,8 @@ class ClassScreen extends StatefulWidget {
 
 class _ClassScreenState extends State<ClassScreen> {
   bool isBooked = false; // Biến trạng thái: true => hiển thị booked classes
+  int? selectedBranchId;
+  final List<int> branchIds = [1, 2, 3, 4, 5];
 
   final List<String> images = [
     'images/cycling.jpg',
@@ -456,16 +458,37 @@ class _ClassScreenState extends State<ClassScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  if (room.trainer != null) ...[
+                    Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Trainer: ${room.trainer!.fullName}",
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   const SizedBox(height: 4),
                   // Thời gian lớp học
                   Text(
                     "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
                     style: const TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 16,
                     ),
                   ),
                   const SizedBox(height: 8),
+
+
                   // Nút "Book"
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../token/token_manager.dart';
+import '../../../smart_deal/service/PromotionService.dart';
+import '../../data/WorkoutPackage.dart';
 
 class PayPalPaymentScreen extends StatefulWidget {
   final int userId;
   final int packageId;
+  final PackageName packageName; // thêm
 
-  const PayPalPaymentScreen({super.key, required this.userId, required this.packageId});
+  const PayPalPaymentScreen({super.key, required this.userId, required this.packageId, required this.packageName});
 
   @override
   _PayPalPaymentScreenState createState() => _PayPalPaymentScreenState();
@@ -20,27 +23,32 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
   double? totalAmount; // ✅ Giá trị gói tập từ DB
   double? discountedAmount;  //Giá mã giảm giá
   bool _isLoading = false;
-
+  String? _selectedDiscountCode;
+  Map<String, double>? _discountCodes;
   final TextEditingController _discountController = TextEditingController();
-  final Map<String, double> _discountCodes = {
-    "FIT10": 10.0, // 10% discount
-    "VIP20": 20.0, // 20% discount
-  };
 
   @override
   void initState() {
     super.initState();
     _paypalService = Provider.of<PaypalService>(context, listen: false);
-    _fetchPackageDetails();
+    Future.delayed(Duration.zero, () {
+      _fetchPackageDetails();
+      _fetchUserPromotions();
+    });
+
   }
 
+  Future<void> _fetchUserPromotions() async {
+    final promotionService = Provider.of<PromotionService>(context, listen: false);
+    await promotionService.getPromotionOfUserById(widget.userId);
+  }
   /// **📌 Lấy giá trị gói tập từ database**
   Future<void> _fetchPackageDetails() async {
     setState(() => _isLoading = true);
     try {
+
       final packageDetails = await Provider.of<WorkoutPackageService>(context, listen: false)
           .fetchPackageById(widget.packageId);
-
       setState(() {
         totalAmount = packageDetails?.price;
         discountedAmount = totalAmount;   //Giá mặc định chưa giảm
@@ -56,17 +64,29 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
   }
 
   /// **📌 Áp dụng mã giảm giá**
-  void _applyDiscount() {
-    String code = _discountController.text.trim();
-    if (_discountCodes.containsKey(code) && totalAmount != null) {
-      double discount = _discountCodes[code]! / 100 * totalAmount!;
+  Future<void> _applyDiscount() async {
+    if (_discountCodes == null || totalAmount == null) {
+      _showSnackBar("❌ Please select a valid promotion!");
+      return;
+    }
+
+    String enteredCode = _discountController.text;
+    double discount = _discountCodes![enteredCode] ?? 0;
+    print("✅ Mã giảm giá: $enteredCode");
+    print("✅ Giá trị giảm: $discount");
+    final promotionService = Provider.of<PromotionService>(context, listen: false);
+
+    bool isValid = await promotionService.findCodeOfUser(enteredCode, widget.userId);
+    print('isValid: $isValid');
+    if (isValid) {
       setState(() {
         discountedAmount = totalAmount! - discount;
       });
-      _showSnackBar("✅ Discount code applied successfully!");
+      _showSnackBar("✅ Discount applied: -${discount}\$");
     } else {
-      _showSnackBar("❌ Invalid coupon code!");
+      _showSnackBar("❌ Invalid or unauthorized coupon code!");
     }
+
   }
 
   void _showSnackBar(String message) {
@@ -81,7 +101,6 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
       );
       return;
     }
-
     setState(() => _isLoading = true);
 
     try {
@@ -143,6 +162,16 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final promotionService = Provider.of<PromotionService>(context);
+    final availablePromotions = promotionService.promotionOfUsers
+        .where((promo) => totalAmount != null &&
+        totalAmount! >= promo.minValue &&
+        (promo.packageName == null ||
+            promo.packageName.isEmpty ||
+            promo.packageName.any((name) =>
+            name.toLowerCase() == widget.packageName.name.toLowerCase())))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text("Payment")),
@@ -163,27 +192,102 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
 
             const SizedBox(height: 10),
-
-            // **📝 Ô nhập mã giảm giá**
-            TextField(
-              controller: _discountController,
+            DropdownButtonFormField<String>(
               decoration: InputDecoration(
-                labelText: "Enter discount code",
-                border: OutlineInputBorder(),
+                labelText: "Chọn khuyến mãi",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.check),
                   onPressed: _applyDiscount,
                 ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
+
+              value: _selectedDiscountCode,
+              items: availablePromotions.map((promo) {
+                return DropdownMenuItem<String>(
+                  value: promo.code,
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.local_offer, color: Colors.blueAccent, size: 20),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "${promo.code} - ${promo.promotionAmount}\$",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "price reduction: ${promo.discountValue}\$",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "minimum price: ${promo.minValue}\$",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "📅 ${promo.startDate} ➝ ${promo.endDate}",
+                                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? selectedCode) {
+                if (selectedCode != null) {
+                  final selectedPromo = availablePromotions.firstWhere(
+                        (promo) => promo.code == selectedCode,
+                  );
+                  setState(() {
+                    _selectedDiscountCode = selectedCode;
+                    _discountController.text = selectedCode;
+                    _discountCodes = {selectedCode: selectedPromo?.discountValue ?? 0};
+                  });
+                }
+              },
+              selectedItemBuilder: (BuildContext context) {
+                return availablePromotions.map((promo) {
+                  return Text(
+                    promo.code, // Chỉ hiển thị mã giảm giá khi đã chọn
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                  );
+                }).toList();
+              },
             ),
 
             const SizedBox(height: 10),
-
             // **💲 Hiển thị giá sau giảm (nếu có)**
             if (discountedAmount != null && discountedAmount != totalAmount)
               Text("Discounted Price: \$${discountedAmount!.toStringAsFixed(2)}",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
-
             const SizedBox(height: 20),
 
             // **🛒 Nút thanh toán PayPal**
@@ -202,7 +306,6 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
             ),
 
             const SizedBox(height: 30),
-
             const Text(
               "Secure Payment Powered by PayPal",
               style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),

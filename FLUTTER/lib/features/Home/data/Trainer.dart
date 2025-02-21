@@ -36,7 +36,7 @@ class Rooms {
 
 class Trainer {
   int? id;
-  String? fullname;
+  String? fullName;
   String? slug;
   String? photo;
   String? specialization;
@@ -50,13 +50,13 @@ class Trainer {
   List<Rooms>? roomsList;
 
   Trainer(
-      {this.id, this.fullname, this.slug, this.photo, this.specialization, this.experienceyear, this.certificate, this.phonenumber, this.scheduletrainersList, this.createat, this.updateat, this.branch, this.roomsList});
+      {this.id, this.fullName, this.slug, this.photo, this.specialization, this.experienceyear, this.certificate, this.phonenumber, this.scheduletrainersList, this.createat, this.updateat, this.branch, this.roomsList});
 
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map["id"] = id;
-    map["fullName"] = fullname;
+    map["fullName"] = fullName;
     map["slug"] = slug;
     map["photo"] = photo;
     map["specialization"] = specialization;
@@ -77,7 +77,7 @@ class Trainer {
 
   Trainer.fromJson(dynamic json){
     id = json["id"];
-    fullname = json["fullName"];
+    fullName = json["fullName"];
     slug = json["slug"];
     photo = json["photo"];
     specialization = json["specialization"];

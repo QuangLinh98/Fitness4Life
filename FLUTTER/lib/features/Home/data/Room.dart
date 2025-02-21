@@ -1,3 +1,5 @@
+import 'Trainer.dart';
+
 class Room {
   int? id;
   String? roomname;
@@ -11,6 +13,7 @@ class Room {
   List<int>? createdatList;
   List<int>? updatedatList;
   late bool isBooked;
+  Trainer? trainer;
 
   Room({
     this.id,
@@ -25,6 +28,7 @@ class Room {
     this.createdatList,
     this.updatedatList,
     this.isBooked = false,
+    this.trainer,
   });
 
   Map<String, dynamic> toJson() {
@@ -41,6 +45,7 @@ class Room {
     map["createdAt"] = createdatList;
     map["updatedAt"] = updatedatList;
     map["isBooked"] = isBooked;
+    map["trainer"] = trainer?.toJson();
     return map;
   }
 
@@ -60,5 +65,6 @@ class Room {
     updatedatList =
     json["updatedAt"] != null ? json["updatedAt"].cast<int>() : [];
     isBooked = false;
+    trainer = json["trainer"] != null ? Trainer.fromJson(json["trainer"]) : null;
   }
 }
