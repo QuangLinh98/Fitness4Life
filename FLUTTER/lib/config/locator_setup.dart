@@ -15,6 +15,7 @@ import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
 import 'package:fitness4life/api/User_Repository/LoginRepository.dart';
 import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
+import 'package:fitness4life/api/User_Repository/ProfileRepository.dart';
 import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
 import 'package:fitness4life/api/api_gateway.dart';
 import 'package:get_it/get_it.dart';
@@ -60,6 +61,9 @@ void setUpLocator() {
 
   // Đăng ký RegisterRepository
   locator.registerLazySingleton(() => RegisterRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký ProfileRepository
+  locator.registerLazySingleton(() => ProfileRepository(locator<ApiGateWayService>()));
 
   // Đăng ký PasswordRepository
   locator.registerLazySingleton(() => PasswordRepository(locator<ApiGateWayService>()));

@@ -160,6 +160,16 @@ class ApiGateWayService {
     }
   }
 
+  Future<Response?> putFormData(String endpoint, {FormData? formData, Options? options}) async {
+    try {
+      final response = await _dio.put(endpoint, data: formData, options: options ?? Options(headers: {'Content-Type': 'multipart/form-data'}));
+      return response;
+    } catch (e) {
+      print("Error in PUT request with FormData: \$e");
+      return null;
+    }
+  }
+
 
   // Phương thức DELETE
   Future<Response> deleteData(String endpoint, {Map<String, dynamic>? data}) async {

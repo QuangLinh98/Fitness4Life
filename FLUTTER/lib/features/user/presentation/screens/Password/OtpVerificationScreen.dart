@@ -1,3 +1,4 @@
+import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:fitness4life/features/user/service/PasswordService.dart';
 import 'package:fitness4life/features/user/service/RegisterService.dart';
@@ -138,7 +139,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
          Navigator.pushReplacement(
            context,
            MaterialPageRoute(
-             builder: (context) => LoginScreen(),
+             builder: (context) => PageManager(),
            ),
          );
       }

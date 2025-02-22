@@ -24,7 +24,7 @@ class ClassScreen extends StatefulWidget {
 class _ClassScreenState extends State<ClassScreen> {
   bool isBooked = false; // Biến trạng thái: true => hiển thị booked classes
   int? selectedBranchId;
-
+  int? packageId;
 
   final List<String> images = [
     'images/cycling.jpg',
@@ -44,6 +44,7 @@ class _ClassScreenState extends State<ClassScreen> {
       // Gọi fetchRooms
       final roomService = Provider.of<RoomService>(context, listen: false);
       roomService.fetchRooms();
+      //roomService.fetchRoomsByPackage(packageId!);
 
       // Gọi fetchRooms
       final branchService = Provider.of<BranchService>(context, listen: false);

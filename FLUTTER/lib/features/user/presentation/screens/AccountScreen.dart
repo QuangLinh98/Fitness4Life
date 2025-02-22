@@ -3,6 +3,8 @@ import 'package:fitness4life/features/booking/data/MembershipSubscription%20.dar
 import 'package:fitness4life/features/booking/service/MembershipSubscriptionService.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/Password/ChangePasswordScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Profile/ProfileScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Profile/UpdateProfileScreen.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
@@ -80,12 +82,14 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        "Profile >",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => UpdateProfileScreen())
+                          );
+                        },
+                        child: const Text("Profile >", style: TextStyle(color: Colors.red, fontSize: 16)),
                       ),
                     ],
                   ),
