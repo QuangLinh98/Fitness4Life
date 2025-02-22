@@ -43,10 +43,12 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     final userName = Provider.of<UserInfoProvider>(context).userName;
+    final userId = Provider.of<UserInfoProvider>(context).userId;
     final membershipService = Provider.of<MembershipSubscriptionService>(context);
     final membership = membershipService.membershipSubscription;
 
     return Scaffold(
+
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -86,7 +88,8 @@ class _AccountScreenState extends State<AccountScreen> {
                         onPressed: () {
                           Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => UpdateProfileScreen())
+                              //MaterialPageRoute(builder: (context) => UpdateProfileScreen())
+                              MaterialPageRoute(builder: (context) => ProfileScreen(userId: userId!))
                           );
                         },
                         child: const Text("Profile >", style: TextStyle(color: Colors.red, fontSize: 16)),

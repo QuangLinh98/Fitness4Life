@@ -1,10 +1,14 @@
 import 'package:fitness4life/api/User_Repository/ProfileRepository.dart';
 import 'package:flutter/material.dart';
 
+import '../data/models/UserResponseDTO.dart';
+
 class ProfileService extends ChangeNotifier {
   final ProfileRepository _profileRepository;
+  UserResponseDTO? _userProfile;
 
   ProfileService(this._profileRepository);
+  UserResponseDTO? get userProfile => _userProfile;
 
   Future<bool> updateUserProfile({
     required int userId,
@@ -41,4 +45,22 @@ class ProfileService extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<UserResponseDTO?> getUserById(int userId) async {
+    try {
+      final user = await _profileRepository.getUserById(userId);
+      if (user != null) {
+        _userProfile = user;
+        notifyListeners(); // Cập nhật UI
+        return user;
+      } else {
+        print("Failed to fetch user profile");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching user profile: $e");
+      return null;
+    }
+  }
+
 }

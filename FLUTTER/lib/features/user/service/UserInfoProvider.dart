@@ -1,4 +1,6 @@
+import 'package:fitness4life/features/user/service/ProfileService.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UserInfoProvider extends ChangeNotifier {
   String? _userName;

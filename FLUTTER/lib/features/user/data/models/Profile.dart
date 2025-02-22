@@ -36,7 +36,7 @@ class UserAndProfileUpdateDTO {
       fullName: json['full_name'],
       role: json['role'],
       gender: Gender.values.firstWhere(
-            (e) => e.toString().split('.').last == json['packageName'],
+            (e) => e.toString().split('.').last == json['gender'],
         orElse: () => Gender.MALE,
       ),
       status: json['status'],
@@ -47,7 +47,7 @@ class UserAndProfileUpdateDTO {
       heightValue: json['height_value'],
       avatar: json['avatar'],
       maritalStatus: MaritalStatus.values.firstWhere(
-            (e) => e.toString().split('.').last == json['packageName'],
+            (e) => e.toString().split('.').last == json['marital_status'],
         orElse: () => MaritalStatus.SINGLE,
       ),
       description: json['description'],
