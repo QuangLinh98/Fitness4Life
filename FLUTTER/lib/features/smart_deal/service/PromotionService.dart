@@ -10,6 +10,7 @@ class PromotionService extends ChangeNotifier {
   PromotionService(this._promotionRepository);
 
   List<PromotionPointDTO> promotionPoints = [];
+  PromotionPointDTO? promotionPoint;
 
   PromotionOfUserDTO? promotionOfUser;
 
@@ -58,6 +59,20 @@ class PromotionService extends ChangeNotifier {
       print("Error fetching promotions by ID: $e");
     } finally {
       isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchPromotionInJsonById(String promotionId) async {
+    isFetchingSingle = true;
+    notifyListeners();
+    try {
+      promotionPoint = await _promotionRepository.getPromotionInJsonById(promotionId);
+      debugPrint("Fetched fetchPromotionInJsonById được gọi ko: $promotionPoints");
+    } catch (e) {
+      print("Error fetching promotions by ID: $e");
+    } finally {
+      isFetchingSingle = false;
       notifyListeners();
     }
   }

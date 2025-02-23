@@ -48,15 +48,9 @@ public class FileUploadAvata {
         if (!directory.exists()) {
             directory.mkdirs();
         }
-//        // tạo tên đường dẫn
-//        String fileName = UUID.randomUUID().toString()+"_"+ multipartFile.getOriginalFilename();
-
-        // Tạo tên file mới không chứa khoảng trắng
-        String originalFileName = multipartFile.getOriginalFilename();
-        String sanitizedFileName = originalFileName != null ? originalFileName.replaceAll("\\s+", "_") : "default_file";
-        String fileName = UUID.randomUUID().toString() + "_" + sanitizedFileName;
+        // tạo tên đường dẫn
+        String fileName = UUID.randomUUID().toString() +"_"+ multipartFile.getOriginalFilename();
         Path destination = Path.of(exactFolderPath, fileName);
-
 
         // lưu file
         Files.copy(multipartFile.getInputStream(), destination);

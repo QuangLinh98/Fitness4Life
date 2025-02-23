@@ -8,8 +8,6 @@ import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import '../../../smart_deal/presentation/screens/RewardProgramPage.dart';
 import '../../../smart_deal/presentation/screens/post/YourPost.dart';
 import '../../../smart_deal/presentation/screens/promotion/PromotionScreen.dart';
 

@@ -123,7 +123,7 @@ class PromotionRepository {
     try {
       final response = await _apiGateWayService.getData('/deal/promotions/json/all');
 
-      debugPrint("lấy được data từ api ko ta:  ${response.data}");
+      // debugPrint("lấy được data từ api ko ta:  ${response.data}");
       if (response.data != null && response.data['data'] is List) {
         List<dynamic> dataList = response.data['data'];
         List<PromotionPointDTO?> promotions= dataList.map((json) {
@@ -140,8 +140,29 @@ class PromotionRepository {
         throw Exception("Invalid response structure or 'data' is not a List.");
       }
     } catch (e) {
-      print("❌ Lỗi khi lấy danh sách PromotionOfUserDTO: $e");
-      throw Exception("Failed to fetch PromotionOfUserDTO. Please try again later.");
+      print("❌ Lỗi khi lấy danh sách PromotionPointDTO: $e");
+      throw Exception("Failed to fetch PromotionPointDTO. Please try again later.");
+    }
+  }
+  Future<PromotionPointDTO> getPromotionInJsonById(String promotionId) async {
+    try {
+      final response = await _apiGateWayService.getData('/deal/promotions/json/$promotionId');
+
+      debugPrint("lấy được data từ api ko ta:  ${response.data}");
+      if (response.data != null && response.data['data'] != null) {
+        try {
+          PromotionPointDTO code = PromotionPointDTO.fromJson(response.data['data']);
+          return code;
+        } catch (e) {
+          print("❌ Lỗi chuyển đổi PromotionPointDTO one: $e");
+          return response.data;
+        }
+      }else {
+        throw Exception("Invalid response structure or 'data' is not a List.");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi lấy danh sách PromotionPointDTO: $e");
+      throw Exception("Failed to fetch PromotionPointDTO. Please try again later.");
     }
   }
 
@@ -149,7 +170,7 @@ class PromotionRepository {
     try {
       final response = await _apiGateWayService.postData('/deal/promotionOfUser/usedPointChangCode/$userId?point=$point&promotionId=$promotionId');
       if (response.data != null) {
-        print("log data usedPointChangeCode ${response.data}");
+        // print("log data usedPointChangeCode ${response.data}");
         return true;
       } else {
         throw Exception("Invalid response structure usedPointChangeCode.");

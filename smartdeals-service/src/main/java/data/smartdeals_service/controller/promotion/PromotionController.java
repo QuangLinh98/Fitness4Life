@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/deal/promotions")
 @RequiredArgsConstructor
@@ -62,6 +59,7 @@ public class PromotionController {
     public void deletePromotion(@PathVariable Long id) {
         promotionService.deletePromotion(id);
     }
+
     @PutMapping("/changePublished/{id}")
     public ResponseEntity<?> changePublished(@PathVariable Long id, @RequestBody PromotionStatusDTO promotionStatusDTO,
                                              BindingResult bindingResult) {

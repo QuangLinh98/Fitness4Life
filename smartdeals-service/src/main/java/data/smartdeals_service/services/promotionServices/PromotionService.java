@@ -222,7 +222,6 @@ public class PromotionService {
         userPromotionRepository.save(userPromotion);
     }
     public void sendCodeToUser(String code, String email) {
-//        UserDTO user = erurekaService.getUserById(userId);
         UserDTO user = erurekaService.getUserByEmail(email);
         if (user == null) {
             throw new IllegalArgumentException("User not found");
@@ -352,7 +351,24 @@ public class PromotionService {
             switch (point){
                 case 500:
                 case 1000:
+                case 1500:
                 case 2000:
+                case 2500:
+                case 3000:
+                case 3500:
+                case 4000:
+                case 4500:
+                case 5000:
+                case 5500:
+                case 6000:
+                case 6500:
+                case 7000:
+                case 7500:
+                case 8000:
+                case 8500:
+                case 9000:
+                case 9500:
+                case 10000:
                     if (totalPoint >= point){
                         // create promotion
                         Promotion promotion = promotionRepository.findPromotionByCode(getOnePromotion.getCode());

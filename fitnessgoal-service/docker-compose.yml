@@ -1,0 +1,94 @@
+services:
+  # Dịch vụ Zookeeper
+  my_zookeeper:
+    # Sử dụng image Zookeeper từ Confluent
+    image: confluentinc/cp-zookeeper
+    environment:
+      # Cổng Zookeeper lắng nghe các kết nối client
+      ZOOKEEPER_CLIENT_PORT: 2182
+      # Thời gian kiểm tra kết nối giữa các node trong cluster Zookeeper
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      # Ánh xạ cổng 2181 trên host tới cổng 2181 trong container Zookeeper
+      - 2182:2182
+    # Tự động khởi động lại dịch vụ nếu gặp lỗi
+    restart: "on-failure"
+
+  # Dịch vụ Kafka broker 1
+  kafka1:
+    # Sử dụng image Kafka từ Confluent, phiên bản 7.2.1
+    image: confluentinc/cp-kafka:7.2.1
+    # Đặt tên container là kafka1 để dễ quản lý và theo dõi
+    container_name: fitnessgoal1
+    ports:
+      # Ánh xạ cổng 8097 trên host tới cổng 8097 trong container Kafka 1
+      - "8097:8097"
+    # Đảm bảo Zookeeper đã khởi động trước khi Kafka 1 khởi động
+    depends_on:
+      - my_zookeeper
+    environment:
+      # Đặt ID cho Kafka broker, ID này phải duy nhất trong cluster Kafka
+      KAFKA_BROKER_ID: 4
+      # Địa chỉ kết nối tới Zookeeper để Kafka có thể liên lạc
+      KAFKA_ZOOKEEPER_CONNECT: my_zookeeper:2182
+      # Cấu hình các giao thức bảo mật cho các listener Kafka
+      # "EXTERNAL" và "INTERNAL" đều sử dụng giao thức PLAINTEXT (không mã hóa)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      # Định nghĩa các listener để Kafka sử dụng
+      # EXTERNAL dùng cho các kết nối bên ngoài qua cổng 8097
+      # INTERNAL dùng cho các kết nối giữa các broker qua cổng 9092
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:8097,INTERNAL://fitnessgoal1:9092
+      # Đặt listener "INTERNAL" làm giao thức để các broker liên lạc với nhau
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      # Thiết lập số lượng bản sao cho topic lưu trữ offset của các consumer
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+  # Dịch vụ Kafka broker 2
+  kafka2:
+    image: confluentinc/cp-kafka:7.2.1
+    container_name: fitnessgoal2
+    ports:
+      # Ánh xạ cổng 8098 trên host tới cổng 8098 trong container Kafka 2
+      - "8098:8098"
+    depends_on:
+      - my_zookeeper
+    environment:
+      # Đặt ID duy nhất cho Kafka broker 2
+      KAFKA_BROKER_ID: 5
+      # Địa chỉ kết nối tới Zookeeper
+      KAFKA_ZOOKEEPER_CONNECT: my_zookeeper:2182
+      # Cấu hình giao thức bảo mật cho các listener Kafka
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      # Định nghĩa các listener cho Kafka broker 2
+      # EXTERNAL cho các kết nối bên ngoài qua cổng 8098
+      # INTERNAL cho các kết nối giữa các broker qua cổng 9092
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:8098,INTERNAL://fitnessgoal2:9092
+      # Đặt listener "INTERNAL" làm giao thức để các broker liên lạc với nhau
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      # Thiết lập số lượng bản sao cho topic lưu trữ offset của các consumer
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+  # Dịch vụ Kafka broker 3
+  kafka3:
+    image: confluentinc/cp-kafka:7.2.1
+    container_name: fitnessgoal3
+    ports:
+      # Ánh xạ cổng 8099 trên host tới cổng 8099 trong container Kafka 3
+      - "8099:8099"
+    depends_on:
+      - my_zookeeper
+    environment:
+      # Đặt ID duy nhất cho Kafka broker 3
+      KAFKA_BROKER_ID: 6
+      # Địa chỉ kết nối tới Zookeeper
+      KAFKA_ZOOKEEPER_CONNECT: my_zookeeper:2182
+      # Cấu hình giao thức bảo mật cho các listener Kafka
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      # Định nghĩa các listener cho Kafka broker 3
+      # EXTERNAL cho các kết nối bên ngoài qua cổng 8099
+      # INTERNAL cho các kết nối giữa các broker qua cổng 9092
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:8099,INTERNAL://fitnessgoal3:9092
+      # Đặt listener "INTERNAL" làm giao thức để các broker liên lạc với nhau
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      # Thiết lập số lượng bản sao cho topic lưu trữ offset của các consumer
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3

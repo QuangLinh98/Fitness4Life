@@ -13,7 +13,7 @@ class ApiGateWayService {
     "/users/reset-password",
     "/users/refresh_token",
     "/booking/qrCode/validate",
-    "/uploads/TrainerImage/"
+    "/uploads/"
   ];
 
   //Thêm token vào header cho mỗi yêu cầu.

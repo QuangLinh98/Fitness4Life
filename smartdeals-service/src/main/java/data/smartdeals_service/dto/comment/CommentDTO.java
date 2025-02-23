@@ -19,4 +19,5 @@ public class CommentDTO { // lưu ý blogId và questionId ko được nhập v�
     private Boolean isPublished;
     private LocalDateTime createdAt;
     private List<CommentDTO> replies = new ArrayList<>();
+
 }

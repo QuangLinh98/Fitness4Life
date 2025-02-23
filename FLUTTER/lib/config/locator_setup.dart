@@ -1,4 +1,3 @@
-// File chứa hàm `setupLocator()` và cấu hình DI
 import 'package:dio/dio.dart';
 import 'package:fitness4life/api/Booking_Repository/BookingRoomRepository.dart';
 import 'package:fitness4life/api/Booking_Repository/MembershipSubscriptionRepository.dart';
@@ -24,7 +23,7 @@ final GetIt locator = GetIt.instance;
 void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
-    baseUrl: "http://192.168.31.91:9000/api", // API Gateway URL
+    baseUrl:"http://172.16.12.91:9000/api", // API Gateway URL ở quán bamos
     connectTimeout: const Duration(milliseconds: 30000), // Thời gian timeout kết nối
     receiveTimeout: const Duration(milliseconds: 30000), // Thời gian timeout nhận dữ liệu
   )));

@@ -46,4 +46,20 @@
   "packageName" : [ "CLASSIC" ],
   "code" : "EDFC743E",
   "points" : 1000
+}, {
+  "id" : "2F4565A3",
+  "title" : "fdsfđà",
+  "description" : "dsadsad",
+  "discountType" : [ "PERCENTAGE", "FIXED" ],
+  "discountValue" : 1122,
+  "startDate" : null,
+  "endDate" : null,
+  "isActive" : true,
+  "applicableService" : [ "ALL" ],
+  "minValue" : 6000,
+  "customerType" : [ "RETURNING" ],
+  "createdBy" : "huy",
+  "packageName" : [ "PRESIDENT", "ROYAL", "SIGNATURE" ],
+  "code" : "FB4C1BF9",
+  "points" : 10000
 } ]

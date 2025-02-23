@@ -93,6 +93,7 @@ public class QuestionService {
     public Optional<Question> findById(Long id) {
         return questionRepository.findById(id);
     }
+
     public Optional<QuestionResponseDTO> getOneQuestionById(Long id) {
         Optional<Question> question = questionRepository.findById(id);
         return question.map(QuestionResponseDTO::new);

@@ -1,16 +1,13 @@
 package data.smartdeals_service.controller.promotion;
 
 import data.smartdeals_service.dto.promotion.PromotionOfUserDTO;
-import data.smartdeals_service.eureka_client.PointServiceClient;
 import data.smartdeals_service.helpers.ApiResponse;
-import data.smartdeals_service.models.promotion.Promotion;
 import data.smartdeals_service.models.user.UserPromotion;
 import data.smartdeals_service.services.promotionServices.PromotionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -94,4 +91,5 @@ public class PromotionOfUser {
                     .body(ApiResponse.errorServer("Server error: " + ex.getMessage()));
         }
     }
+
 }

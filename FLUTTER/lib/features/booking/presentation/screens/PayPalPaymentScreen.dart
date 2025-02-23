@@ -282,14 +282,12 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
                 }).toList();
               },
             ),
-
             const SizedBox(height: 10),
             // **💲 Hiển thị giá sau giảm (nếu có)**
             if (discountedAmount != null && discountedAmount != totalAmount)
               Text("Discounted Price: \$${discountedAmount!.toStringAsFixed(2)}",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
             const SizedBox(height: 20),
-
             // **🛒 Nút thanh toán PayPal**
             _isLoading
                 ? const CircularProgressIndicator()
@@ -304,7 +302,6 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
                 foregroundColor: Colors.white,
               ),
             ),
-
             const SizedBox(height: 30),
             const Text(
               "Secure Payment Powered by PayPal",

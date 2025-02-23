@@ -1,4 +1,4 @@
-//package data.smartdeals_service.services.kafkaServices;
+package data.smartdeals_service.services.kafkaServices;//package data.smartdeals_service.services.kafkaServices;
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //
