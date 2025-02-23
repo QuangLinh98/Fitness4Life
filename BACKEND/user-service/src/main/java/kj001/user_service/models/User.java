@@ -49,7 +49,7 @@ public class User implements UserDetails {
 
     private LocalDateTime createAt;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER , cascade = CascadeType.ALL)
     private List<Token> tokens;
 
     public String getUsername() {

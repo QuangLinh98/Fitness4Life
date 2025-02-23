@@ -8,6 +8,7 @@ import kj001.user_service.helpers.ApiResponse;
 import kj001.user_service.helpers.FileUpload;
 import kj001.user_service.models.OTP;
 import kj001.user_service.models.Profile;
+import kj001.user_service.models.Roles;
 import kj001.user_service.models.User;
 import kj001.user_service.repository.OtpRepository;
 import kj001.user_service.repository.UserRepository;
@@ -75,6 +76,7 @@ public class UserService {
         userRepository.updateUserPackageId(userId, packageId);
     }
 
+    //Hàm xử lý chỉ để giao tiếp feign client
     public UserDTO getUserById(Long id) {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isEmpty()) {
@@ -96,6 +98,44 @@ public class UserService {
                 .build();
         return userDTO;
     }
+
+    //Hàm xử lý để lấy thông tin để hiên thị profile
+    public UserResponseDTO getUserByIdToShowProfile(long userId) {
+        Optional<User> existingUser = userRepository.findById(userId);
+
+        if (existingUser.isEmpty()) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+
+        User user = existingUser.get();
+        Profile profile = user.getProfile();
+
+        // Nếu Profile chưa tồn tại, tạo một ProfileDTO rỗng
+        ProfileDTO profileDTO = new ProfileDTO();
+
+        if (profile != null) {
+            profileDTO.setHobbies(profile.getHobbies());
+            profileDTO.setAddress(profile.getAddress());
+            profileDTO.setAge(profile.getAge());
+            profileDTO.setHeightValue(profile.getHeightValue());
+            profileDTO.setAvatar(profile.getAvatar());
+            profileDTO.setDescription(profile.getDescription());
+            profileDTO.setMaritalStatus(profile.getMaritalStatus());
+        }
+
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .workoutPackageId(user.getWorkoutPackageId())
+                .email(user.getEmail())
+                .isActive(user.isActive())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .profileDTO(profileDTO)
+                .build();
+    }
+
 
     public User findByEmail(String email) {
         // Validate the email input
@@ -192,12 +232,23 @@ public class UserService {
 
     //Phương thức Update User
     public Optional<UserResponseDTO> updateUser(Long userId, UserAndProfileUpdateDTO userAndProfileUpdateDTO) throws IOException {
+        System.out.println("Request flutter gửi xuống yêu cầu update profile :  " + userAndProfileUpdateDTO);
         Optional<User> existingUser = userRepository.findById(userId);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
 
+            // Giữ nguyên role nếu không được gửi từ DTO, mặc định là USER nếu role chưa có
+            if (userAndProfileUpdateDTO.getRole() != null) {
+                user.setRole(userAndProfileUpdateDTO.getRole());
+            } else if (user.getRole() == null) {
+                user.setRole(Roles.USER); // 🔥 Nếu role bị null, đặt mặc định USER
+            }
+
+            Roles currentRole = user.getRole();
+
             //Sử dụng objectMapper để update dữ liệu dựa trên UserAndProfileUpdateDTO
             objectMapper.updateValue(user, userAndProfileUpdateDTO);
+            user.setRole(currentRole);
 
             //Xử lý thông tin profile
             Profile profile = user.getProfile();
@@ -227,6 +278,10 @@ public class UserService {
             //Cập nhật các thông tin profile từ DTO
             objectMapper.updateValue(profile, userAndProfileUpdateDTO);
             user.setProfile(profile);
+
+            if (user.getRole() == null) {
+                user.setRole(Roles.USER); // Đảm bảo role không bị null trước khi lưu
+            }
 
             //Lưu thông tin User và Profile
             userRepository.save(user);

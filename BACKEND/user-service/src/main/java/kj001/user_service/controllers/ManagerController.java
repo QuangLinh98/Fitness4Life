@@ -31,9 +31,16 @@ public class ManagerController {
     }
 
     @GetMapping("manager/users/{id}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<?> getUserById(@PathVariable long id){
         UserDTO userDTO = userService.getUserById(id);
         return ResponseEntity.ok(userDTO);
+    }
+
+    @GetMapping("manager/users/profile/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+    public ResponseEntity<?> getUserByIdToShowProfile(@PathVariable long id){
+        UserResponseDTO user = userService.getUserByIdToShowProfile(id);
+        return ResponseEntity.ok(user);
     }
 }

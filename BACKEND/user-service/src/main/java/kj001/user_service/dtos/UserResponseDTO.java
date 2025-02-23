@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import kj001.user_service.models.Gender;
 import kj001.user_service.models.Profile;
 import kj001.user_service.models.Roles;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class UserResponseDTO {
     private long id;
 

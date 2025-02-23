@@ -1,6 +1,7 @@
 package kj001.user_service.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.micrometer.common.lang.Nullable;
 import kj001.user_service.models.Gender;
 import kj001.user_service.models.MaritalStatus;
 import kj001.user_service.models.Roles;
@@ -26,5 +27,6 @@ public class UserAndProfileUpdateDTO {
     private String description;
 
     @JsonIgnore
+    @Nullable
     private MultipartFile file;
 }
