@@ -10,6 +10,7 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,6 +30,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.web.server.WebFilter;
+
 import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 
@@ -42,7 +45,10 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http)  {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable) // Bỏ qua CSRF cho API
                 .authorizeExchange(
-                        exchange  -> exchange .pathMatchers(
+                        exchange  -> exchange
+                                //thêm mới - dùng để cho phép Options
+                                .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .pathMatchers(
                                         "/api/users/login",
                                         "/api/users/register",
                                         "/api/users/verify-account/**",
@@ -64,7 +70,10 @@ public class SecurityConfig {
                                 .pathMatchers("/api/notify/**").hasAnyAuthority("ADMIN", "USER")
                                 .anyExchange()
                                 .authenticated() // Các yêu cầu khác cần xác thực
-                ).addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                )
+                //thêm dùng để check và xác định cors được chạy trước
+                .addFilterBefore(corsWebFilter(), SecurityWebFiltersOrder.CORS)
+                .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((exchange, e) -> {
                             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -107,15 +116,25 @@ public class SecurityConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
+        // chỏ phép 1 đường dẫn cụ thể hoạt động
         corsConfig.setAllowedOrigins(List.of("http://localhost:3000"));
-        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type" , "Accept"));
+        corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "PUT", "DELETE"));
         corsConfig.setAllowCredentials(true); // Cho phép gửi thông tin xác thực
         corsConfig.setMaxAge(3600L); // Thời gian cache cho phép là 1 giờ
-
+        //thêm Cho phép đọc headers
+        corsConfig.setExposedHeaders(List.of("Authorization", "X-Username", "X-Role"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig); // Áp dụng cho tất cả các đường dẫn
-
         return new CorsWebFilter(source);
+    }
+
+    // thêm dùng để loại bỏ 1 số Header ko cần thiết và chạy nhiều
+    @Bean
+    public WebFilter removeVaryHeader() {
+        return (exchange, chain) -> {
+            exchange.getResponse().getHeaders().remove("Vary");
+            return chain.filter(exchange);
+        };
     }
 }
