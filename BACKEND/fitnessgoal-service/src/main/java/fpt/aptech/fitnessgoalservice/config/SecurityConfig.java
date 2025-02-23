@@ -23,6 +23,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/goal/approvePoint/**"
+                                )
+                        .permitAll()
                         .anyRequest()
                         .authenticated() // Yêu cầu tất cả endpoint cần xác thực
                 )

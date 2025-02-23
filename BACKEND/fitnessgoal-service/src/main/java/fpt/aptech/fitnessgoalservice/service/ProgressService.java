@@ -28,7 +28,6 @@ public class ProgressService {
 
     //Handle get all progress data
     public List<Progress> getAllProgress() {
-        System.out.println("request nhận được từ ");
         return progressRepository.findAll();
     }
 
@@ -39,72 +38,79 @@ public class ProgressService {
 
     //Handle add a progress
     public Progress createProgress(ProgressDTO progressDTO) {
-        UserDTO existingUser = userEurekaClient.getUserById(progressDTO.getUserId());
-        if (existingUser == null) {
-            throw new RuntimeException("User not found");
-        }
-        Goal existingGoal = goalRepository.findById(progressDTO.getGoal()).orElseThrow(() -> new RuntimeException("Goal not found"));
-        //Kiểm tra trạng thái của Goal nếu là COMPLETED or FAILED thì không cho user nhập Progress
-        if (existingGoal.getGoalStatus() == GoalStatus.COMPLETED || existingGoal.getGoalStatus() == GoalStatus.FAILED) {
-            throw new RuntimeException("Cannot add progress. Goal is already " + existingGoal.getGoalStatus());
-        }
-        Progress newProgress = Progress.builder()
-                .userId(progressDTO.getUserId())
-                .goal(existingGoal)
-                .fullName(existingGoal.getFullName())
-                .trackingDate(progressDTO.getTrackingDate())
-                .metricName(progressDTO.getMetricName())
-                .value(progressDTO.getValue())
-                .weight(progressDTO.getWeight())
-                .caloriesConsumed(progressDTO.getCaloriesConsumed())
-                .createdAt(LocalDateTime.now())
-                .build();
+        System.out.println("Request nhận từ flutter : " + progressDTO);
+        try {
+            UserDTO existingUser = userEurekaClient.getUserById(progressDTO.getUserId());
+            if (existingUser == null) {
+                throw new RuntimeException("User not found");
+            }
+            Goal existingGoal = goalRepository.findById(progressDTO.getGoal()).orElseThrow(() -> new RuntimeException("Goal not found"));
+            //Kiểm tra trạng thái của Goal nếu là COMPLETED or FAILED thì không cho user nhập Progress
+            if (existingGoal.getGoalStatus() == GoalStatus.COMPLETED || existingGoal.getGoalStatus() == GoalStatus.FAILED) {
+                throw new RuntimeException("Cannot add progress. Goal is already " + existingGoal.getGoalStatus());
+            }
+            Progress newProgress = Progress.builder()
+                    .userId(progressDTO.getUserId())
+                    .goal(existingGoal)
+                    .fullName(existingGoal.getFullName())
+                    .trackingDate(progressDTO.getTrackingDate())
+                    .metricName(progressDTO.getMetricName())
+                    .value(progressDTO.getValue())
+                    .weight(progressDTO.getWeight())
+                    .caloriesConsumed(progressDTO.getCaloriesConsumed())
+                    .createdAt(LocalDateTime.now())
+                    .build();
 
-        //So sánh lương caloriesConsumed với targetCalories trong bảng Goal và hiển thị message
-        double targetCalories = existingGoal.getTargetCalories();
-        double caloriesConsumed = progressDTO.getCaloriesConsumed();
-        if (caloriesConsumed > targetCalories) {
-            newProgress.setMessage("You have passed " + (caloriesConsumed - targetCalories) + " calories.Or reduce calorie intake.");
-        } else if (caloriesConsumed < targetCalories) {
-            newProgress.setMessage("You need to add more " + (targetCalories - caloriesConsumed) + " calories to reach daily calorie goal.");
-        } else {
-            newProgress.setMessage("You have consumed the calories to reach your daily calorie goal.");
+            //So sánh lương caloriesConsumed với targetCalories trong bảng Goal và hiển thị message
+            double targetCalories = existingGoal.getTargetCalories();
+            double caloriesConsumed = progressDTO.getCaloriesConsumed();
+            if (caloriesConsumed > targetCalories) {
+                newProgress.setMessage("You have passed " + (caloriesConsumed - targetCalories) + " calories.Or reduce calorie intake.");
+            } else if (caloriesConsumed < targetCalories) {
+                newProgress.setMessage("You need to add more " + (targetCalories - caloriesConsumed) + " calories to reach daily calorie goal.");
+            } else {
+                newProgress.setMessage("You have consumed the calories to reach your daily calorie goal.");
+            }
+
+            //Cập nhật giá trị currentValue trong Goal dựa vào metricName
+            switch (progressDTO.getMetricName().name().toUpperCase()) {
+                case "WEIGHT":
+                    if (existingGoal.getGoalType() == GoalType.WEIGHT_LOSS || existingGoal.getGoalType() == GoalType.WEIGHT_GAIN) {
+                        existingGoal.setCurrentValue(progressDTO.getValue());
+                    }
+                    break;
+                case "BODY_FAT":
+                    if (existingGoal.getGoalType() == GoalType.FAT_LOSS) {
+                        existingGoal.setCurrentValue(progressDTO.getValue());
+                    }
+                    break;
+                case "MUSCLEMASS":
+                    if (existingGoal.getGoalType() == GoalType.MUSCLE_GAIN) {
+                        existingGoal.setCurrentValue(progressDTO.getValue());
+                    }
+                    break;
+                default:
+                    //Duy trì cân nặng thì không cần cập nhật currentValue
+                    break;
+            }
+            //Gọi phương thức cập nhật Goal Status
+            int pointsToAdd = checkAndUpdateGoalStatus(existingGoal, newProgress);
+
+            // Lưu lại cập nhật vào bảng Goal
+            goalRepository.save(existingGoal);
+
+            // Gửi thông báo nếu có điểm được cộng qua notifi-service
+            if (pointsToAdd > 0) {
+                String resultMessage = "You have completed an important step towards the goal. " + existingGoal.getGoalType() + ". You are added " + pointsToAdd + " point.";
+                notifyService.sendPointNotification(existingUser, existingGoal, resultMessage, pointsToAdd);
+            }
+
+            return progressRepository.save(newProgress);
+        }catch (Exception e) {
+            System.err.println("❌ Lỗi khi xử lý ProgressDTO: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("❌ Lỗi khi xử lý ProgressDTO: " + e.getMessage());
         }
-
-        //Cập nhật giá trị currentValue trong Goal dựa vào metricName
-        switch (progressDTO.getMetricName().name().toUpperCase()) {
-            case "WEIGHT":
-                if (existingGoal.getGoalType() == GoalType.WEIGHT_LOSS || existingGoal.getGoalType() == GoalType.WEIGHT_GAIN) {
-                    existingGoal.setCurrentValue(progressDTO.getValue());
-                }
-                break;
-            case "BODY_FAT":
-                if (existingGoal.getGoalType() == GoalType.FAT_LOSS) {
-                    existingGoal.setCurrentValue(progressDTO.getValue());
-                }
-                break;
-            case "MUSCLEMASS":
-                if (existingGoal.getGoalType() == GoalType.MUSCLE_GAIN) {
-                    existingGoal.setCurrentValue(progressDTO.getValue());
-                }
-                break;
-            default:
-                //Duy trì cân nặng thì không cần cập nhật currentValue
-                break;
-        }
-        //Gọi phương thức cập nhật Goal Status
-        int pointsToAdd = checkAndUpdateGoalStatus(existingGoal, newProgress);
-
-        // Lưu lại cập nhật vào bảng Goal
-        goalRepository.save(existingGoal);
-
-        // Gửi thông báo nếu có điểm được cộng qua notifi-service
-        if (pointsToAdd > 0) {
-            String resultMessage = "Ban da hoan thanh mot moc quan trong cho muc tieu " + existingGoal.getGoalType() + ". Ban đuoc cong " + pointsToAdd + " điem.";
-            notifyService.sendPointNotification(existingUser, existingGoal, resultMessage, pointsToAdd);
-        }
-
-        return progressRepository.save(newProgress);
     }
 
     //Handle update a progress
@@ -182,11 +188,11 @@ public class ProgressService {
             if (goal.getCurrentValue() >= goal.getTargetValue()) {
                 // Check if currentValue exceeds targetValue significantly
                 if (goal.getCurrentValue() - goal.getTargetCalories() > 4) {
-                    progress.setMessage(progress.getMessage() + " Luu y: Ban da vuot qua muc tieu qua nhieu (" + (goal.getCurrentValue() - goal.getTargetCalories()) + "). Hay dieu chinh lai ke hoach.");
+                    progress.setMessage(progress.getMessage() + " Note: You have exceeded your target by a lot. (" + (goal.getCurrentValue() - goal.getTargetCalories()) + "). Or adjust the plan.");
                 }
                 goal.setGoalStatus(GoalStatus.COMPLETED);
                 if (goal.getGoalStatus() == GoalStatus.COMPLETED) {
-                    progress.setMessage(progress.getMessage() + " Muc tieu cua ban da hoan thanh. Xin chuc mung.");
+                    progress.setMessage(progress.getMessage() + " Your goal is complete. Congratulations..");
                     //Cộng điểm nếu mục tiêu hoàn thành
                     pointsToAdd += 500;
                 }

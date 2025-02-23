@@ -125,7 +125,7 @@ public class ManagerController {
             Progress newProgress = progressService.createProgress(progressDTO);
             return ResponseEntity.status(201).body(ApiResponse.created(newProgress, "Create progress successfully"));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server : ") + e.getMessage());
+            return ResponseEntity.status(400).body(ApiResponse.badRequest(e.getMessage()));
         }
     }
 

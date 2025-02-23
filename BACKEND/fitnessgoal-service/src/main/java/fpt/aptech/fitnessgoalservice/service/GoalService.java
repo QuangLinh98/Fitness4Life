@@ -42,23 +42,20 @@ public class GoalService {
             throw new RuntimeException("User not found");
         }
         List<Goal> userGoals = goalRepository.findGoalByUserId(userId);
-        if (userGoals.isEmpty()) {
-            throw new RuntimeException("No goals found for the user");
-        }
+//        if (userGoals.isEmpty()) {
+//            throw new RuntimeException("No goals found for the user");
+//        }
         return userGoals;
     }
 
     //Handle get one goal by id
     public Goal getGoalById(int id) {
-        System.out.println("✅ Nhận được request từ Flutter: " + id);
         return goalRepository.findById(id).orElseThrow(() -> new RuntimeException("Goal not found"));
     }
 
     //Handle create Goal
     public Goal createGoal(GoalDTO goalDTO) {
         try {
-            System.out.println("✅ Nhận được request từ Flutter: " + goalDTO);
-
             UserDTO existingUser = userEurekaClient.getUserById(goalDTO.getUserId());
             if (existingUser == null) {
                 throw new RuntimeException("User not found");

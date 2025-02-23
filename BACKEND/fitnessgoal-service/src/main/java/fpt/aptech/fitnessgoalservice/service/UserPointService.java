@@ -31,12 +31,6 @@ public class UserPointService {
     }
 
     //Handle get Point now
-//    public int getPoints(long userId) {
-//        return  pointRepository.findByUserId(userId)
-//                .map(UserPoint::getTotalPoints)
-//                .orElse(0);
-//    }
-
     public UserPoinDTO getUserPoint(long userId) {
         UserPoint findUserPoint = pointRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("UserNotFound" ));
@@ -55,10 +49,24 @@ public class UserPointService {
             switch (point) {
                 case 500:
                 case 1000:
+                case 1500:
                 case 2000:
+                case 2500:
                 case 3000:
+                case 3500:
                 case 4000:
+                case 4500:
                 case 5000:
+                case 5500:
+                case 6000:
+                case 6500:
+                case 7000:
+                case 7500:
+                case 8000:
+                case 8500:
+                case 9000:
+                case 9500:
+                case 10000:
                     if (totalPoints >= point) {
                         totalPoints -= point;
                         findUserPoint.setTotalPoints(totalPoints);
