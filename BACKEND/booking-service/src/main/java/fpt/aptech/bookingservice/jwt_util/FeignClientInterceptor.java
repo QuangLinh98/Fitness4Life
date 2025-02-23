@@ -21,6 +21,11 @@ public class FeignClientInterceptor implements RequestInterceptor {
             return; // Bỏ qua thêm Authorization header
         }
 
+        if (url.startsWith("/api/goal/approvePoint/**")) {
+            System.out.println("Skipping Authorization for URL: " + url);
+            return; // Bỏ qua thêm Authorization header
+        }
+
         // Lấy Authentication từ SecurityContextHolder
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
