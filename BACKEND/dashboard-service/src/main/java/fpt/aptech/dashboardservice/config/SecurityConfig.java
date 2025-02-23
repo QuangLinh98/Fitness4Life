@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/dashboard/room/**",
+                                "/api/dashboard/availableSeats/update/**",
                                 "/uploads/**"
                         )
                         .permitAll()
@@ -45,19 +46,4 @@ public class SecurityConfig {
                 .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/uploads/**")
-                        .allowedOrigins("*") // Hoặc chỉ định cụ thể "http://192.168.1.20"
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedHeaders("*")
-                        .allowCredentials(false);
-            }
-        };
-    }
-
 }

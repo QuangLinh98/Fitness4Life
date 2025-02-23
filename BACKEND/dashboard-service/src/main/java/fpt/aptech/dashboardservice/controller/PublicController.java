@@ -123,6 +123,17 @@ public class PublicController {
         }
     }
 
+    @GetMapping("{roomId}/trainer")
+    public ResponseEntity<Trainer> getTrainerByRoomId(@PathVariable int roomId) {
+        Trainer trainer = roomService.getTrainerByRoomId(roomId);
+        return trainer != null ? ResponseEntity.ok(trainer) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("room/byBranch/{branchId}")
+    public List<Room> getRoomsByBranch(@PathVariable int branchId) {
+        return roomService.getRoomsByBranchId(branchId);
+    }
+
     @GetMapping("room/{id}")
     //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<?> getRoomById(@PathVariable int id) {

@@ -1,6 +1,8 @@
 package fpt.aptech.dashboardservice.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "trainers")
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class  Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +45,7 @@ public class  Trainer {
     private Branch branch;
 
     @OneToMany(mappedBy = "trainer",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Room> rooms;
 
 }

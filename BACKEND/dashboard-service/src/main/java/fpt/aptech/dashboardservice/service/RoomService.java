@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -30,7 +31,27 @@ public class RoomService {
 
     //Handle get all data
     public List<Room> getAllRoom() {
-        return roomRepository.findAll();
+        LocalDateTime now = LocalDateTime.now();
+        List<Room> rooms = roomRepository.findAll();
+
+        //Xử lý reset ghế trống về 0 nếu thời gian endTime đã qua
+        for (Room room : rooms) {
+            if (room.getEndTime().isBefore(LocalTime.from(now))) {
+                room.setAvailableSeats(0); // Reset ghế trống
+                roomRepository.save(room);
+            }
+        }
+        return rooms;
+    }
+
+    //Handle get trainer by roomId
+    public Trainer getTrainerByRoomId(int roomId) {
+        return roomRepository.findTrainerByRoomId(roomId);
+    }
+
+    //Handle get rooms by branchId
+    public List<Room> getRoomsByBranchId(int branchId) {
+        return roomRepository.findRoomsByBranchId(branchId);
     }
 
     //Handle get one room

@@ -356,7 +356,7 @@ public class ManagerController {
         }
     }
 
-    @DeleteMapping("packages/{roomId}/rooms/{packageId}")
+    @DeleteMapping("packages/{packageId}/rooms/{roomId}")
      //@PreAuthorize("hasAnyAuthority('MANAGER','ADMIN')")
     public ResponseEntity<String> removeClassFromPackage(
             @PathVariable int packageId,
