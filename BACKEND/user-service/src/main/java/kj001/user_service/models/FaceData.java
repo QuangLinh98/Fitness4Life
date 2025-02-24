@@ -1,5 +1,6 @@
 package kj001.user_service.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -21,6 +22,7 @@ public class FaceData {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @Column(name = "face_encoding", columnDefinition = "TEXT")
