@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .authorizeExchange(
                         exchange  -> exchange .pathMatchers(
                                         "/api/users/login",
+                                        "/api/face-auth/login",
                                         "/api/users/register",
                                         "/api/users/verify-account/**",
                                         "/api/users/send-otp",
@@ -55,6 +56,7 @@ public class SecurityConfig {
                                         "/api/booking/packages"
                                 )
                                 .permitAll()
+                                .pathMatchers("/api/face-auth/**").hasAnyAuthority("ADMIN", "USER")  // Cả ADMIN và USER đều có thể truy cập các endpoint này
                                 .pathMatchers("/api/users/**").hasAnyAuthority("ADMIN", "USER")  // Cả ADMIN và USER đều có thể truy cập các endpoint này
                                 .pathMatchers("/api/booking/**").hasAnyAuthority("USER","ADMIN")
                                 .pathMatchers("/api/paypal/**").hasAnyAuthority("USER","ADMIN")

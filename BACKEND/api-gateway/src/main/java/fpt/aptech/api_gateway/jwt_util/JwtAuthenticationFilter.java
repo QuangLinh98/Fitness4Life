@@ -31,11 +31,11 @@ public class JwtAuthenticationFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         System.out.println("JWT Filter Triggered: " + exchange.getRequest().getURI());
-
         // Bỏ qua xác thực cho các endpoint không cần JWT
         String path = exchange.getRequest().getPath().toString();
         if (path.startsWith("/api/users/login") ||
                 path.startsWith("/api/users/register") ||
+                path.startsWith("/api/face-auth/login") ||
                 path.startsWith("\"/api/users/verify-account/**\", \"/api/users/verify-account/*\"") ||
                 path.startsWith("/api/users/send-otp") ||
                 path.startsWith("/api/users/reset-password") ||
