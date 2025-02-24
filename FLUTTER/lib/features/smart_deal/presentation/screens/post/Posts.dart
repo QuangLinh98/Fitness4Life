@@ -32,8 +32,15 @@ class _PostsState extends State<Posts> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Question Details"),
-        backgroundColor: Colors.teal,
+        title: const Text("Question Detail",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color(0xFFB00020),
+        centerTitle: true,
       ),
       body: questionService.isFetchingSingle
           ? const Center(child: CircularProgressIndicator())

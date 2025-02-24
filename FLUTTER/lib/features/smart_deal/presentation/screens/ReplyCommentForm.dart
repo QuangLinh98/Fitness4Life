@@ -83,7 +83,7 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
         TextField(
           controller: _contentController,
           decoration: InputDecoration(
-            hintText: "Nhập câu trả lời...",
+            hintText: "Comment...",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             suffixIcon: IconButton(
               icon: Icon(Icons.send, color: Colors.teal),

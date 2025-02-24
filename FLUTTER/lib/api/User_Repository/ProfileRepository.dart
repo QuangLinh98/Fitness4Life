@@ -54,7 +54,7 @@ class ProfileRepository {
   Future<UserResponseDTO?> getUserById(int userId) async {
     try {
       final response = await _apiGateWayService.getData('/users/manager/users/profile/$userId');
-      print('get user info : ${response.data}');
+      //print('get user info : ${response.data}');
       if (response != null && response.statusCode == 200) {
         return UserResponseDTO.fromJson(response.data);
       } else {

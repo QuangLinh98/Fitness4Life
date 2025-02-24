@@ -23,6 +23,7 @@ class RoomRepository{
   Future<List<Room>> getAllRoomsByPackage(int packageId) async {
     try{
       final response = await _apiGateWayService.getData('/dashboard/packages/$packageId/rooms');
+      print('Response Room by Package : ${response.data}');
       return (response.data as List)
           .map((json) => Room.fromJson(json))
           .toList();

@@ -5,6 +5,7 @@ import 'package:fitness4life/features/Home/service/BranchService.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/booking/data/BookingRoom.dart';
 import 'package:fitness4life/features/booking/presentation/screens/BookingDetailScreen.dart';
+import 'package:fitness4life/features/booking/presentation/screens/WorkoutPackageScreen.dart';
 import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +14,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ClassScreen extends StatefulWidget {
-  final int roomId;
+  int? roomId;
 
-  const ClassScreen({super.key,  this.roomId = 3 });
+   ClassScreen({super.key,  this.roomId });
 
   @override
   State<ClassScreen> createState() => _ClassScreenState();
@@ -53,7 +54,7 @@ class _ClassScreenState extends State<ClassScreen> {
       //Gọi bookingRoom
       final bookingRoomService = Provider.of<BookingRoomService>(context, listen: false);
       if (userInfo.userId != null) {
-        bookingRoomService.bookingRoom(widget.roomId, userInfo.userId!);
+        bookingRoomService.bookingRoom(widget.roomId!, userInfo.userId!);
       }
 
       //Gọi booked room by userId
@@ -64,7 +65,7 @@ class _ClassScreenState extends State<ClassScreen> {
 
       //Gọi cancel booking room
       final cancelBooking = Provider.of<BookingRoomService>(context, listen: false);
-      cancelBooking.cancelBooking(widget.roomId);
+      cancelBooking.cancelBooking(widget.roomId!);
 
     });
   }
@@ -247,7 +248,7 @@ class _ClassScreenState extends State<ClassScreen> {
     );
   }
 
-  // Card hiển thị thông tin booking room
+  // Card hiển thị thông tin những room đã được booking
   Widget _buildBookingCard(BookingRoom booking) {
     String formatDateTime(DateTime? dateTime) {
       if (dateTime != null) {
@@ -524,42 +525,65 @@ class _ClassScreenState extends State<ClassScreen> {
                         onPressed: (isRoomExpired || (room.availableseats ?? 0) == (room.capacity ?? 0))
                             ? null // Vô hiệu hóa nút nếu đầy
                             : () async {
-                          try {
-                            // Xử lý sự kiện click Book button
-                            final bookingRoomService = Provider.of<
-                                BookingRoomService>(context, listen: false);
-                            bool success = await bookingRoomService.bookingRoom(
-                                room.id ?? 0, userId!);
+                          final userInfo = Provider.of<UserInfoProvider>(context , listen: false);
 
-                            if (success) {
-                              //Nếu booking thành công , hiển thị dialog thông báo thành công
-                              CustomDialog.show(
-                                context,
-                                title: "Success",
-                                content: "Room booked successfully!",
-                                buttonText: "OK",
-                                onButtonPressed: () {
-                                  setState(() {
-                                    room.availableseats =
-                                        (room.availableseats ?? 0) + 1; //Cập nhật số ghế
-                                  });
-                                },
-                              );
-                            }
-                          }catch(error){
-                            print("❌ Caught error: $error"); // Log lỗi
-                            print("❌ Error type: ${error.runtimeType}");
+                          if(userInfo.workoutPackageId == 0 || userInfo.workoutPackageId == null) {
+                            ///user chưa mua membership, chuyển đến workoutPackageScreen
+                            CustomDialog.show(
+                              context,
+                              title: "Membership Required",
+                              content: "You haven't signed up for an exercise pack. Please register before booking a class.",
+                              buttonText: "OK",
+                              onButtonPressed: () {
+                                /// Chuyển đến trang WorkoutPackageScreen sau khi đóng dialog
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => WorkoutPackageScreen()),
+                                );
+                              },
+                            );
+                          }else {
+                            ///User đã có membership tiến hành booking
+                            try {
+                              // Xử lý sự kiện click Book button
+                              final bookingRoomService = Provider.of<
+                                  BookingRoomService>(context, listen: false);
+                              bool success = await bookingRoomService
+                                  .bookingRoom(
+                                  room.id ?? 0, userId!);
 
-                            // Kiểm tra nếu đang ở trong cây widget hợp lệ
-                            if (context.mounted) {
-                              CustomDialog.show(
-                                context,
-                                title: "Error",
-                                content: extractErrorMessage(error),
-                                buttonText: "OK",
-                              );
-                            } else {
-                              print("🚨 Context is no longer valid. Cannot show dialog.");
+                              if (success) {
+                                //Nếu booking thành công , hiển thị dialog thông báo thành công
+                                CustomDialog.show(
+                                  context,
+                                  title: "Success",
+                                  content: "Room booked successfully!",
+                                  buttonText: "OK",
+                                  onButtonPressed: () {
+                                    setState(() {
+                                      room.availableseats =
+                                          (room.availableseats ?? 0) +
+                                              1; //Cập nhật số ghế
+                                    });
+                                  },
+                                );
+                              }
+                            } catch (error) {
+                              print("❌ Caught error: $error"); // Log lỗi
+                              print("❌ Error type: ${error.runtimeType}");
+
+                              // Kiểm tra nếu đang ở trong cây widget hợp lệ
+                              if (context.mounted) {
+                                CustomDialog.show(
+                                  context,
+                                  title: "Error",
+                                  content: extractErrorMessage(error),
+                                  buttonText: "OK",
+                                );
+                              } else {
+                                print(
+                                    "🚨 Context is no longer valid. Cannot show dialog.");
+                              }
                             }
                           }
                         },
@@ -606,6 +630,7 @@ class _ClassScreenState extends State<ClassScreen> {
     }
   }
 
+  //Hàm filter room theo banchID
   Widget _buildFilterForm() {
     return Container(
       padding: const EdgeInsets.all(12),

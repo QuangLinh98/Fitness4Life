@@ -6,6 +6,7 @@ import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/Goa
 import 'package:fitness4life/features/fitness_goal/presentation/screens/HealthScreen.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Progress/ProgressScreen.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
+import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,8 +25,15 @@ class _GoalScreenState extends State<GoalScreen> {
     super.initState();
     // Fetch goals after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userInfo  = Provider.of<UserInfoProvider>(context, listen: false);
+
       final goalService = Provider.of<GoalService>(context, listen: false);
-      goalService.fetchGoals(); // Fetch goals when screen loads
+      //goalService.fetchGoals(); // Fetch goals when screen loads
+      if (userInfo.userId != null) {
+        goalService.fetchGoalsByUserId(userInfo.userId!);
+      } else {
+        print("⚠️ User ID is null, cannot fetch goals!");
+      }
     });
   }
 

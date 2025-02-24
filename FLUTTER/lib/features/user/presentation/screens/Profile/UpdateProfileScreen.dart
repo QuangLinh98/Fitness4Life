@@ -204,12 +204,14 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           fillColor: Colors.white,
           labelText: label,
           border: const OutlineInputBorder(),
+          errorStyle: const TextStyle(color: Colors.white),
         ),
         dropdownColor: Colors.white,
         style: const TextStyle(color: Colors.black),
         items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
         onChanged: onChanged,
         validator: (value) => value == null ? "$label is required" : null,
+
       ),
     );
   }

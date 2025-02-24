@@ -37,7 +37,33 @@ class GoalRepository {
     }
   }
 
-  // Sửa phương thức submitGoal trong repository để trả về Goal
+  //Hàm xử lý lấy Goal theo UserId
+  Future<List<Goal>> getGoalByUserId (int userId) async {
+    try{
+      final response = await _apiGateWayService.getData('/goal/user/$userId');
+      print('Goal Response to server : ${response.data}');
+      // Kiểm tra cấu trúc JSON trả về
+      if (response.data != null && response.data is List) {
+        return (response.data as List).map((item) {
+          // Loại bỏ các trường không cần thiết
+          final json = Map<String, dynamic>.from(item);
+          json.remove('goalExtensions');
+          json.remove('progresses');
+          json.remove('dietPlans');
+
+          // Parse JSON thành Goal
+          return Goal.fromJson(json);
+        }).toList();
+      } else {
+        throw Exception("Invalid data structure: Expected a List.");
+      }
+    }catch (e, stackTrace) {
+      print("Error fetching goals: $e");
+      print("StackTrace: $stackTrace");
+      throw Exception("Error fetching goals: $e");
+    }
+  }
+
   Future<Goal> submitGoal(GoalDTO goalDTO) async {
     try {
       final response = await _apiGateWayService.postData('/goal/add',

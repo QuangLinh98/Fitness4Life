@@ -54,6 +54,24 @@ class GoalService extends ChangeNotifier {
        }
      }
 
+    //Get Goal By UserId
+    Future<void> fetchGoalsByUserId(int userId) async {
+      isLoading = true;
+      notifyListeners();
+      try{
+        goals = await _goalRepository.getGoalByUserId(userId);
+        // Sau khi lấy dữ liệu, lưu vào SharedPreferences
+        //saveGoalsToSharedPreferences();
+      }
+      catch(e) {
+        print("Error fetching goal by userId: $e");
+      }
+      finally {
+        isLoading = false;
+        notifyListeners();
+      }
+    }
+
      //Create Goal
     Future<void> submitGoal(BuildContext context, GoalDTO goalDTO) async {
       final goalState = Provider.of<GoalSetupState>(context, listen: false); // Lấy goalState từ Provider
