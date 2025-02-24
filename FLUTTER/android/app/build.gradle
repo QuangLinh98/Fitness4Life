@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.uni_links"
+//    namespace = "com.example.uni_links"
     namespace = "com.example.fitness4life"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "25.1.8937393"
@@ -31,6 +31,11 @@ android {
         versionName = flutter.versionName
         // Kích hoạt MultiDex
         multiDexEnabled true
+        // Thêm cấu hình cho ML Kit
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
+
     }
 
     buildTypes {
@@ -50,4 +55,8 @@ dependencies {
     implementation 'androidx.core:core:1.6.0' // Bổ sung dòng này
     implementation 'androidx.security:security-crypto:1.0.0-alpha03'
     implementation 'androidx.multidex:multidex:2.0.1'
+
+    // ML Kit dependencies
+    implementation "com.google.mlkit:face-detection:16.1.5"
+    implementation "com.google.android.gms:play-services-mlkit-face-detection:17.1.0"
 }

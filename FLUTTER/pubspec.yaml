@@ -43,13 +43,24 @@ dependencies:
   cached_network_image: ^3.3.0
   image_picker: ^0.8.4+4 #  thêm mới
   url_launcher: ^6.1.10
-  uni_links: ^0.5.1   #để lắng nghe khi PayPal redirect về fitness4life://paypal_success
+#  uni_links: ^0.5.1   #để lắng nghe khi PayPal redirect về fitness4life://paypal_success
   fl_chart: ^0.65.0   #Sử dụng để thiết kế biểu đồ (chart)
   carousel_slider: ^5.0.0
+  camera: ^0.11.1
+  path_provider: ^2.1.5
+  mime: ^1.0.4
+  http_parser: ^4.0.2
+  image: ^4.1.7  # hoặc version mới nhất
+  permission_handler: ^11.2.1
+#  google_ml_kit: ^0.16.3  # Latest version
+#  google_mlkit_face_detection: ^0.9.0
+  google_mlkit_face_detection: 0.9.0
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

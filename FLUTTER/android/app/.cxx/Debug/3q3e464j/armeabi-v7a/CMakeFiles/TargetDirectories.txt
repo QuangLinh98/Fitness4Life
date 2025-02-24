@@ -1,0 +1,2 @@
+D:/Chu minh/Fitness4Life/FLUTTER/android/app/.cxx/Debug/3q3e464j/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/Chu minh/Fitness4Life/FLUTTER/android/app/.cxx/Debug/3q3e464j/armeabi-v7a/CMakeFiles/rebuild_cache.dir

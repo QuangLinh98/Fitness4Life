@@ -7,6 +7,7 @@ class ApiGateWayService {
   // Danh sách các endpoint không cần token
   static const  List<String> noAuthEndpoints = [
     "/users/login",
+    "/face-auth/login",
     "/users/register",
     "/users/verify-account/",
     "/users/send-otp",
@@ -15,6 +16,7 @@ class ApiGateWayService {
     "/booking/qrCode/validate",
     "/uploads/TrainerImage/"
   ];
+
 
   //Thêm token vào header cho mỗi yêu cầu.
   ApiGateWayService(this._dio) {
@@ -121,6 +123,8 @@ class ApiGateWayService {
       rethrow; // Để xử lý lỗi ở lớp trên
     }
   }
+
+
 
   Future<Response> postDataWithFormData(String endpoint, {FormData? formData, Options? options}) async {
     try {
