@@ -202,7 +202,6 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               //Login faceid
-              const SizedBox(height: 20),
 
               // Face ID Login Button
               ElevatedButton.icon(
@@ -231,6 +230,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
 
               // Register Navigation
               Center(
