@@ -7,6 +7,7 @@ class ApiGateWayService {
   // Danh sách các endpoint không cần token
   static const  List<String> noAuthEndpoints = [
     "/users/login",
+    "/face-auth/login"
     "/users/register",
     "/users/verify-account/",
     "/users/send-otp",

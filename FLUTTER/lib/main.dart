@@ -5,7 +5,7 @@ import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:uni_links/uni_links.dart';
+// import 'package:uni_links/uni_links.dart';
 import 'features/booking/presentation/screens/PaymentSuccessScreen.dart';
 import 'features/booking/service/PaypalService.dart';
 
@@ -22,18 +22,18 @@ void main() async {
 }
 
 void _handleIncomingLinks(BuildContext context) {
-  linkStream.listen((String? deepLink) {
-    if (deepLink != null && deepLink.contains("paypal_success")) {
-      Uri uri = Uri.parse(deepLink);
-      String? paymentId = uri.queryParameters["paymentId"];
-      String? payerId = uri.queryParameters["PayerID"];
-      String? paypalToken = uri.queryParameters["token"];
-
-      if (paymentId != null && payerId != null && paypalToken != null) {
-        _executePayPalPayment(context, paymentId, payerId, paypalToken);
-      }
-    }
-  });
+  // linkStream.listen((String? deepLink) {
+  //   if (deepLink != null && deepLink.contains("paypal_success")) {
+  //     Uri uri = Uri.parse(deepLink);
+  //     String? paymentId = uri.queryParameters["paymentId"];
+  //     String? payerId = uri.queryParameters["PayerID"];
+  //     String? paypalToken = uri.queryParameters["token"];
+  //
+  //     if (paymentId != null && payerId != null && paypalToken != null) {
+  //       _executePayPalPayment(context, paymentId, payerId, paypalToken);
+  //     }
+  //   }
+  // });
 }
 
 
