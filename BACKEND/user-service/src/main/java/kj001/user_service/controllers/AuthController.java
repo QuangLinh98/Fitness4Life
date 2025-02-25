@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -58,7 +57,7 @@ public class AuthController {
     @GetMapping("verify-account/{code}")
     public ResponseEntity<?> verifyAccount(@PathVariable String code) {
         try {
-            Map<String, Object> response  = authenticationService.verifyAndActivateAccount(code);
+            boolean response  = authenticationService.verifyAndActivateAccount(code);
             return ResponseEntity.ok(response );
         } catch (RuntimeException ex) {
             if (ex.getMessage().contains("OTPHasExpired")) {

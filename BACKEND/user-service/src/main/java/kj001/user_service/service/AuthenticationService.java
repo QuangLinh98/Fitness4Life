@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 // Đánh dấu class là một Spring service
 @Service
@@ -55,7 +55,8 @@ public class AuthenticationService {
 
     // Phương thức kích hoạt tài khoản sau khi user đăng ký thành công
     @Transactional
-    public Map<String, Object> verifyAndActivateAccount(String otpCode) {
+    public boolean verifyAndActivateAccount( String otpCode) {
+
         // Kiểm tra xem người dùng đã tồn tại hay chưa, nếu đã tồn tại thì trả về phản hồi lỗi
         User user = userRepository.findByOtpCode(otpCode)
                 .orElseThrow(() -> new RuntimeException("Invalid OTP"));
@@ -77,12 +78,7 @@ public class AuthenticationService {
         // Xóa các bản ghi không kích hoạt khác có cùng email
         userRepository.deleteInactiveUsersByEmail(user.getEmail(), user.getId());
 
-        // Tạo đối tượng chứa thông tin trả về
-        Map<String, Object> response = new HashMap<>();
-        response.put("verified", true);
-        response.put("userId", user.getId());
-
-        return response;
+        return true;
     }
 
     // Phương thức để xác thực người dùng (Login)
