@@ -50,17 +50,20 @@ public class SecurityConfig {
                                 .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .pathMatchers(
                                         "/api/users/login",
+                                        "/api/face-auth/login",
                                         "/api/users/register",
                                         "/api/users/verify-account/**",
                                         "/api/users/send-otp",
                                         "/api/users/reset-password",
                                         "/api/users/refresh_token",
                                         "/api/booking/qrCode/validate",
-                                        "/uploads/TrainerImage/**",
-                                        "/uploads/qrCodeImages/**",
+//                                        "/uploads/TrainerImage/**",
+//                                        "/uploads/qrCodeImages/**",
+                                        "/uploads/**",
                                         "/api/booking/packages"
                                 )
                                 .permitAll()
+                                .pathMatchers("/api/face-auth/**").hasAnyAuthority("ADMIN", "USER")
                                 .pathMatchers("/api/users/**").hasAnyAuthority("ADMIN", "USER")  // Cả ADMIN và USER đều có thể truy cập các endpoint này
                                 .pathMatchers("/api/booking/**").hasAnyAuthority("USER","ADMIN")
                                 .pathMatchers("/api/paypal/**").hasAnyAuthority("USER","ADMIN")
