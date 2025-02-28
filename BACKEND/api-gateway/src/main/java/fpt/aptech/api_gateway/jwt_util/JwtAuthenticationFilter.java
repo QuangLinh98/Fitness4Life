@@ -37,7 +37,8 @@ public class JwtAuthenticationFilter implements WebFilter {
         if (path.startsWith("/api/users/login") ||
                 path.startsWith("/api/users/register") ||
                 path.startsWith("/api/face-auth/login") ||
-                path.startsWith("\"/api/users/verify-account/**\", \"/api/users/verify-account/*\"") ||
+                path.startsWith("/api/users/verify-account/**") ||
+                path.startsWith("/api/users/verify-account2/**") ||
                 path.startsWith("/api/users/send-otp") ||
                 path.startsWith("/api/users/reset-password") ||
                 path.startsWith("/api/users/refresh_token") ||

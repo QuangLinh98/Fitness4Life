@@ -57,7 +57,7 @@ public class SecurityConfig {
                                         "/api/users/reset-password",
                                         "/api/users/refresh_token",
                                         "/api/booking/qrCode/validate",
-//                                        "/uploads/TrainerImage/**",
+                                        "api/users/verify-account2/**",
 //                                        "/uploads/qrCodeImages/**",
                                         "/uploads/**",
                                         "/api/booking/packages"
