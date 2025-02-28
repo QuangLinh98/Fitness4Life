@@ -10,6 +10,7 @@ import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/TrainerRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/ProgressRepository.dart';
+import 'package:fitness4life/api/Notification_Repository/NotifyRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/BlogRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
@@ -27,7 +28,7 @@ final GetIt locator = GetIt.instance;
 void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
-    baseUrl: "http://172.16.12.142:9001/api", // API Gateway URL
+    baseUrl: "http://172.16.12.48:9001/api", // API Gateway URL
     connectTimeout: const Duration(milliseconds: 10000), // Thời gian timeout kết nối
     receiveTimeout: const Duration(milliseconds: 10000), // Thời gian timeout nhận dữ liệu
   )));
@@ -76,6 +77,9 @@ void setUpLocator() {
 
   // Đăng ký PayPalRepository
   locator.registerLazySingleton(() => PaypalRepository(locator<ApiGateWayService>()));
+
+  // Đăng ký NotifyRepository
+  locator.registerLazySingleton(() => NotifyRepository(locator<ApiGateWayService>()));
 
   // Đăng ký BlogRepository
   locator.registerLazySingleton(() => BlogRepository(locator<ApiGateWayService>()));

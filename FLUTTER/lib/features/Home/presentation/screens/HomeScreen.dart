@@ -1,22 +1,20 @@
 import 'package:fitness4life/config/constants.dart';
 import 'package:fitness4life/core/widgets/SubMenu.dart';
-import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
-import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:fitness4life/features/Home/data/Trainer.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/Home/service/TrainerService.dart';
-import 'package:fitness4life/features/fitness_goal/data/Goal/Goal.dart';
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/GoalSuccessScreen.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
-import 'package:fitness4life/features/smart_deal/presentation/screens/blog/CarouseBlog.dart';
 import 'package:fitness4life/features/smart_deal/presentation/screens/blog/LesmillsBlog.dart';
 import 'package:fitness4life/features/smart_deal/presentation/screens/post/Carouse.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginRegisterHeader.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
+import 'package:fitness4life/features/user/service/ProfileService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
+import '../../../user/presentation/screens/Profile/ProfileNotificationBanner.dart';
+
+// Import the notification banner
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,6 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
       // Gọi fetchGoals
       final goalService = Provider.of<GoalService>(context, listen: false);
       goalService.fetchGoals();
+
+      // Fetch user profile if logged in
+      final userInfoProvider = Provider.of<UserInfoProvider>(context, listen: false);
+      if (userInfoProvider.userId != null) {
+        final profileService = Provider.of<ProfileService>(context, listen: false);
+        profileService.getUserById(userInfoProvider.userId!);
+      }
     });
   }
 
@@ -50,19 +55,25 @@ class _HomeScreenState extends State<HomeScreen> {
     final trainerService = Provider.of<TrainerService>(context);   // Lấy trạng thái từ Provider
     final roomService = Provider.of<RoomService>(context);
     final goalService = Provider.of<GoalService>(context);
+    final userInfoProvider = Provider.of<UserInfoProvider>(context);
 
     return Scaffold(
       body: Stack(
         children: [
          Padding(
            padding: const EdgeInsets.only(top: 210),
-             child:SingleChildScrollView(
+             child: SingleChildScrollView(
                padding: const EdgeInsets.all(16.0),
                child: Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                    const SubMenu(),   // Menu bên dưới header
                    const SizedBox(height: 16),
+
+                   // Add notification banner if user is logged in
+                   if (userInfoProvider.userId != null)
+                     const ProfileNotificationBanner(),
+
                    const Text(
                      "Personal goal this week",
                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -71,30 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                    // Phần "Personal goal this week"
                    buildPersonalGoalSection(),
-
-                   // const SizedBox(height: 15),
-                   // const Text(
-                   //   "Upcoming Classes",
-                   //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                   // ),
-                   // const SizedBox(height: 6),
-                   // roomService.isLoading
-                   //     ? const Center(child: CircularProgressIndicator())
-                   //     : roomService.rooms.isNotEmpty
-                   //     ? SingleChildScrollView(
-                   //   scrollDirection: Axis.horizontal,
-                   //   child: Row(
-                   //     children: roomService.rooms.map((room) {
-                   //       return Padding(
-                   //         padding: const EdgeInsets.only(right: 10),
-                   //         child: buildUpcomingClassCard(room),
-                   //       );
-                   //     }).toList(),
-                   //   ),
-                   // )
-                   //     : const Center(
-                   //   child: Text("No Rooms available"),
-                   // ),
 
                    const SizedBox(height: 15),
                    const Text(
@@ -159,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-
 
   //Xử lý Personal goal this week
   Widget buildPersonalGoalSection() {
@@ -228,7 +214,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
-
 }

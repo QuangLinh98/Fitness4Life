@@ -1,3 +1,4 @@
+import 'package:fitness4life/features/user/data/models/FaceDataDTO.dart';
 import 'package:fitness4life/features/user/data/models/ProfileDTO.dart';
 
 enum Roles { ADMIN, USER }
@@ -14,6 +15,7 @@ class UserResponseDTO {
   final Roles role;
   final Gender gender;
   final ProfileDTO profileDTO;
+  final FaceDataDTO faceDataDTO;
 
   UserResponseDTO({
     required this.id,
@@ -25,6 +27,7 @@ class UserResponseDTO {
     required this.role,
     required this.gender,
     required this.profileDTO,
+    required this.faceDataDTO,
   });
 
   factory UserResponseDTO.fromJson(Map<String, dynamic> json) {
@@ -44,6 +47,7 @@ class UserResponseDTO {
         orElse: () => Gender.MALE,
       ),
       profileDTO: ProfileDTO.fromJson(json['profileDTO']),
+      faceDataDTO: FaceDataDTO.fromJson(json['faceDataDTO']),
     );
   }
 
@@ -58,6 +62,7 @@ class UserResponseDTO {
       'role': role.toString().split('.').last,
       'gender': gender.toString().split('.').last,
       'profileDTO': profileDTO.toJson(),
+      'faceDataDTO': faceDataDTO.toJson(),
     };
   }
 }

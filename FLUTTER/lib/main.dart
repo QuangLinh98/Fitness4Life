@@ -1,3 +1,4 @@
+import 'package:app_links/app_links.dart';
 import 'package:fitness4life/token/app_initializer.dart';
 import 'package:fitness4life/config/locator_setup.dart';
 import 'package:fitness4life/config/provider_setup.dart';
@@ -5,29 +6,30 @@ import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:uni_links/uni_links.dart';
+//import 'package:uni_links/uni_links.dart';
 import 'features/booking/presentation/screens/PaymentSuccessScreen.dart';
 import 'features/booking/service/PaypalService.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //để đảm bảo Flutter đã sẵn sàng làm việc với các plugin native (như flutter_secure_storage).
-  setUpLocator(); // Thiết lập các Dependency ở file Locator_setup
+  WidgetsFlutterBinding.ensureInitialized(); ///để đảm bảo Flutter đã sẵn sàng làm việc với các plugin native (như flutter_secure_storage).
+  setUpLocator(); /// Thiết lập các Dependency ở file Locator_setup
 
   runApp(MultiProvider(
-    providers: providers, // Sử dụng danh sách Providers từ file provider_setup.dart
+    providers: providers, /// Sử dụng danh sách Providers từ file provider_setup.dart
     child: MyApp(),
   ),);
 }
 
-void _handleIncomingLinks(BuildContext context) {
-  linkStream.listen((String? deepLink) {
-    if (deepLink != null && deepLink.contains("paypal_success")) {
-      Uri uri = Uri.parse(deepLink);
-      String? paymentId = uri.queryParameters["paymentId"];
-      String? payerId = uri.queryParameters["PayerID"];
-      String? paypalToken = uri.queryParameters["token"];
+void _handleIncomingLinks(BuildContext context) async {
+  final appLinks = AppLinks();
+
+  appLinks.uriLinkStream.listen((Uri? deepLink) {
+    if (deepLink != null && deepLink.toString().contains("paypal_success")) {
+      String? paymentId = deepLink.queryParameters["paymentId"];
+      String? payerId = deepLink.queryParameters["PayerID"];
+      String? paypalToken = deepLink.queryParameters["token"];
 
       if (paymentId != null && payerId != null && paypalToken != null) {
         _executePayPalPayment(context, paymentId, payerId, paypalToken);
@@ -35,6 +37,7 @@ void _handleIncomingLinks(BuildContext context) {
     }
   });
 }
+
 
 
 void _executePayPalPayment(BuildContext context, String paymentId, String payerId , String paypalToken) async {

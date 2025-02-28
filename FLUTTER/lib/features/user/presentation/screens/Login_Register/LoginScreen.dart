@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'FaceIDCameraScreen.dart';
+import 'FaceIDRegisterScreen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -228,6 +229,63 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 20),
+
+              // Test Face ID Registration Button
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  // Hiển thị dialog xác nhận
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Test FaceID'),
+                      content: const Text('Bạn muốn test đăng ký FaceID với userId = 304?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Hủy'),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFB00020),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            // Chuyển đến màn hình đăng ký FaceID với userId cố định
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FaceIDRegisterScreen( userId: 902,
+                                  email: "linhnqt1s2303008@fpt.edu.vn",
+                                  password: "1234567",),
+                              ),
+                            );
+                          },
+                          child: const Text('Test ngay', style: TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.bug_report),
+                label: const Text(
+                  'Test Face ID Registration',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               // Register Navigation
               Center(
                 child: TextButton(

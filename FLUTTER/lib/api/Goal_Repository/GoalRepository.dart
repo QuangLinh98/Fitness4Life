@@ -41,7 +41,6 @@ class GoalRepository {
   Future<List<Goal>> getGoalByUserId (int userId) async {
     try{
       final response = await _apiGateWayService.getData('/goal/user/$userId');
-      print('Goal Response to server : ${response.data}');
       // Kiểm tra cấu trúc JSON trả về
       if (response.data != null && response.data is List) {
         return (response.data as List).map((item) {

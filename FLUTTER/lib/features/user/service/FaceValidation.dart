@@ -56,23 +56,7 @@ class FaceValidator {
       final double faceSize = face.boundingBox.width;
       final double? angle = face.headEulerAngleY;
 
-      if (faceSize < MIN_FACE_SIZE) {
-        return FaceValidationResult(
-          isValid: false,
-          message: 'Vui lòng di chuyển gần hơn',
-          faceSize: faceSize,
-          angle: angle,
-        );
-      }
 
-      if (faceSize > MAX_FACE_SIZE) {
-        return FaceValidationResult(
-          isValid: false,
-          message: 'Vui lòng di chuyển xa hơn',
-          faceSize: faceSize,
-          angle: angle,
-        );
-      }
 
       if (angle != null && angle.abs() > MAX_ANGLE) {
         return FaceValidationResult(

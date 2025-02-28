@@ -7,6 +7,7 @@ import 'package:fitness4life/api/Dashboard_Repository/BranchRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/ProgressRepository.dart';
+import 'package:fitness4life/api/Notification_Repository/NotifyRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/BlogRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
@@ -26,6 +27,7 @@ import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/fitness_goal/service/ProgressService.dart';
+import 'package:fitness4life/features/notification/service/NotifyService.dart';
 import 'package:fitness4life/features/smart_deal/service/BlogService.dart';
 import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
 import 'package:fitness4life/features/smart_deal/service/PromotionService.dart';
@@ -61,6 +63,7 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => PaypalService(locator<PaypalRepository>())),
   ChangeNotifierProvider(create: (_) => QuestionService(locator<QuestionRepository>())),
   ChangeNotifierProvider(create: (_) => CommentService(locator<CommentRepository>())),
+  ChangeNotifierProvider(create: (_) => NotifyService(locator<NotifyRepository>())),
   ChangeNotifierProvider(create: (_) => BlogService(locator<BlogRepository>())),
   ChangeNotifierProvider(create: (_) => PromotionService(locator<PromotionRepository>())),
 

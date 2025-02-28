@@ -129,9 +129,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 buildTextField("Phone", phoneController, keyboardType: TextInputType.phone),
                 Row(
                   children: [
-                    Expanded(child: buildDropdownField("Gender", ["MALE", "FEMALE", "OTHER"], (val) => gender = val)),
+                    Expanded(child: buildDropdownField("Gender", ["MALE", "FEMALE", "OTHER"], (val) => gender = val,gender)),
                     const SizedBox(width: 10),
-                    Expanded(child: buildDropdownField("Marital Status", ["SINGLE", "MARRIED"], (val) => maritalStatus = val)),
+                    Expanded(child: buildDropdownField("Marital Status", ["SINGLE", "MARRIED"], (val) => maritalStatus = val, maritalStatus)),
                   ],
                 ),
                 buildTextField("Hobbies", hobbiesController),
@@ -195,10 +195,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     );
   }
 
-  Widget buildDropdownField(String label, List<String> items, Function(String?) onChanged) {
+  Widget buildDropdownField(String label, List<String> items, Function(String?) onChanged, String? currentValue) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: DropdownButtonFormField<String>(
+        value: currentValue, // Set giá trị mặc định
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
