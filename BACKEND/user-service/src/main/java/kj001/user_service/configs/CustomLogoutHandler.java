@@ -38,7 +38,6 @@ public class CustomLogoutHandler implements LogoutHandler {
             storedToken.setLoggedOut(true);
             tokenRepository.save(storedToken);
             System.out.println("Token has been logged out successfully.");
-
         }
     }
 }

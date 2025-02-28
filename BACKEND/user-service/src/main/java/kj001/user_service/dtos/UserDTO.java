@@ -15,4 +15,5 @@ public class UserDTO {
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private ProfileUserDTO  profileUserDTO;
+    private FaceDataDTO faceDataDTO;
 }

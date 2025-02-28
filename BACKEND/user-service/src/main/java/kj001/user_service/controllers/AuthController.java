@@ -8,11 +8,10 @@ import kj001.user_service.dtos.*;
 import kj001.user_service.helpers.ApiResponse;
 import kj001.user_service.models.AuthenticationResponse;
 import kj001.user_service.models.User;
+import kj001.user_service.repository.UserRepository;
 import kj001.user_service.service.AuthenticationService;
-import kj001.user_service.service.JwtService;
 import kj001.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -20,15 +19,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users/")
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
+    private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
+
 
     @PostMapping("register")
     public ResponseEntity<?> createOneUser(@Valid @RequestBody CreateUserDTO createUserDTO, BindingResult bindingResult) {
@@ -59,6 +59,22 @@ public class AuthController {
         try {
             boolean response  = authenticationService.verifyAndActivateAccount(code);
             return ResponseEntity.ok(response );
+        } catch (RuntimeException ex) {
+            if (ex.getMessage().contains("OTPHasExpired")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("OTP has expired"));
+            } else if (ex.getMessage().contains("OTPVERIFIED")) {
+                return ResponseEntity.status(400).body(ApiResponse.badRequest("Account has verified"));
+            } else {
+                return ResponseEntity.status(500).body(ApiResponse.errorServer("Unexpected error: " + ex.getMessage()));
+            }
+        }
+    }
+
+    @GetMapping("verify-account2/{code}")
+    public ResponseEntity<?> verifyAccount2(@PathVariable String code) {
+        try {
+            Map<String, Object> response = authenticationService.verifyAccount2(code);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException ex) {
             if (ex.getMessage().contains("OTPHasExpired")) {
                 return ResponseEntity.status(400).body(ApiResponse.badRequest("OTP has expired"));

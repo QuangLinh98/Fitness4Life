@@ -20,7 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // Đánh dấu class là một Spring service
 @Service
@@ -79,6 +81,46 @@ public class AuthenticationService {
         userRepository.deleteInactiveUsersByEmail(user.getEmail(), user.getId());
 
         return true;
+    }
+
+    @Transactional
+    public Map<String, Object> verifyAccount2(String otpCode) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // Kiểm tra xem người dùng đã tồn tại hay chưa, nếu đã tồn tại thì trả về phản hồi lỗi
+            User user = userRepository.findByOtpCode(otpCode)
+                    .orElseThrow(() -> new RuntimeException("Invalid OTP"));
+
+            // Kiểm tra OTP có khớp không và còn hiệu lực không
+            if (!otpCode.equals(user.getOtpCode()) || user.getExpiryTime().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Invalid OTP provided.");
+            }
+
+            // Nếu tài khoản đã kích hoạt
+            if (user.isActive()) {
+                throw new RuntimeException("OTP has expired.");
+            }
+
+            // Kích hoạt tài khoản
+            user.setActive(true);
+            userRepository.save(user);
+
+            // Xóa các bản ghi không kích hoạt khác có cùng email
+            userRepository.deleteInactiveUsersByEmail(user.getEmail(), user.getId());
+
+            // Tạo response tương tự như bên Dart
+            response.put("success", true);
+            response.put("userId", user.getId());
+            response.put("email", user.getEmail());
+
+            return response;
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            throw e; // Rethrow exception để caller có thể xử lý
+        }
     }
 
     // Phương thức để xác thực người dùng (Login)

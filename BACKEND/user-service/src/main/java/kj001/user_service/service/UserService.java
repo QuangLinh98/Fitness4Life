@@ -6,10 +6,7 @@ import jakarta.transaction.Transactional;
 import kj001.user_service.dtos.*;
 import kj001.user_service.helpers.ApiResponse;
 import kj001.user_service.helpers.FileUpload;
-import kj001.user_service.models.OTP;
-import kj001.user_service.models.Profile;
-import kj001.user_service.models.Roles;
-import kj001.user_service.models.User;
+import kj001.user_service.models.*;
 import kj001.user_service.repository.OtpRepository;
 import kj001.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -79,23 +76,42 @@ public class UserService {
     //Hàm xử lý chỉ để giao tiếp feign client
     public UserDTO getUserById(Long id) {
         Optional<User> existingUser = userRepository.findById(id);
+
         if (existingUser.isEmpty()) {
             return null;
         }
+
         User user = existingUser.get();
 
-        Profile profile = existingUser.get().getProfile();
-        //Chuyển đổi entity thanh dto
+        // Get profile data
+        Profile profile = user.getProfile();
         ProfileUserDTO profileUserDTO = (profile != null) ?
                 new ProfileUserDTO(profile.getAge(), profile.getHeightValue()) : null;
 
+        // Get face data
+        FaceDataDTO faceDataDTO = null;
+        // Use the reference from the user object instead of a separate repository call
+        FaceData faceData = user.getFaceData();
+
+        if (faceData != null) {
+            faceDataDTO = FaceDataDTO.builder()
+                    .userId(user.getId())
+                    .faceEncoding(faceData.getFaceEncoding())
+                    .originalImagePath(faceData.getOriginalImagePath())
+                    .hasFaceData(faceData.getFaceEncoding() != null && !faceData.getFaceEncoding().trim().isEmpty())
+                    .build();
+        }
+
+        // Build the complete user DTO with profile and face data
         UserDTO userDTO = UserDTO.builder()
                 .id(user.getId())
-                .fullName(existingUser.get().getFullName())
-                .email(existingUser.get().getEmail())
-                .gender(existingUser.get().getGender())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .gender(user.getGender())
                 .profileUserDTO(profileUserDTO)
+                .faceDataDTO(faceDataDTO)  // Thêm face data vào response
                 .build();
+
         return userDTO;
     }
 
@@ -109,6 +125,7 @@ public class UserService {
 
         User user = existingUser.get();
         Profile profile = user.getProfile();
+        FaceData faceData = user.getFaceData();
 
         // Nếu Profile chưa tồn tại, tạo một ProfileDTO rỗng
         ProfileDTO profileDTO = new ProfileDTO();
@@ -123,6 +140,17 @@ public class UserService {
             profileDTO.setMaritalStatus(profile.getMaritalStatus());
         }
 
+        // Xử lý FaceData
+        FaceDataDTO faceDataDTO = null;
+        if (faceData != null) {
+            faceDataDTO = FaceDataDTO.builder()
+                    .userId(user.getId())
+                    .faceEncoding(faceData.getFaceEncoding())
+                    .originalImagePath(faceData.getOriginalImagePath())
+                    .hasFaceData(faceData.getFaceEncoding() != null && !faceData.getFaceEncoding().trim().isEmpty())
+                    .build();
+        }
+
         return UserResponseDTO.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
@@ -133,9 +161,9 @@ public class UserService {
                 .role(user.getRole())
                 .gender(user.getGender())
                 .profileDTO(profileDTO)
+                .faceDataDTO(faceDataDTO)
                 .build();
     }
-
 
     public User findByEmail(String email) {
         // Validate the email input
@@ -160,7 +188,6 @@ public class UserService {
             throw new RuntimeException("An unexpected error occurred while fetching the user: " + ex.getMessage(), ex);
         }
     }
-
 
     //Phương thức Register User
     @Transactional

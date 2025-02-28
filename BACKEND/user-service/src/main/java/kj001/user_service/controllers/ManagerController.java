@@ -2,8 +2,6 @@ package kj001.user_service.controllers;
 
 import kj001.user_service.dtos.UserDTO;
 import kj001.user_service.dtos.UserResponseDTO;
-import kj001.user_service.models.Profile;
-import kj001.user_service.models.User;
 import kj001.user_service.repository.UserRepository;
 import kj001.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;

@@ -52,6 +52,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER , cascade = CascadeType.ALL)
     private List<Token> tokens;
 
+    @OneToOne(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private FaceData faceData;
+
     public String getUsername() {
         return email;
     }

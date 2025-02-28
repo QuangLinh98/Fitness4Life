@@ -1,6 +1,7 @@
 package kj001.user_service.dtos;
 
 import jakarta.persistence.*;
+import kj001.user_service.models.FaceData;
 import kj001.user_service.models.Gender;
 import kj001.user_service.models.Profile;
 import kj001.user_service.models.Roles;
@@ -30,6 +31,8 @@ public class UserResponseDTO {
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    private FaceDataDTO faceDataDTO;
 
     private ProfileDTO profileDTO;
 }
