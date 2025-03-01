@@ -15,6 +15,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
   @override
   void initState() {
     super.initState();
@@ -58,6 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   : null,
             ),
 
+
             const SizedBox(height: 20),
             userProfile != null
                 ? Column(
@@ -66,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildInfoRow("Email", userProfile.email),
                 _buildInfoRow("Phone", userProfile.phone),
                 _buildInfoRow("Age", userProfile.profileDTO.age.toString()),
-                _buildInfoRow("Gender", userProfile.gender.toString().split('.').last),
+                _buildInfoRow("Gender", userProfile.gender.name),
                 _buildInfoRow("Height", "${userProfile.profileDTO.heightValue} cm"),
                 _buildInfoRow("Marital Status", userProfile.profileDTO.maritalStatus.toString().split('.').last),
                 _buildInfoRow("Address", userProfile.profileDTO.address),
