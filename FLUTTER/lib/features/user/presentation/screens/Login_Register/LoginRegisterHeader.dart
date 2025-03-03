@@ -4,11 +4,9 @@ import 'package:fitness4life/features/user/presentation/screens/Login_Register/L
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/RegisterScreen.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../../core/widgets/LanguageProvider.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class LoginRegisterHeader extends StatefulWidget {
   const LoginRegisterHeader({Key? key}) : super(key: key);
@@ -40,70 +38,73 @@ class _LoginRegisterHeaderState extends State<LoginRegisterHeader> {
           height: 150,
           color: const Color(0xFFB00020),
           padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Căn hai bên
-            children: [
-              Expanded(
-                child: Center( // Căn giữa Text trong Row
-                  child: Text(
-                    userName != null ? 'Hello, $userName!' : 'Hello customers!',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+          child: Center(
+            child: Text(
+              userName != null ? 'Hello, $userName!' : 'Hello customers !',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.language,
-                    color: Provider.of<LanguageProvider>(context).isVietnamese
-                        ? Colors.green // Nếu Tiếng Việt -> xanh lá
-                        : Colors.blue,  // Nếu English -> xanh dương
-                  ),
-                  onPressed: () {
-                    // Đổi ngôn ngữ khi nhấn vào
-                    Provider.of<LanguageProvider>(context, listen: false)
-                        .toggleLanguage();
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         ),
+
         // Kiểm tra trạng thái người dùng và hiển thị widget tương ứng
+        // Positioned(
+        //   top: 100,
+        //   left: 16,
+        //   right: 16,
+        //   child: userName != null
+        //       ? goalService.goals.isEmpty
+        //           ? const Center(child: CircularProgressIndicator())
+        //           : SingleChildScrollView(
+        //               scrollDirection: Axis.horizontal,
+        //               child: Row(
+        //                 children: goalService.goals.isNotEmpty
+        //                     ? goalService.goals.map((goal) {
+        //                         return Padding(
+        //                           padding: const EdgeInsets.symmetric(
+        //                               horizontal: 8.0),
+        //                           child: buildGoalCard(goal),
+        //                         );
+        //                       }).toList()
+        //                     : [
+        //                         Padding(
+        //                           padding: const EdgeInsets.symmetric(
+        //                               horizontal: 8.0),
+        //                           child:
+        //                               buildEmptyGoalCard(), // Hiển thị hiệu ứng khi không có mục tiêu
+        //                         ),
+        //                       ],
+        //               ),
+        //             )
+        //       : buildLoginRegister(context),  //Chưa đăng nhập
+        // ),
         Positioned(
           top: 100,
           left: 16,
           right: 16,
           child: userName != null
-              ? goalService.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: goalService.goals.isNotEmpty
-                            ? goalService.goals.map((goal) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: buildGoalCard(goal),
-                                );
-                              }).toList()
-                            : [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child:
-                                      buildEmptyGoalCard(), // Hiển thị hiệu ứng khi không có mục tiêu
-                                ),
-                              ],
-                      ),
-                    )
-              : buildLoginRegister(context),  //Chưa đăng nhập
+              ? (goalService.isLoading
+                  ? buildLoginRegister(
+                      context) // Nếu đang tải, hiển thị Login/Register
+                  : (goalService.goals.isEmpty
+                      ? buildLoginRegister(context) // Nếu không có goals, hiển thị animation
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: goalService.goals.map((goal) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: buildGoalCard(goal),
+                              );
+                            }).toList(),
+                          ),
+                        )))
+              : buildLoginRegister(
+                  context), // Nếu chưa đăng nhập, hiển thị Login/Register
         ),
       ],
     );
@@ -292,43 +293,4 @@ class _LoginRegisterHeaderState extends State<LoginRegisterHeader> {
     );
   }
 
-  //Xử lý Goal card empty hiển thị animation
-  Widget buildEmptyGoalCard() {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      elevation: 10,
-      //color: const Color(0xFF1E1B2E),
-      child: Container(
-        width: 350,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Hiển thị hoạt hình Lottie
-            Lottie.asset(
-              'animations/Animation.json', // Đường dẫn file JSON
-              width: 150,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(height: 2),
-            // Hiển thị thông báo
-            const Text(
-              "No goals available",
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

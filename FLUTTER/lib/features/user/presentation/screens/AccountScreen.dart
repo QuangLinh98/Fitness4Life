@@ -3,6 +3,8 @@ import 'package:fitness4life/features/booking/data/MembershipSubscription%20.dar
 import 'package:fitness4life/features/booking/service/MembershipSubscriptionService.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/Password/ChangePasswordScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Profile/ProfileScreen.dart';
+import 'package:fitness4life/features/user/presentation/screens/Profile/UpdateProfileScreen.dart';
 import 'package:fitness4life/features/user/service/LoginService.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +14,7 @@ import '../../../smart_deal/presentation/screens/post/YourPost.dart';
 import '../../../smart_deal/presentation/screens/promotion/PromotionScreen.dart';
 
 class AccountScreen extends StatefulWidget {
-  final int userId;
-  const AccountScreen({super.key,  this.userId = 102});
+  const AccountScreen({super.key});
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -29,18 +30,23 @@ class _AccountScreenState extends State<AccountScreen> {
     super.initState();
     // Gọi các service để lấy dữ liệu
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
       final membershipService = Provider.of<MembershipSubscriptionService>(context, listen: false);
-      membershipService.getMembershipSubscription(widget.userId); // 🔹 Chỉ gọi API, không dùng setState()
+      if (userInfo.userId != null) {
+        membershipService.getMembershipSubscription(userInfo.userId!);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final userName = Provider.of<UserInfoProvider>(context).userName;
+    final userId = Provider.of<UserInfoProvider>(context).userId;
     final membershipService = Provider.of<MembershipSubscriptionService>(context);
     final membership = membershipService.membershipSubscription;
 
     return Scaffold(
+
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -76,12 +82,15 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        "Profile >",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              //MaterialPageRoute(builder: (context) => UpdateProfileScreen())
+                              MaterialPageRoute(builder: (context) => ProfileScreen(userId: userId!))
+                          );
+                        },
+                        child: const Text("Profile >", style: TextStyle(color: Colors.red, fontSize: 16)),
                       ),
                     ],
                   ),
@@ -131,17 +140,17 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                         const SizedBox(height: 4),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children:[
-                            Text(
-                              "Membership: ${membership.membershipLevel}",
-                              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              "${NumberFormat('#,###').format(membership.amount)} USD",
-                              style: const TextStyle(color: Colors.white, fontSize: 16),
-                            ),
-                          ]
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children:[
+                              Text(
+                                "Membership: ${membership.membershipLevel}",
+                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                "${NumberFormat('#,###').format(membership.amount)} USD",
+                                style: const TextStyle(color: Colors.white, fontSize: 16),
+                              ),
+                            ]
                         ),
 
                         const SizedBox(height: 8),
@@ -154,11 +163,14 @@ class _AccountScreenState extends State<AccountScreen> {
                           "Expiration Date: ${membership.formattedExpirationDate}",
                           style: const TextStyle(color: Colors.white70, fontSize: 14),
                         ),
+
                         const SizedBox(height: 4),
+
                       ],
                     );
                   },
                 ),
+
               ),
             ),
 
@@ -167,7 +179,12 @@ class _AccountScreenState extends State<AccountScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                buildOptionItem("User Guide", Icons.help_outline, () {}),
+                buildOptionItem("User Guide", Icons.help_outline, () {
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(builder: (context) => RewardProgramPage())
+                  // );
+                }),
                 buildOptionItem("Your Discount", Icons.code, () {
                   Navigator.push(
                       context,
@@ -184,10 +201,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 buildOptionItem("Contract", Icons.description_outlined, () {}),
                 buildOptionItem("Customer Care History", Icons.history, () {}),
                 buildOptionItem("Change password", Icons.lock_outline, ()  {
-                     Navigator.push(
-                         context,
-                         MaterialPageRoute(builder: (context) => const ChangePasswordScreen())
-                     );
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ChangePasswordScreen())
+                  );
                 }),
                 buildOptionItem("Logout", Icons.logout, ()async {
                   await handleLogout(context);
@@ -222,9 +239,6 @@ class _AccountScreenState extends State<AccountScreen> {
       // Gọi hàm logout từ LoginService
       final loginService = Provider.of<LoginService>(context, listen: false);
       await loginService.logout();
-
-      //thêm
-      Provider.of<UserInfoProvider>(context, listen: false).resetPoint();
 
       // Điều hướng về màn hình đăng nhập
       Navigator.pushReplacement(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class GoalSetupState with ChangeNotifier {
+  int? goalId;
   String? goalType;
   double? weight;
   double? currentValue;
@@ -9,6 +10,11 @@ class GoalSetupState with ChangeNotifier {
   String? endDate;
   String activityLevel = "SEDENTARY"; // Giá trị mặc định
   bool isKgSelected = true;
+
+  void setGoalId(int id) {
+    goalId = id;
+    notifyListeners();
+  }
 
   void setGoalType(String type) {
     goalType = type;
@@ -20,13 +26,14 @@ class GoalSetupState with ChangeNotifier {
     notifyListeners();
   }
 
-            void setCurrentValue(double value) {
+  void setCurrentValue(double value) {
     currentValue = value;
     notifyListeners();
   }
 
   void setWeight(double value) {
     weight = value;
+    print('Setting weight: $weight');
     notifyListeners();
   }
 

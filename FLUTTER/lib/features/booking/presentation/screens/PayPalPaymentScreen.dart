@@ -79,13 +79,13 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
     bool isValid = await promotionService.findCodeOfUser(enteredCode, widget.userId);
     print('isValid: $isValid');
     if (isValid) {
-        setState(() {
-          discountedAmount = totalAmount! - discount;
-        });
-        _showSnackBar("✅ Discount applied: -${discount}\$");
-      } else {
-        _showSnackBar("❌ Invalid or unauthorized coupon code!");
-      }
+      setState(() {
+        discountedAmount = totalAmount! - discount;
+      });
+      _showSnackBar("✅ Discount applied: -${discount}\$");
+    } else {
+      _showSnackBar("❌ Invalid or unauthorized coupon code!");
+    }
 
   }
 
@@ -165,11 +165,11 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
     final promotionService = Provider.of<PromotionService>(context);
     final availablePromotions = promotionService.promotionOfUsers
         .where((promo) => totalAmount != null &&
-                          totalAmount! >= promo.minValue &&
-                          (promo.packageName == null ||
-                                promo.packageName.isEmpty ||
-                                promo.packageName.any((name) =>
-                                      name.toLowerCase() == widget.packageName.name.toLowerCase())))
+        totalAmount! >= promo.minValue &&
+        (promo.packageName == null ||
+            promo.packageName.isEmpty ||
+            promo.packageName.any((name) =>
+            name.toLowerCase() == widget.packageName.name.toLowerCase())))
         .toList();
 
     return Scaffold(
@@ -273,6 +273,7 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
                   });
                 }
               },
+
               selectedItemBuilder: (BuildContext context) {
                 return availablePromotions.map((promo) {
                   return Text(
@@ -282,12 +283,14 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
                 }).toList();
               },
             ),
+
             const SizedBox(height: 10),
             // **💲 Hiển thị giá sau giảm (nếu có)**
             if (discountedAmount != null && discountedAmount != totalAmount)
               Text("Discounted Price: \$${discountedAmount!.toStringAsFixed(2)}",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
             const SizedBox(height: 20),
+
             // **🛒 Nút thanh toán PayPal**
             _isLoading
                 ? const CircularProgressIndicator()
@@ -302,6 +305,7 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
                 foregroundColor: Colors.white,
               ),
             ),
+
             const SizedBox(height: 30),
             const Text(
               "Secure Payment Powered by PayPal",

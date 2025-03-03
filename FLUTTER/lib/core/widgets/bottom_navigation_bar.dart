@@ -1,11 +1,10 @@
 import 'package:fitness4life/features/Home/presentation/screens/HomeScreen.dart';
 import 'package:fitness4life/features/booking/presentation/screens/ClassesScreen.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/DashboardScreen.dart';
 import 'package:fitness4life/features/fitness_goal/presentation/screens/HealthScreen.dart';
+import 'package:fitness4life/features/notification/presentation/NotificationScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/AccountScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'LanguageProvider.dart';
 
 class PageManager extends StatefulWidget {
   const PageManager({super.key});
@@ -24,9 +23,16 @@ class _PageManagerState extends State<PageManager> {
   final List<Widget> _pages = [
     HomeScreen(), // Tab "Home"
     ClassScreen(),  // Tab "Classes"
-    HealthScreen(),  // Tab "Health"
+    DashboardScreen(),  // Tab "Health"
+    NotificationScreen(),  // Tab "Health"
     AccountScreen(),  // Tab "Account"
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
 
   void updateIndex(int index) {
     setState(() {
@@ -36,8 +42,6 @@ class _PageManagerState extends State<PageManager> {
 
   @override
   Widget build(BuildContext context) {
-    final isVietnamese = Provider.of<LanguageProvider>(context).isVietnamese;
-
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -61,26 +65,31 @@ class _PageManagerState extends State<PageManager> {
             fontSize: 12,
           ),
           onTap: (index) => updateIndex(index),
-          items: [
+          items: const [
             BottomNavigationBarItem(
-              icon: const Icon(Icons.home),
-              label: isVietnamese ? 'Trang chủ' : 'Home',
+              icon: Icon(Icons.home),
+              label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.fitness_center),
-              label: isVietnamese ? 'Lớp học' : 'Classes',
+              icon: Icon(Icons.fitness_center),
+              label: 'Classes',
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.health_and_safety),
-              label: isVietnamese ? 'Sức khỏe' : 'Health',
+              icon: Icon(Icons.health_and_safety),
+              label: 'Health',
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.account_circle),
-              label: isVietnamese ? 'Tài khoản' : 'Account',
+              icon: Icon(Icons.notifications_active),
+              label: 'Notifications',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle),
+              label: 'Account',
             ),
           ],
         ),
       ),
     );
   }
+
 }

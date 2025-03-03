@@ -355,7 +355,6 @@ class WorkoutPackageCard extends StatelessWidget {
                     final packageId = package.id;
                     final packageName = package.packageName;
 
-                    // thêm packageName vào khi truyền data cho PayPalPaymentScreen
                     Navigator.push(context, MaterialPageRoute(builder: (context) => PayPalPaymentScreen(userId: userId ?? 0,
                       packageId: packageId, packageName: packageName)));
                   },

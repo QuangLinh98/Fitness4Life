@@ -540,7 +540,7 @@ class _PromotionScreenState extends State<PromotionScreen>
   Widget _buildRedeemPointsTab(String tabName) {
     final userInfo = Provider.of<UserInfoProvider>(context, listen: false);
     int? userId = userInfo.userId;
-    int currentPoint = userInfo.userPoint;
+    int currentPoint = userInfo.userPoint!;
     if (tabName == "Redeem Points") {
       return Consumer<PromotionService>(
         builder: (context, promotionService, child) {

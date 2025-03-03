@@ -12,12 +12,12 @@ class TokenManager {
     try {
       await _storage.write(key: _accessTokenKey, value: accessToken);
       await _storage.write(key: _refreshTokenKey, value: refreshToken);
-      print("Tokens saved securely.");
+      //print("Tokens saved securely.");
 
       // Xác minh lưu trữ
       final savedAccessToken = await _storage.read(key: _accessTokenKey);
       final savedRefreshToken = await _storage.read(key: _refreshTokenKey);
-      print("Verification - AccessToken: $savedAccessToken, RefreshToken: $savedRefreshToken");
+      //print("Verification - AccessToken: $savedAccessToken, RefreshToken: $savedRefreshToken");
     } catch (e) {
       print("Failed to save tokens: $e");
     }

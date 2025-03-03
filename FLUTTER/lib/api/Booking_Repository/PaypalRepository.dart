@@ -103,10 +103,7 @@ class PaypalRepository {
     try {
       Response response = await _apiGateWayService.postData(
         "/paypal/success?paymentId=$paymentId&token=$paypalToken&PayerID=$payerId",
-        // data: {
-        //   "paymentId": paymentId,
-        //   "payer_id": payerId
-        // },
+
         options: Options(
           headers: {
             'Content-Type': 'application/json',

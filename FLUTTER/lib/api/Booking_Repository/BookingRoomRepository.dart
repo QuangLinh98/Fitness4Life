@@ -8,7 +8,8 @@ class BookingRoomRepository {
 
     //Xử lý booking room
     Future<bool> bookRoom(int roomId, int userId) async {
-      try {
+      print('Có lọt vào không ');
+    try {
         final url = '/booking/bookingRoom/add';
 
         // Chuẩn bị payload
@@ -19,8 +20,7 @@ class BookingRoomRepository {
 
         // Gửi request POST
         final response = await _apiGateWayService.postData(url, data: payload);
-        print('Response book : ${response.data}');
-
+        print('Request gửi xuống backend : ${response.data}');
       // Kiểm tra statusCode
         if (response.statusCode == 201) {
           return true;

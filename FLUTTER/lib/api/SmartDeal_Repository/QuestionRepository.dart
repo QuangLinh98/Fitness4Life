@@ -12,17 +12,27 @@ class QuestionRepository {
   Future<List<Question>> getAllQuestion() async {
     try {
       final response = await _apiGateWayService.getData('/deal/forums/questions');
+
+      // In dữ liệu API trả về
+      debugPrint("Response từ getAllQuestion API all: ${response.data}");
+
       if (response.data != null && response.data['data'] is List) {
         List<dynamic> dataList = response.data['data'];
+
         List<Question?> questions = dataList.map((json) {
           try {
-            Question question = Question.fromJson(json);
+            Question question = Question.fromJson(json); // Chuyển đổi thành đối tượng Question
+
+            // ✅ Log dữ liệu đã chuyển đổi
+            debugPrint("✅ Đã parse all: $question");
+
             return question;
           } catch (e) {
             print("❌ Lỗi chuyển đổi Question all: $e");
             return null;
           }
         }).where((item) => item != null).toList();
+
         return questions.cast<Question>();
       } else {
         throw Exception("Invalid response structure or 'data' is not a List.");
@@ -38,9 +48,15 @@ class QuestionRepository {
     try {
       final response = await _apiGateWayService.getData('/deal/forums/questions/getOne/$questionId');
 
+      debugPrint("Response từ API one ($questionId): ${response.data}");
+
       if (response.data != null && response.data['data'] != null) {
         try {
           Question question = Question.fromJson(response.data['data']);
+
+          // ✅ Log dữ liệu đã chuyển đổi
+          debugPrint("✅ Đã parse by id: $question");
+
           return question;
         } catch (e) {
           print("❌ Lỗi chuyển đổi Question one: $e");
@@ -57,11 +73,13 @@ class QuestionRepository {
 
   Future<Response> createQuestion(CreateQuestionDTO question) async {
     try {
+      // Chuyển danh sách Uint8List thành MultipartFile
       List<MultipartFile> images = await Future.wait(
         question.imageQuestionUrl.map((image) async {
-          return MultipartFile.fromBytes(image, filename: 'image.jpg');
+          return MultipartFile.fromBytes(image, filename: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg');
         }),
       );
+
       final url = '/deal/forums/questions/create';
       // Tạo FormData
       FormData formData = FormData.fromMap({
@@ -75,30 +93,17 @@ class QuestionRepository {
         'rolePost': question.rolePost,
         'imageQuestionUrl': images,
       });
+
+      // Gửi dữ liệu qua phương thức postDataWithFormData
       Response response = await _apiGateWayService.postDataWithFormData(url,formData: formData,);
-      // debugPrint("✅ API Response: ${response.data}");
+
+      print("✅ API Response: ${response.data}");
       return response;
     } catch (e) {
       print("❌ Lỗi khi tạo câu hỏi: $e");
       rethrow;
     }
   }
-
-  // Future<bool> voteQuestion(int questionId, int userId, String voteType) async {
-  //   try {
-  //     // Tạo URL với query parameters
-  //     final url = '/deal/forums/$questionId/vote?userId=$userId&voteType=$voteType';
-  //
-  //     // Gửi request POST
-  //     await _apiGateWayService.postData(url);
-  //
-  //     debugPrint("✅ Vote thành công");
-  //     return true;
-  //   } catch (e) {
-  //     print("❌ Lỗi khi vote câu hỏi: $e");
-  //     rethrow;
-  //   }
-  // }
 
 
 

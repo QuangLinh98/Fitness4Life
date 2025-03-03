@@ -2,33 +2,30 @@ import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
 import 'package:fitness4life/features/booking/presentation/screens/ClassesScreen.dart';
 import 'package:fitness4life/features/booking/presentation/screens/WorkoutPackageScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'LanguageProvider.dart';
 
 class SubMenu  extends StatelessWidget {
   const SubMenu ({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          buildMenuButton(Icons.calendar_today, Provider.of<LanguageProvider>(context).isVietnamese ? 'Lịch' : 'Schedule', (){
+          buildMenuButton(Icons.calendar_today, 'Schedule',(){
             PageManager.of(context)?.updateIndex(1);
           }),
-          buildMenuButton(Icons.person, Provider.of<LanguageProvider>(context).isVietnamese ? 'Huấn luyện viên' : 'Trainer', () {}),
-          buildMenuButton(Icons.book, Provider.of<LanguageProvider>(context).isVietnamese ? 'Lịch lớp' : 'Class Schedule', () {}),
-          buildMenuButton(Icons.credit_card, Provider.of<LanguageProvider>(context).isVietnamese ? 'Gói thành viên' : 'Membership', () {
+          buildMenuButton(Icons.person, 'Trainer',(){}),
+          buildMenuButton(Icons.book, 'Class Schedule',(){}),
+          buildMenuButton(Icons.credit_card, 'Membership',() {
             Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const WorkoutPackageScreen()),
+                context,
+                MaterialPageRoute(builder: (context) => const WorkoutPackageScreen()),
             );
           }),
-          buildMenuButton(Icons.shopping_cart, Provider.of<LanguageProvider>(context).isVietnamese ? 'Dịch vụ' : 'Services', () {}),
+          buildMenuButton(Icons.shopping_cart, 'Services',(){}),
         ],
       ),
     );
