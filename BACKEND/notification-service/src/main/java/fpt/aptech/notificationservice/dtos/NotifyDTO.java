@@ -9,5 +9,6 @@ public class NotifyDTO {
     private String fullName;
     private String title;
     private String content;
-   // private String token;
+    private String token;
+    private String body;
 }

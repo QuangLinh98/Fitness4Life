@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.*;
 public class ManagerController {
     @Autowired
     private NotifyService notifyService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @PostMapping("send")
+    public void sendNotification(@RequestParam String userId, @RequestParam String message) {
+        messagingTemplate.convertAndSendToUser(userId, "/queue/notifications", message);
+    }
 
     @PostMapping("create")
     public ResponseEntity<?> createNotify(@Valid @RequestBody Notify notify,

@@ -13,14 +13,24 @@ import java.util.List;
 public class NotifyService {
     private final NotifyRepository notifyRepository;
 
-    //Phương thức lấy data
+    // Phương thức lấy tất cả thông báo
     public List<Notify> findAll() {
         return notifyRepository.findAll();
     }
 
-    //Phương thức tìm Goal theo id
+    // Phương thức tìm thông báo theo id
     public Notify findById(int id) {
         return notifyRepository.findById(id).orElse(null);
+    }
+
+    // Phương thức lấy thông báo theo userId
+    public List<Notify> findByUserId(Long userId) {
+        return notifyRepository.findByUserIdOrderByCreatedDateDesc(userId);
+    }
+
+    // Phương thức lấy thông báo chưa đọc theo userId
+    public List<Notify> findUnreadByUserId(Long userId) {
+        return notifyRepository.findByUserIdAndStatusFalse(userId);
     }
 
     //Phương thức tạo 1 Notify mới
@@ -32,7 +42,17 @@ public class NotifyService {
     //Phương thức delete 1 notify
     public void deleteNotify(int id) {
         Notify notifyExisting = notifyRepository.findById(id).orElse(null);
-         notifyRepository.delete(notifyExisting);
+        notifyRepository.delete(notifyExisting);
+    }
+
+    // Phương thức cập nhật trạng thái đã đọc
+    public Notify markAsRead(int id) {
+        Notify notifyExisting = notifyRepository.findById(id).orElse(null);
+        if (notifyExisting != null) {
+            notifyExisting.setStatus(true);
+            return notifyRepository.save(notifyExisting);
+        }
+        return null;
     }
 
 }

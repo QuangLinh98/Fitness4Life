@@ -24,43 +24,17 @@ public class NotifyConsumer {
     private NotifyService notifyService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;  //Dùng để gửi tin nhắn qua template
-    @Autowired
-    private UserEurekaClient eurekaClient;
-    @Autowired
-    private MailResetPass mailResetPass;
+
 
     @KafkaListener(topics = "notifyFitness_topic", groupId = "notifyFitness-group", concurrency = "3")
     public void listen(String message) {
         try {
             NotifyDTO notifyDTO = objectMapper.readValue(message, NotifyDTO.class);
-
-            //Sử dụng token từ các service gửi message kèm token thông qua kafka để gửi đến user-service xác thực
-           // String token  = notifyDTO.getToken();
+            System.out.println("Received token: " + notifyDTO.getToken());
 
             Notify notify = objectMapper.convertValue(notifyDTO, Notify.class);
             notifyService.addNotify(notify);
 
-            //Gửi thông báo qua websocket
-            messagingTemplate.convertAndSendToUser(
-                    String.valueOf(notify.getUserId()),             //Gửi tới user
-                    "/queue/notifications",         // Endpoint cá nhân hóa
-                    notify                          // Nội dung thông báo
-            );
-
-            //Lấy email từ user-service thông qua feign client
-//            UserDTO userDTO = eurekaClient.getUserById(notify.getUserId(),token);
-//            if (userDTO != null && userDTO.getEmail() != null) {
-//                //Send mail
-//                String emailContent = "Xin chào " + notify.getFullName() + ",\n\n" + notify.getContent();
-//                // Tạo MailEntity
-//                MailEntity mailEntity = new MailEntity();
-//                mailEntity.setEmail(userDTO.getEmail());
-//                mailEntity.setSubject(notify.getTitle());
-//                mailEntity.setContent(emailContent);
-//
-//                // Gửi email
-//                mailResetPass.sendMailOTP(mailEntity);
-//            }
         }
         catch (Exception e) {
             e.printStackTrace();

@@ -142,6 +142,13 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+        <!--        Cấu hình Firebase-->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>9.0.0</version>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>

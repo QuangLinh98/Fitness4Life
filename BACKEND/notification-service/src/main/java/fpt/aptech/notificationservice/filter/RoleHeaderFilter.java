@@ -17,7 +17,6 @@ import java.util.List;
 public class RoleHeaderFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("Request URI in RoleHeaderFilter: " + request.getRequestURI());
         String role = request.getHeader("X-Role"); // Lấy role từ header
         String token = request.getHeader("Authorization"); // Lấy token từ header
         System.out.println("Role header: " + role);
