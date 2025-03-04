@@ -20,11 +20,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findCommentsByQuestionId(@Param("questionId") Long questionId);
     Optional<Comment> findById(Long id);
 
-    // Lấy tất cả các bình luận gốc (không có bình luận cha) của một câu hỏi
-    List<Comment> findByQuestionAndParentCommentIsNull(Question question);
 
     // Lấy tất cả các bình luận con của một bình luận cha
     List<Comment> findByParentComment(Comment parentComment);
 
     List<Comment> findByBlogId(Long blogId);
+
 }

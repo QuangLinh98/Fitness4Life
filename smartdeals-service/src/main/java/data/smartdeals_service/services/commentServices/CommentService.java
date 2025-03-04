@@ -28,7 +28,6 @@ public class CommentService {
     private final QuestionRepository questionRepository;
 
     //========================= Generic Helper =========================
-
     private CommentDTO convertToCommentDTOWithReplies(Comment comment) {
         CommentDTO dto = new CommentDTO();
         dto.setId(comment.getId());
@@ -138,21 +137,6 @@ public class CommentService {
     }
 
     //=================forum============================
-
-    public List<CommentDTO> getAllCommentsForum() {
-        return commentRepository.findAll().stream()
-                .map(comment -> {
-                    CommentDTO dto = new CommentDTO();
-                    dto.setId(comment.getId());
-                    dto.setContent(EmojiUtils.unicodeToEmoji(comment.getContent())); // Chuyển Unicode thành emoji
-                    dto.setUserName(comment.getUserName());
-                    dto.setCreatedAt(comment.getCreatedAt());
-                    dto.setIsPublished(comment.getIsPublished());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
     public Comment createCommentForum(CommentDTO commentDTO) {
         Comment comment = new Comment();
         comment.setContent(EmojiUtils.emojiToUnicode(commentDTO.getContent())); // Chuyển emoji thành Unicode
@@ -234,23 +218,6 @@ public class CommentService {
 
         commentRepository.deleteById(id);
     }
-
-    public List<CommentDTO> getCommentsByQuestion(Long questionId) {
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
-        return commentRepository.findByQuestionAndParentCommentIsNull(question).stream()
-                .map(this::convertToCommentDTOWithReplies)
-                .collect(Collectors.toList());
-    }
-
-    public List<CommentDTO> getReplies(Long parentCommentId) {
-        Comment parentComment = commentRepository.findById(parentCommentId)
-                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
-        return commentRepository.findByParentComment(parentComment).stream()
-                .map(this::convertToCommentDTOWithReplies)
-                .collect(Collectors.toList());
-    }
-
     public Comment changeStatusCMF(Long id, ChangeStatusCommentDTO status) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("CommentNotFoundWithId"));

@@ -62,4 +62,20 @@
   "packageName" : [ "PRESIDENT", "ROYAL", "SIGNATURE" ],
   "code" : "FB4C1BF9",
   "points" : 10000
+}, {
+  "id" : "4A6F7D8C",
+  "title" : "vvvvv",
+  "description" : "vvvvvv",
+  "discountType" : [ "PERCENTAGE", "FIXED" ],
+  "discountValue" : 50,
+  "startDate" : null,
+  "endDate" : null,
+  "isActive" : true,
+  "applicableService" : [ "GYM" ],
+  "minValue" : 10000,
+  "customerType" : [ "RETURNING" ],
+  "createdBy" : "huy",
+  "packageName" : [ "CLASSIC", "CLASSIC_PLUS" ],
+  "code" : "C3AFC0F2",
+  "points" : 500
 } ]

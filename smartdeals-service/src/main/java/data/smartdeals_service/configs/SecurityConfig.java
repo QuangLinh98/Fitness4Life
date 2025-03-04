@@ -15,14 +15,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http.csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/uploads/**","/api/deal/blogs","/api/deal/blogs/**")
+//                        .permitAll()
+//                        .anyRequest()
+//                        .authenticated()
+//                )
+//                .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class);
+//        return http.build();
+//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/uploads/**")
+                        .requestMatchers("/uploads/**",
+                                "/api/articles/generate"  )
                         .permitAll()
                         .anyRequest()
-                        .authenticated()
+                        .authenticated() // Yêu cầu tất cả endpoint cần xác thực
                 )
                 .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();

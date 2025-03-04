@@ -25,7 +25,7 @@ public class RoleHeaderFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7); // Lấy token từ header Authorization
-            System.out.println("Token được lấy" + token);
+            System.out.println("Token được lấy: " + token);
 
             try {
                 // Giải mã payload của JWT (không kiểm tra chữ ký)

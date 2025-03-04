@@ -15,6 +15,7 @@ import data.smartdeals_service.services.kafkaServices.CommentProducer;
 import data.smartdeals_service.services.commentServices.CommentService;
 import data.smartdeals_service.services.forumServices.QuestionService;
 import data.smartdeals_service.services.spam.SpamFilterService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,7 @@ public class ForumController {
     private final CommentService commentService;
     private final CommentProducer commentProducer;
     private final SpamFilterService spamFilterService;
+    private final HttpServletRequest request;
 
     @PostMapping("/{questionId}/vote")
     public ResponseEntity<?> vote(@PathVariable Long questionId,
@@ -162,7 +164,7 @@ public class ForumController {
 
     // Tạo bình luận
     @PostMapping("/comments/create")
-    public ResponseEntity<?> createComment(@RequestBody @Valid CommentDTO commentDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> createComment(@RequestBody @Valid CommentDTO commentDTO,BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(ApiResponse.badRequest(bindingResult));
         }
@@ -172,7 +174,10 @@ public class ForumController {
                 return ResponseEntity.status(402).body("Comment contains spam and cannot be accepted.");
             }
             Optional<Question> questionId = questionService.findById(commentDTO.getQuestionId());
+
             if (questionId.isPresent()) {
+                String token = request.getHeader("Authorization");
+                commentDTO.setToken(token);
                 commentProducer.sendComment(commentDTO); // Gửi bình luận tới Kafka
                 return ResponseEntity.ok(ApiResponse.created(null, "Create comment successfully"));
             }else {

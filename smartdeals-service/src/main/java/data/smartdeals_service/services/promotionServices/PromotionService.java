@@ -222,8 +222,10 @@ public class PromotionService {
         userPromotionRepository.save(userPromotion);
     }
     public void sendCodeToUser(String code, String email) {
+        email = email.trim();
         UserDTO user = erurekaService.getUserByEmail(email);
         if (user == null) {
+            System.out.println("userrr được lấy" + user);
             throw new IllegalArgumentException("User not found");
         }
         try {

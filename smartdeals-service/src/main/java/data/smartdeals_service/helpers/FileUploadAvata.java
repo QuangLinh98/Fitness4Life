@@ -19,10 +19,7 @@ public class FileUploadAvata {
     // hàm MIME types hợp lệ (check các định dạng file hợp lệ)
     private static final String[] ALLOWED_MIME_TYPES = {
             "image/png", "image/jpeg","image/gif","image/bmp",
-            "image/webp","image/tiff", "image/x-icon","image/svg+xml",
-            "video/mp4","video/x-msvideo", "video/x-matroska",
-            "video/quicktime", "video/x-ms-wmv", "video/x-flv",
-            "video/webm", "video/3gpp", "video/mpeg"
+            "image/webp","image/tiff","video/mp4",
     };
 
     public String storeImage(String subFolder, MultipartFile multipartFile) throws IOException {
@@ -39,7 +36,7 @@ public class FileUploadAvata {
 
         // lỗi xuất dưới terminal và status 500 server error
         if (!isValidType) {
-            throw new IllegalArgumentException("Loại file không được hỗ trợ. Chỉ chấp nhận các loại: image/png, image/jpeg.");
+            throw new IllegalArgumentException("Loại file không được hỗ trợ. Chỉ chấp nhận các loại: image/png, image/jpeg...");
         }
 
         // tạo thư mục nếu chưa tồn tại

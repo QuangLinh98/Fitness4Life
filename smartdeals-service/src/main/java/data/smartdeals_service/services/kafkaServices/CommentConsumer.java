@@ -1,9 +1,14 @@
 package data.smartdeals_service.services.kafkaServices;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import data.smartdeals_service.dto.NotifyDTO;
 import data.smartdeals_service.dto.comment.CommentDTO;
+import data.smartdeals_service.dto.user.UserDTO;
+import data.smartdeals_service.eureka_client.ErurekaService;
 import data.smartdeals_service.models.blog.Blog;
+import data.smartdeals_service.models.comment.Comment;
 import data.smartdeals_service.models.forum.Question;
+import data.smartdeals_service.notification.NotifyService;
 import data.smartdeals_service.services.blogServices.BlogService;
 import data.smartdeals_service.services.commentServices.CommentService;
 import data.smartdeals_service.services.forumServices.QuestionService;
@@ -20,6 +25,8 @@ public class CommentConsumer {
     private final BlogService blogService;
     private final QuestionService questionService;
     private final CommentService commentService;
+    private final ErurekaService userEurekaClient;
+    private final NotifyService notifyService;
 
     @KafkaListener(topics = "comment-topic", groupId = "comment-group", concurrency = "3")
     private void listen(String message) {
@@ -33,12 +40,24 @@ public class CommentConsumer {
                 commentService.createCommentBlog(comments);
                 return;
             }
+            UserDTO existingUser = userEurekaClient.getUserById(comments.getUserId());
             Optional<Question> existingQuestion = Optional.empty();
             if (comments.getQuestionId() != null) {
                 existingQuestion = questionService.findById(comments.getQuestionId());
             }
             if (existingQuestion.isPresent()) {
-                commentService.createCommentForum(comments);
+               Comment save = commentService.createCommentForum(comments);
+
+                NotifyDTO notifyDTO = new NotifyDTO();
+                notifyDTO.setItemId(comments.getQuestionId());
+                notifyDTO.setUserId(existingQuestion.get().getAuthorId());
+                notifyDTO.setFullName(existingQuestion.get().getAuthor());
+                notifyDTO.setToken(comments.getToken());
+                notifyService.sendCreatedNotification(existingUser, notifyDTO, save);
+
+                if(save.getParentComment() != null) {
+                    notifyService.sendReplyOfComentNotification(existingUser, notifyDTO, save);
+                }
                 return;
             }
             throw new RuntimeException("BLOGANDQUESTIONNOTFOUND");
@@ -46,6 +65,4 @@ public class CommentConsumer {
             e.printStackTrace();
         }
     }
-
-
 }
