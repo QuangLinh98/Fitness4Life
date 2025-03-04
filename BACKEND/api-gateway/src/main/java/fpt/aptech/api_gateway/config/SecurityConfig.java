@@ -60,7 +60,11 @@ public class SecurityConfig {
                                         "api/users/verify-account2/**",
 //                                        "/uploads/qrCodeImages/**",
                                         "/uploads/**",
-                                        "/api/booking/packages"
+                                        "/api/booking/packages",
+                                        "/api/dashboard/clubs",
+                                        "/api/dashboard/club/**",
+                                        "/api/deal/blogs",
+                                        "/api/deal/blogs/**"
                                 )
                                 .permitAll()
                                 .pathMatchers("/api/face-auth/**").hasAnyAuthority("ADMIN", "USER")
