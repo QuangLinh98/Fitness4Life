@@ -49,10 +49,10 @@ public class User implements UserDetails {
 
     private LocalDateTime createAt;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     private List<Token> tokens;
 
-    @OneToOne(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user",fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     private FaceData faceData;
 
     public String getUsername() {

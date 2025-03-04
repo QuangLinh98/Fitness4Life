@@ -22,7 +22,7 @@ public class ManagerController {
     private final UserRepository userRepository;
 
     @GetMapping("manager/all")
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllUser(){
         List<UserResponseDTO> users =  userService.getAllUser();
         return ResponseEntity.ok(users);
