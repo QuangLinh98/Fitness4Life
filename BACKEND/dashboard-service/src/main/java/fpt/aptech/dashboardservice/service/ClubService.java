@@ -31,7 +31,7 @@ public class ClubService {
     private final FileUpload fileUpload;
     private String subFolder = "ClubImage";
     String upFolder = "uploads";
-    private String rootUrl = "http://localhost:8080/";
+    private String rootUrl = "http://localhost:8081/";
     private String urlImage = rootUrl + upFolder + File.separator + subFolder;
 
     //Handle get all data

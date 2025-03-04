@@ -37,7 +37,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/dashboard/room/**",
                                 "/api/dashboard/availableSeats/update/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/api/dashboard/clubs",
+                                "/api/dashboard/club/**"
                         )
                         .permitAll()
                         .anyRequest()
