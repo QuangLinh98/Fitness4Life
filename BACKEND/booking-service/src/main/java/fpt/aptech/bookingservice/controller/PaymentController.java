@@ -5,6 +5,7 @@ import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 import fpt.aptech.bookingservice.dtos.MembershipSubscriptionDTO;
+import fpt.aptech.bookingservice.helpers.ApiResponse;
 import fpt.aptech.bookingservice.models.MembershipSubscription;
 import fpt.aptech.bookingservice.service.PayPalService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,20 +25,6 @@ public class PaymentController {
     private final PayPalService payPalService;
     @PostMapping("pay")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-//    public ResponseEntity<?> pay(@RequestBody MembershipSubscriptionDTO subscriptionDTO) {
-//        try {
-//            Payment payment = payPalService.createPayment(subscriptionDTO);
-//            // Duyệt qua các link trong Payment để tìm URL chấp thuận thanh toán (approval_url)
-//            for (Links links : payment.getLinks()) {
-//                if (links.getRel().equals("approval_url")) {
-//                    return ResponseEntity.ok(links.getHref());
-//                }
-//            }
-//        } catch (PayPalRESTException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//        return ResponseEntity.badRequest().body("Error occurred");
-//    }
 
     public ResponseEntity<?> pay(@RequestBody MembershipSubscriptionDTO subscriptionDTO) {
         try {
@@ -92,6 +80,18 @@ public class PaymentController {
             return ResponseEntity.status(200).body(ResponseEntity.ok(member));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/payments")
+    public ResponseEntity<?> getAllOrders() {
+        try {
+            List<MembershipSubscription> orders =  payPalService.AllOrders();
+
+            return ResponseEntity.status(200).body(ApiResponse.success(orders, "Gets successfully"));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
         }
     }
 }

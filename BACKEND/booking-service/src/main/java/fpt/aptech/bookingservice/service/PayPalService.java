@@ -197,4 +197,8 @@ public class PayPalService {
          }
     }
 
+    public List<MembershipSubscription> AllOrders() {
+        return membershipRepository.findAll();
+    }
+
 }

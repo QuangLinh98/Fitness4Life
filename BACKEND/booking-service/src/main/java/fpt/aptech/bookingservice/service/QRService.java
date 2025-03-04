@@ -58,7 +58,7 @@ public class QRService {
 
         try {
             // Lấy địa chỉ IP cục bộ (thay đổi 'localhost' thành địa chỉ IP)
-            String localIpAddress = "192.168.1.38"; // Thay bằng địa chỉ IP thực tế của máy
+            String localIpAddress = "192.168.1.68"; // Thay bằng địa chỉ IP thực tế của máy
 
             // Tạo mã RANDOM cho QR
             String checkInCode = UUID.randomUUID().toString();
@@ -74,7 +74,7 @@ public class QRService {
             qrRepository.save(qrCode);
 
             // Tạo URL API chứa qrId
-            String apiUrl = String.format("http://%s:9000/api/booking/qrCode/validate?qrCodeId=%d",localIpAddress,qrCode.getId());
+            String apiUrl = String.format("http://%s:9001/api/booking/qrCode/validate?qrCodeId=%d",localIpAddress,qrCode.getId());
 
             File directory = new File(QR_CODE_DIRECTORY);
             if (!directory.exists()) {
