@@ -20,7 +20,7 @@ public class BookingRoom {
     private int id;
 
     @OneToOne(mappedBy = "bookingRoom",cascade = CascadeType.ALL,orphanRemoval =true)
-    @JsonBackReference
+    //@JsonBackReference
     private QRCode qrCode;
 
     private int userId;

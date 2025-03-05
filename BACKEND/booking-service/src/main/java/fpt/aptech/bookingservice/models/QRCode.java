@@ -1,5 +1,6 @@
 package fpt.aptech.bookingservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class QRCode {
 
     @OneToOne
     @JoinColumn(name="booking_room_id", referencedColumnName = "id")
+    @JsonIgnore
     private BookingRoom bookingRoom;
 
     private String qrCodeUrl;
