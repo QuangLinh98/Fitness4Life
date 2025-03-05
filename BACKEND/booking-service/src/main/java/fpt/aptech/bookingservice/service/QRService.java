@@ -45,6 +45,11 @@ public class QRService {
         return qrCode;
     }
 
+    //Handle get all QR by BookingId
+    public List<QRCode> getAllQRByBookingId(int bookingId) {
+        return qrRepository.findByBookingRoomId(bookingId);
+    }
+
     //Handle create qrCode when booking successfully
     @Transactional
     public QRCode createBookingWithQRCode(BookingRoom bookingRoom) {
@@ -58,7 +63,7 @@ public class QRService {
 
         try {
             // Lấy địa chỉ IP cục bộ (thay đổi 'localhost' thành địa chỉ IP)
-            String localIpAddress = "192.168.1.68"; // Thay bằng địa chỉ IP thực tế của máy
+            String localIpAddress = "173.16.17.132"; // Thay bằng địa chỉ IP thực tế của máy
 
             // Tạo mã RANDOM cho QR
             String checkInCode = UUID.randomUUID().toString();
@@ -68,6 +73,7 @@ public class QRService {
                     .qrCodeUrl("http://" + localIpAddress + ":8082/uploads/qrCodeImages/" + checkInCode + ".jpg")
                     .qrCodeStatus(QRCodeStatus.VALID)
                     .bookingRoom(savedBooking)
+                    .createdAt(LocalDateTime.now())
                     .build();
 
             // Lưu QRCode vào database để lấy qrId

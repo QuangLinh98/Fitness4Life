@@ -10,10 +10,14 @@ import fpt.aptech.bookingservice.service.BookingRoomService;
 import fpt.aptech.bookingservice.service.QRService;
 import fpt.aptech.bookingservice.service.WorkoutPackageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -94,5 +98,20 @@ public class PublicController {
         catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.errorServer("Error server" + e.getMessage()));
         }
+    }
+
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<Map<String, Object>> getBookingHistory(@PathVariable int userId) {
+        Map<String, Object> response = new HashMap<>();
+        List<BookingRoom> bookings = bookingRoomService.getBookRoomByUserId(userId);
+        List<QRCode> qrCodes = new ArrayList<>();
+
+        for (BookingRoom booking : bookings) {
+            qrCodes.addAll(qrService.getAllQRByBookingId(booking.getId()));
+        }
+
+        response.put("bookings", bookings);
+        response.put("qrCodes", qrCodes);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
