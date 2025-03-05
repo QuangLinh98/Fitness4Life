@@ -1,5 +1,7 @@
 package fpt.aptech.dashboardservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "clubs")
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Club {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,5 +36,6 @@ public class Club {
     private List<ClubImages> clubImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Room> rooms;
 }

@@ -37,7 +37,8 @@ public class Room {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "club_id", nullable = false)
-    @JsonIgnore
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("club")
     private Club club;
 
     @ManyToOne(fetch = FetchType.LAZY)
