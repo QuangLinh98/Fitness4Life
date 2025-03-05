@@ -38,6 +38,7 @@ class ProfileService extends ChangeNotifier {
 
       if (isSuccess) {
         notifyListeners(); // Thông báo cập nhật UI nếu cần
+        await getUserById(userId);
       }
       return isSuccess;
     } catch (e) {

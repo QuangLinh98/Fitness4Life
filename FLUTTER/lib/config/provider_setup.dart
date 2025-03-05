@@ -7,7 +7,6 @@ import 'package:fitness4life/api/Dashboard_Repository/BranchRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/ProgressRepository.dart';
-import 'package:fitness4life/api/Notification_Repository/NotifyRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/BlogRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
@@ -27,7 +26,6 @@ import 'package:fitness4life/features/booking/service/WorkoutPackageService.dart
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
 import 'package:fitness4life/features/fitness_goal/service/GoalService.dart';
 import 'package:fitness4life/features/fitness_goal/service/ProgressService.dart';
-import 'package:fitness4life/features/notification/service/NotifyService.dart';
 import 'package:fitness4life/features/smart_deal/service/BlogService.dart';
 import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
 import 'package:fitness4life/features/smart_deal/service/PromotionService.dart';
@@ -41,6 +39,10 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../api/Dashboard_Repository/TrainerRepository.dart';
+import '../api/Notification_Repository/NotifyRepository2.dart';
+import '../features/notification/service/NotificationProvider.dart';
+import '../features/notification/service/NotifyService2.dart';
+import '../features/notification/service/WebSocketService.dart';
 import 'locator_setup.dart';
 
 //Quản lý các phụ thuộc của ứng dụng
@@ -63,11 +65,15 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => PaypalService(locator<PaypalRepository>())),
   ChangeNotifierProvider(create: (_) => QuestionService(locator<QuestionRepository>())),
   ChangeNotifierProvider(create: (_) => CommentService(locator<CommentRepository>())),
-  ChangeNotifierProvider(create: (_) => NotifyService(locator<NotifyRepository>())),
+  // Notification services
+  ChangeNotifierProvider(create: (_) => NotifyService2(locator<NotifyRepository2>())),
+  ChangeNotifierProvider(create: (_) => NotificationProvider(
+    locator<NotifyService2>(),
+    locator<WebSocketService>(),
+  )),
+
   ChangeNotifierProvider(create: (_) => BlogService(locator<BlogRepository>())),
   ChangeNotifierProvider(create: (_) => PromotionService(locator<PromotionRepository>())),
-
-
 
   // Thêm GoalSetupState sử dụng để lưu trữ giá trị tamk thời khi thiết lập goal
   ChangeNotifierProvider(create: (_) => GoalSetupState()),

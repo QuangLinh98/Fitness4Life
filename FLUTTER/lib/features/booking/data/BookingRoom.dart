@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:fitness4life/features/booking/data/QR.dart';
+
 class BookingRoom {
   int? id;
   int? userId;
@@ -9,6 +11,7 @@ class BookingRoom {
   DateTime? bookingDate;
   String? status;
   DateTime? createAt;
+  List<QR>? qrCodes;
 
   BookingRoom({
     this.id,
@@ -19,6 +22,7 @@ class BookingRoom {
     this.bookingDate,
     this.status,
     this.createAt,
+    this.qrCodes,
   });
 
   // Tạo từ JSON
@@ -42,6 +46,11 @@ class BookingRoom {
           : null,
       status: json['status'],
       createAt: json['createAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['createAt'][6] * 1000) : null,
+      qrCodes: json['qrCodes'] != null
+          ? (json['qrCodes'] as List)
+          .map((qrCodeJson) => QR.fromJson(qrCodeJson))
+          .toList()
+          : null,
     );
   }
 
@@ -65,6 +74,8 @@ class BookingRoom {
           : null,
       'status': status,
       'createAt': createAt?.toIso8601String(),
+      'qrCodes': qrCodes?.map((qrCode) => qrCode.toJson()).toList(), // Chuyển qrCodes thành JSON
+
     };
   }
 }

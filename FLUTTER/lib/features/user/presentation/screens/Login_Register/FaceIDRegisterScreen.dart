@@ -392,6 +392,7 @@ class _FaceIDRegisterScreenState extends State<FaceIDRegisterScreen> {
       if (token == null) {
         await loginService.login(widget.email, widget.password);
         token = await TokenManager.getAccessToken();
+        print("token faceidddddd $token");
       }
 
       // Kiểm tra lại token

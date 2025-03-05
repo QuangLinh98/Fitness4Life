@@ -64,7 +64,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       if (widget.mode == "resetPassword") {
         await passwordService.sendOtpPassword(widget.email);
       } else if (widget.mode == "verifyAccount") {
-        await registerService.verifyAccount(widget.email);
+        await registerService.verifyAccount2(widget.email);
       }
 
       ScaffoldMessenger.of(context).showSnackBar(

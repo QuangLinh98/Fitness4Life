@@ -15,7 +15,7 @@ class UserResponseDTO {
   final Roles role;
   final Gender gender;
   final ProfileDTO profileDTO;
-  final FaceDataDTO faceDataDTO;
+  final FaceDataDTO? faceDataDTO;
 
   UserResponseDTO({
     required this.id,
@@ -47,7 +47,11 @@ class UserResponseDTO {
         orElse: () => Gender.MALE,
       ),
       profileDTO: ProfileDTO.fromJson(json['profileDTO']),
-      faceDataDTO: FaceDataDTO.fromJson(json['faceDataDTO']),
+      //faceDataDTO: FaceDataDTO.fromJson(json['faceDataDTO']),
+      // Kiểm tra nếu faceDataDTO là null, nếu có trả về đối tượng null
+      faceDataDTO: json['faceDataDTO'] != null
+          ? FaceDataDTO.fromJson(json['faceDataDTO'])
+          : null, // Nếu không có faceDataDTO hoặc là null, trả về null
     );
   }
 
@@ -62,7 +66,7 @@ class UserResponseDTO {
       'role': role.toString().split('.').last,
       'gender': gender.toString().split('.').last,
       'profileDTO': profileDTO.toJson(),
-      'faceDataDTO': faceDataDTO.toJson(),
+      'faceDataDTO': faceDataDTO?.toJson(),
     };
   }
 }

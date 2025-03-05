@@ -10,7 +10,7 @@ import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/api/Dashboard_Repository/TrainerRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/GoalRepository.dart';
 import 'package:fitness4life/api/Goal_Repository/ProgressRepository.dart';
-import 'package:fitness4life/api/Notification_Repository/NotifyRepository.dart';
+import 'package:fitness4life/api/Notification_Repository/NotifyRepository2.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/BlogRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/CommentRepository.dart';
 import 'package:fitness4life/api/SmartDeal_Repository/PromotionRepository.dart';
@@ -19,6 +19,8 @@ import 'package:fitness4life/api/User_Repository/PasswordRepository.dart';
 import 'package:fitness4life/api/User_Repository/ProfileRepository.dart';
 import 'package:fitness4life/api/User_Repository/RegisterRepository.dart';
 import 'package:fitness4life/api/api_gateway.dart';
+import 'package:fitness4life/features/notification/service/NotifyService2.dart';
+import 'package:fitness4life/features/notification/service/WebSocketService.dart';
 import 'package:get_it/get_it.dart';
 
 import '../api/SmartDeal_Repository/QuestionRepository.dart';
@@ -28,9 +30,9 @@ final GetIt locator = GetIt.instance;
 void setUpLocator() {
   //Đăng ký đối tượng Dio (Http Client)
   locator.registerLazySingleton(() => Dio(BaseOptions (
-    baseUrl: "http://172.31.208.1:9001/api", // API Gateway URL
-    connectTimeout: const Duration(milliseconds: 10000), // Thời gian timeout kết nối
-    receiveTimeout: const Duration(milliseconds: 10000), // Thời gian timeout nhận dữ liệu
+    baseUrl: "http://192.168.44.13:9001/api", // API Gateway URL
+    connectTimeout: const Duration(milliseconds: 30000), // Thời gian timeout kết nối
+    receiveTimeout: const Duration(milliseconds: 30000), // Thời gian timeout nhận dữ liệu
   )));
 
   // Đăng ký ApiGateWayService (service để gọi API qua API Gateway)
@@ -79,7 +81,14 @@ void setUpLocator() {
   locator.registerLazySingleton(() => PaypalRepository(locator<ApiGateWayService>()));
 
   // Đăng ký NotifyRepository
-  locator.registerLazySingleton(() => NotifyRepository(locator<ApiGateWayService>()));
+  // Đăng ký NotificationRepository
+  locator.registerLazySingleton(() => NotifyRepository2(locator<ApiGateWayService>()));
+
+  // Sau đó mới đăng ký NotificationService
+  locator.registerLazySingleton(() => NotifyService2(locator<NotifyRepository2>()));
+
+  //Đăng ký websocket
+  locator.registerLazySingleton(() => WebSocketService());
 
   // Đăng ký BlogRepository
   locator.registerLazySingleton(() => BlogRepository(locator<ApiGateWayService>()));

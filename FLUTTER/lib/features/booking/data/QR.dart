@@ -28,5 +28,17 @@ class QR {
     );
   }
 
+  // Chuyển đối tượng QR thành Map để gửi qua API hoặc lưu trữ
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'bookingRoom': {
+        'id': bookingRoomId,  // Nếu có mối quan hệ với bookingRoom
+      },
+      'qrCodeUrl': qrCodeUrl,
+      'qrCodeStatus': qrCodeStatus,
+      'createdAt': createdAt.toIso8601String(), // Chuyển DateTime thành chuỗi ISO
+    };
+  }
 
 }

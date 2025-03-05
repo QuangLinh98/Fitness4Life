@@ -47,6 +47,7 @@ class _CreateCommentFormState extends State<CreateCommentForm> {
       questionId: widget.questionId,
       content: _contentController.text.trim(),
     );
+    print("Có userId trong comment không ta: ${userId}");
 
     print("Có data trong comment không ta: ${comment}");
 

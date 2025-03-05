@@ -9,6 +9,7 @@ class BookingRoomService extends ChangeNotifier {
   final RoomRepository _roomRepository;
 
   List<BookingRoom> bookedRooms = [];
+  List<BookingRoom> bookingHistory = [];
   bool isLoading = false;
 
   BookingRoomService(this._bookingRoomRepository, this._roomRepository);
@@ -29,7 +30,7 @@ class BookingRoomService extends ChangeNotifier {
     }
   }
 
-  //Xử lý lấy room theo userId
+  //Xử lý lấy room theo userId để hiển thị trang ClassScreen
   Future<void> fetchBookedRooms(int userId) async {
     isLoading = true;
     try {
@@ -37,6 +38,18 @@ class BookingRoomService extends ChangeNotifier {
       notifyListeners(); // Cập nhật UI
     } catch (e) {
       print("Error fetching booked rooms: $e");
+    }
+  }
+
+  //Xử lý lấy room theo userId để hiển thị trang ClassScreen
+  Future<void> fetchBookingRooms(int userId) async {
+    isLoading = true;
+    try {
+      bookingHistory = await _bookingRoomRepository.fetchBookingHistory(userId);
+      print('Response Booking : $bookingHistory');
+      notifyListeners(); // Cập nhật UI
+    } catch (e) {
+      print("Error fetching booking rooms: $e");
     }
   }
 

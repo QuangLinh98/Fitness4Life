@@ -264,9 +264,9 @@ class LoginScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const FaceIDRegisterScreen( userId: 902,
-                                  email: "linhnqt1s2303008@fpt.edu.vn",
-                                  password: "1234567",),
+                                builder: (context) => const FaceIDRegisterScreen( userId: 1302,
+                                  email: "minhle03032000@gmail.com",
+                                  password: "123456",),
                               ),
                             );
                           },

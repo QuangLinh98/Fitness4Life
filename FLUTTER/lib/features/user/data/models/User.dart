@@ -1,3 +1,5 @@
+import 'FaceDataDTO.dart';
+
 class Tokens {
   int? id;
   String? value;
@@ -40,6 +42,7 @@ class User {
   String? gender;
   String? createat;
   List<Tokens>? tokensList;
+  //FaceDataDTO? faceDataDTO;
 
   User(
       {this.id, this.workoutpackageid, this.fullname, this.email, this.password, this.isbanned, this.isactive, this.otpcode, this.expirytime, this.phone, this.role, this.gender, this.createat, this.tokensList});

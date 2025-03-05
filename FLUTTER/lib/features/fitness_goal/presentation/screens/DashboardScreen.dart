@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 
 
 class DashboardScreen extends StatefulWidget {
+  final int initialTabIndex;
+
+  const DashboardScreen({Key? key, this.initialTabIndex = 0}) : super(key: key);
+
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
 }
@@ -14,7 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this); // 4 tab items
+    _tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialTabIndex); // 4 tab items
   }
 
   @override

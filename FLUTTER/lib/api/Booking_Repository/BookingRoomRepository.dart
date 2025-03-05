@@ -34,7 +34,7 @@ class BookingRoomRepository {
       }
     }
 
-
+    //Hiển thị trang booked room
     Future<List<BookingRoom>> getBookedRooms(int userId) async {
       try{
         final response = await _apiGateWayService.getData("/booking/bookingRooms/history/$userId");
@@ -47,6 +47,28 @@ class BookingRoomRepository {
         throw Exception("Error booking room: $e");
       }
     }
+
+    //Hiển thị lịch sử booking của user
+    Future<List<BookingRoom>> fetchBookingHistory(int userId) async {
+      try {
+        final response = await _apiGateWayService.getData("/booking/history/$userId");
+        print('Booking History : ${response.data}');
+
+        // Kiểm tra nếu response.data['data'] là null hoặc không phải List
+        if (response.data['data'] != null && response.data['data'] is List) {
+          return (response.data['data'] as List)
+              .map((json) => BookingRoom.fromJson(json))
+              .toList();
+        } else {
+          // Trả về danh sách trống hoặc xử lý khi không có dữ liệu
+          return [];
+        }
+      } catch (e) {
+        print("Error get history booking room: $e");
+        throw Exception("Error booking room: $e");
+      }
+    }
+
 
     Future<void> cancelBooking(int id) async {
       try {

@@ -12,6 +12,7 @@ import 'package:fitness4life/features/user/service/ProfileService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../chat/screen/ChatBotWidget.dart';
 import '../../../user/presentation/screens/Profile/ProfileNotificationBanner.dart';
 
 // Import the notification banner
@@ -120,6 +121,9 @@ class _HomeScreenState extends State<HomeScreen> {
          ),
 
           const LoginRegisterHeader(),  //Hiển thị phần đăng ký đăng nhập
+
+          // 📌 Thêm Chatbot vào đây
+          const ChatBotWidget(),
         ],
       )
     );

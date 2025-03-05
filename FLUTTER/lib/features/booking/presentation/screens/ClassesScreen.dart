@@ -126,63 +126,63 @@ class _ClassScreenState extends State<ClassScreen> {
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              //color: Color(0xFF9C9AFF),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(10, (index) {
-                    // Lấy ngày hiện tại và cộng thêm index để có danh sách ngày liên tiếp
-                    DateTime date = DateTime.now().add(Duration(days: index));
-
-                    // Định dạng thứ (EEE) và ngày (dd)
-                    String dayOfWeek = DateFormat('EEE').format(date); // Tue, Wed, Thu...
-                    String dayOfMonth = DateFormat('d').format(date); // 25, 26, 27...
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: index == 0 ? Color(0xFFB8213D) : Colors.grey.shade500,
-                              border: Border.all(
-                                color: Colors.grey.shade700,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                            child: Column(
-                              children: [
-                                Text(
-                                  dayOfWeek,
-                                  style: TextStyle(
-                                    color: index == 0 ? Colors.white : Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  dayOfMonth,
-                                  style: TextStyle(
-                                    color: index == 0 ? Colors.white : Colors.grey.shade300,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
+            // Container(
+            //   padding: EdgeInsets.symmetric(vertical: 8),
+            //   //color: Color(0xFF9C9AFF),
+            //   child: SingleChildScrollView(
+            //     scrollDirection: Axis.horizontal,
+            //     child: Row(
+            //       children: List.generate(10, (index) {
+            //         // Lấy ngày hiện tại và cộng thêm index để có danh sách ngày liên tiếp
+            //         DateTime date = DateTime.now().add(Duration(days: index));
+            //
+            //         // Định dạng thứ (EEE) và ngày (dd)
+            //         String dayOfWeek = DateFormat('EEE').format(date); // Tue, Wed, Thu...
+            //         String dayOfMonth = DateFormat('d').format(date); // 25, 26, 27...
+            //
+            //         return Padding(
+            //           padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            //           child: Column(
+            //             children: [
+            //               Container(
+            //                 decoration: BoxDecoration(
+            //                   color: index == 0 ? Color(0xFFB8213D) : Colors.grey.shade500,
+            //                   border: Border.all(
+            //                     color: Colors.grey.shade700,
+            //                     width: 1.0,
+            //                   ),
+            //                   borderRadius: BorderRadius.circular(20),
+            //                 ),
+            //                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            //                 child: Column(
+            //                   children: [
+            //                     Text(
+            //                       dayOfWeek,
+            //                       style: TextStyle(
+            //                         color: index == 0 ? Colors.white : Colors.white,
+            //                         fontSize: 13,
+            //                         fontWeight: FontWeight.w600,
+            //                       ),
+            //                     ),
+            //                     SizedBox(height: 4),
+            //                     Text(
+            //                       dayOfMonth,
+            //                       style: TextStyle(
+            //                         color: index == 0 ? Colors.white : Colors.grey.shade300,
+            //                         fontSize: 14,
+            //                         fontWeight: FontWeight.bold,
+            //                       ),
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         );
+            //       }),
+            //     ),
+            //   ),
+            // ),
 
             Expanded(
               child: isBooked ? _buildBookedClasses() : _buildAllClasses(),

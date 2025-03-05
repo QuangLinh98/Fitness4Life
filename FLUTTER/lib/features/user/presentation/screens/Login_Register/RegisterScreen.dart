@@ -42,12 +42,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return '$normalizedLocal@$domainPart';
   }
 
-
   void _handleRegister() async {
     if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
       return;
     }
-
 
     setState(() {
       _isLoading = true; // Bắt đầu trạng thái loading
@@ -75,7 +73,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // Nếu thành công, điều hướng tới LoginScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => OtpVerificationScreen(email: _emailController.text.trim(), mode: "verifyAccount")),
+          MaterialPageRoute(
+              builder: (context) => OtpVerificationScreen(
+                  email: _emailController.text.trim(),
+                  mode: "verifyAccount",
+                  password: _passwordController.text)),
         );
 
         // Hiển thị thông báo thành công
@@ -157,7 +159,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     errorStyle: const TextStyle(
                       color: Colors.white, // Đặt màu trắng cho lỗi
-                      fontSize: 12,        // Cỡ chữ của lỗi
+                      fontSize: 12, // Cỡ chữ của lỗi
                     ),
                   ),
                   validator: (value) {
@@ -183,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     errorStyle: const TextStyle(
                       color: Colors.white, // Đặt màu trắng cho lỗi
-                      fontSize: 12,        // Cỡ chữ của lỗi
+                      fontSize: 12, // Cỡ chữ của lỗi
                     ),
                   ),
                   validator: (value) {
@@ -214,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     errorStyle: const TextStyle(
                       color: Colors.white, // Đặt màu trắng cho lỗi
-                      fontSize: 12,        // Cỡ chữ của lỗi
+                      fontSize: 12, // Cỡ chữ của lỗi
                     ),
                   ),
                   validator: (value) {
@@ -244,7 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     errorStyle: const TextStyle(
                       color: Colors.white, // Đặt màu trắng cho lỗi
-                      fontSize: 12,        // Cỡ chữ của lỗi
+                      fontSize: 12, // Cỡ chữ của lỗi
                     ),
                   ),
                   validator: (value) {
@@ -264,9 +266,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   value: _selectedGender,
                   items: ['Male', 'Female']
                       .map((gender) => DropdownMenuItem(
-                    value: gender,
-                    child: Text(gender),
-                  ))
+                            value: gender,
+                            child: Text(gender),
+                          ))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
@@ -281,10 +283,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderSide: BorderSide.none,
                     ),
                     hintText: 'Select gender',
-                    prefixIcon: const Icon(Icons.transgender, color: Colors.grey),
+                    prefixIcon:
+                        const Icon(Icons.transgender, color: Colors.grey),
                     errorStyle: const TextStyle(
                       color: Colors.white, // Đặt màu trắng cho lỗi
-                      fontSize: 12,        // Cỡ chữ của lỗi
+                      fontSize: 12, // Cỡ chữ của lỗi
                     ),
                   ),
                   validator: (value) {
@@ -345,24 +348,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: _acceptTerms && !_isLoading ? _handleRegister : null,
+                  onPressed:
+                      _acceptTerms && !_isLoading ? _handleRegister : null,
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor:
-                      AlwaysStoppedAnimation<Color>(Color(0xFFB00020)),
-                    ),
-                  )
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xFFB00020)),
+                          ),
+                        )
                       : const Text(
-                    'Register',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 20),
 

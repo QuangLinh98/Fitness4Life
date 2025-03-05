@@ -29,7 +29,7 @@ class ProfileNotificationBanner extends StatelessWidget {
 
     // Check if Face ID is registered using the FaceIDService
     // final faceIDService = Provider.of<RegisterService>(context);
-    bool faceIdNeeded = userProfile == null ||userProfile.faceDataDTO.faceEncoding == null;
+    bool faceIdNeeded = userProfile == null ||userProfile.faceDataDTO?.faceEncoding == null;
     // If no updates needed, don't show the banner
     // if (!profileNeedsUpdate && !faceIdNeeded) {
     //   return const SizedBox.shrink();

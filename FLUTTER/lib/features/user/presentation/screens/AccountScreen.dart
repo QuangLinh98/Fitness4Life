@@ -1,5 +1,6 @@
 import 'package:fitness4life/core/widgets/bottom_navigation_bar.dart';
 import 'package:fitness4life/features/booking/data/MembershipSubscription%20.dart';
+import 'package:fitness4life/features/booking/presentation/screens/BookingHistoryPage.dart';
 import 'package:fitness4life/features/booking/service/MembershipSubscriptionService.dart';
 import 'package:fitness4life/features/user/presentation/screens/Login_Register/LoginScreen.dart';
 import 'package:fitness4life/features/user/presentation/screens/Password/ChangePasswordScreen.dart';
@@ -201,7 +202,12 @@ class _AccountScreenState extends State<AccountScreen> {
                 }),
                 buildOptionItem("Contact", Icons.phone, () {}),
                 buildOptionItem("Contract", Icons.description_outlined, () {}),
-                buildOptionItem("Customer Care History", Icons.history, () {}),
+                buildOptionItem("Booking Room History", Icons.history, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => BookingHistoryPage(userId: userId!))
+                  );
+                }),
                 buildOptionItem("Change password", Icons.lock_outline, ()  {
                   Navigator.push(
                       context,

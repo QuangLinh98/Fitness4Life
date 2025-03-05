@@ -23,6 +23,32 @@ class TokenManager {
     }
   }
 
+  static Future<int?> getUserId() async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) return null;
+
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+
+      // Extract the 'id' field from the token
+      final userId = decodedToken['id'];
+
+      // Convert to int if necessary
+      int? userIdInt;
+      if (userId is int) {
+        userIdInt = userId;
+      } else if (userId is String) {
+        userIdInt = int.tryParse(userId);
+      }
+
+      print("Extracted UserId: $userIdInt");
+      return userIdInt;
+    } catch (e) {
+      print("Error extracting user ID from token: $e");
+      return null;
+    }
+  }
+
   // Lấy access token từ SecureStorage
   static Future<String?> getAccessToken() async {
     try {
