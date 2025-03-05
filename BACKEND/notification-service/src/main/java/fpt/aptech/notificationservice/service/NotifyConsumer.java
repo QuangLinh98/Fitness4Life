@@ -42,5 +42,43 @@ public class NotifyConsumer {
         }
     }
 
+    @KafkaListener(topics = "notifyForum_topic", groupId = "notifyForum-group", concurrency = "3")
+    public void listenCreateCommentInForum(String message) {
+        try {
+            NotifyDTO notifyDTO = objectMapper.readValue(message, NotifyDTO.class);
+            Notify notify = objectMapper.convertValue(notifyDTO, Notify.class);
+            notifyService.addNotify(notify);
+
+            //Gửi thông báo qua websocket
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(notify.getUserId()),             //Gửi tới user
+                    "/queue/notifications",         // Endpoint cá nhân hóa
+                    notify                          // Nội dung thông báo
+            );
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to process feed message: " + e.getMessage());
+        }
+    }
+    @KafkaListener(topics = "notifyReply_topic", groupId = "notifyReply-group", concurrency = "3")
+    public void listenReply(String message) {
+        try {
+            NotifyDTO notifyDTO = objectMapper.readValue(message, NotifyDTO.class);
+            Notify notify = objectMapper.convertValue(notifyDTO, Notify.class);
+            notifyService.addNotify(notify);
+
+            //Gửi thông báo qua websocket
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(notify.getUserId()),             //Gửi tới user
+                    "/queue/notifications",         // Endpoint cá nhân hóa
+                    notify                          // Nội dung thông báo
+            );
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to process feed message: " + e.getMessage());
+        }
+    }
 
 }

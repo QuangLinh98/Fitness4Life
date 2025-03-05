@@ -25,7 +25,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest()
-                        .authenticated()
+                        .permitAll()
                 )
                 .addFilterBefore(new RoleHeaderFilter(), UsernamePasswordAuthenticationFilter.class); // Sử dụng bean
 
