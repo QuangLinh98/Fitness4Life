@@ -10,9 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class NotifyProducer {
-    //kafkaTemplate để gửi message đến kafka
+    ///kafkaTemplate để gửi message đến kafka
     private final KafkaTemplate<String, String> kafkaTemplate;
-    //Chuyển đổi đối tương thành JSon
+
+    ///Chuyển đổi đối tương thành JSon
     private final ObjectMapper objectMapper;
 
     public void sendNotify(NotifyDTO notifyDTO) {

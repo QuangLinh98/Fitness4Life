@@ -5,12 +5,12 @@ services:
     image: confluentinc/cp-zookeeper
     environment:
       # Cổng Zookeeper lắng nghe các kết nối client
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: 2182
       # Thời gian kiểm tra kết nối giữa các node trong cluster Zookeeper
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       # Ánh xạ cổng 2181 trên host tới cổng 2181 trong container Zookeeper
-      - 2181:2181
+      - 2182:2182
     # Tự động khởi động lại dịch vụ nếu gặp lỗi
     restart: "on-failure"
 
@@ -30,7 +30,7 @@ services:
       # Đặt ID cho Kafka broker, ID này phải duy nhất trong cluster Kafka
       KAFKA_BROKER_ID: 1
       # Địa chỉ kết nối tới Zookeeper để Kafka có thể liên lạc
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2182
       # Cấu hình các giao thức bảo mật cho các listener Kafka
       # "EXTERNAL" và "INTERNAL" đều sử dụng giao thức PLAINTEXT (không mã hóa)
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
@@ -56,7 +56,7 @@ services:
       # Đặt ID duy nhất cho Kafka broker 2
       KAFKA_BROKER_ID: 2
       # Địa chỉ kết nối tới Zookeeper
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2182
       # Cấu hình giao thức bảo mật cho các listener Kafka
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
       # Định nghĩa các listener cho Kafka broker 2
@@ -81,7 +81,7 @@ services:
       # Đặt ID duy nhất cho Kafka broker 3
       KAFKA_BROKER_ID: 3
       # Địa chỉ kết nối tới Zookeeper
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2182
       # Cấu hình giao thức bảo mật cho các listener Kafka
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
       # Định nghĩa các listener cho Kafka broker 3

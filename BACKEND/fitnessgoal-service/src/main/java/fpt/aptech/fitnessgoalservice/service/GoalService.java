@@ -42,9 +42,6 @@ public class GoalService {
             throw new RuntimeException("User not found");
         }
         List<Goal> userGoals = goalRepository.findGoalByUserId(userId);
-//        if (userGoals.isEmpty()) {
-//            throw new RuntimeException("No goals found for the user");
-//        }
         return userGoals;
     }
 
@@ -119,7 +116,7 @@ public class GoalService {
     }
 
     //PHương thức kiểm tra tất cả những mục tiêu có endDate = currentDate và chưa hoàn thành mục tiêu sẽ gửi thông báo
-    @Scheduled(cron = "0 0 7 * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void checkAndNotifyUnfinishedGoals() {
         // Lấy tất cả các mục tiêu có endDate = hôm nay và chưa hoàn thành
         List<Goal> unfinishedGoals = goalRepository.findByEndDateBeforeAndProgressLessThan(
@@ -133,7 +130,7 @@ public class GoalService {
 
     //Phương thức gửi thông báo xác nhận gia hạn mục tiêu
     @Transactional
-    @Scheduled(cron = "0 0 7 * * ?")// Chạy mỗi ngày lúc 7 giờ sáng
+    @Scheduled(cron = "0 * * * * ?")// Chạy mỗi ngày lúc 7 giờ sáng
     public void checkGoalsOnEndDate() {
         try {
             // Lấy ngày hiện tại

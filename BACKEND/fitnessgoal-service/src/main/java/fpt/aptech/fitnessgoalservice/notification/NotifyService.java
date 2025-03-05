@@ -31,8 +31,8 @@ public class NotifyService {
                 .itemId(notifyDTO.getItemId())
                 .userId(notifyDTO.getUserId())
                 .fullName(existingUser.getFullName())
-                .title("Chao mung " + existingUser.getFullName() + " đen voi muc tieu " +goalDTO.getGoalType())
-                .content("Chuc ban som hoan thanh đuoc muc tieu đe ra.")
+                .title("Welcome " + existingUser.getFullName() + " to the goal " +goalDTO.getGoalType())
+                .content("Wish you soon complete the set goal.")
                 //.token(token)
                 .build();
         // Gửi thông báo thông qua NotifyProducer
@@ -52,7 +52,7 @@ public class NotifyService {
                 .itemId(goal.getId())
                 .userId(goal.getUserId())
                 .fullName(existingUser.getFullName())
-                .title("Nhac nho muc tieu sap den han")
+                .title("Reminder of upcoming goals")
                 .content(content)
                 .build();
         // Gửi thông báo thông qua NotifyProducer
@@ -74,7 +74,7 @@ public class NotifyService {
                 .itemId(goal.getId())
                 .userId(goal.getUserId())
                 .fullName(existingUser.getFullName())
-                .title("Thong bao nhac nho gia han muc tieu")
+                .title("Goal renewal reminder notifications")
                 .content(content)
                 .build();
         // Gửi thông báo thông qua NotifyProducer
@@ -100,7 +100,7 @@ public class NotifyService {
                 .itemId(goal.getId())
                 .userId(goal.getUserId())
                 .fullName(existingUser.getFullName())
-                .title("Cap nhat tien do muc tieu" )
+                .title("Update your target schedule" )
                 .content(resultMessage)
                 .build();
         // Gửi thông báo thông qua NotifyProducer
@@ -113,7 +113,7 @@ public class NotifyService {
                 .itemId(goal.getId())
                 .userId(goal.getUserId())
                 .fullName(existingUser.getFullName())
-                .title("Thong bao cong diem thuong" )
+                .title("Reward Point Announcement" )
                 .content(resultMessage)
                 .build();
         // Gửi thông báo thông qua NotifyProducer

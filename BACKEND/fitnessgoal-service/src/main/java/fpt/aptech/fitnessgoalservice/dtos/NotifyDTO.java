@@ -14,6 +14,7 @@ public class NotifyDTO {
     private int itemId;
     private int userId;
     private String fullName;
+    private String token;
     private String title;
     private String content;
 }
