@@ -64,7 +64,8 @@ public class SecurityConfig {
                                         "/api/dashboard/clubs",
                                         "/api/dashboard/club/**",
                                         "/api/deal/blogs",
-                                        "/api/deal/blogs/**"
+                                        "/api/deal/blogs/**",
+                                        "/api/deal/articles/generate"
                                 )
                                 .permitAll()
                                 .pathMatchers("/api/face-auth/**").hasAnyAuthority("ADMIN", "USER")

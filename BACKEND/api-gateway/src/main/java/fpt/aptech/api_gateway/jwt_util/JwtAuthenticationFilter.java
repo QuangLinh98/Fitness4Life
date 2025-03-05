@@ -47,7 +47,8 @@ public class JwtAuthenticationFilter implements WebFilter {
                 path.startsWith("/api/dashboard/clubs") ||
                 path.startsWith("/api/dashboard/club/**") ||
                 path.startsWith("/api/deal/blogs") ||
-                path.startsWith("/api/deal/blogs/**")
+                path.startsWith("/api/deal/blogs/**")||
+                path.startsWith("/api/deal/articles/generate")
         ){
             System.out.println("Skipping JWT filter for: " + path);
             return chain.filter(exchange);
