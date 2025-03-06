@@ -18,9 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
@@ -119,9 +121,25 @@ public class FaceAuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if user already has face data - validate early
+        // Check if user already has face data
         if (faceDataRepository.existsByUser(user)) {
             throw new RuntimeException("Face data already exists for this user");
+        }
+
+        // Lấy encoding của khuôn mặt mới
+        String newFaceEncoding = getFaceEncodingFromPythonService(faceImage);
+
+        // Kiểm tra so sánh với tất cả các khuôn mặt đã đăng ký
+        List<FaceData> allFaces = faceDataRepository.findAll();
+        for (FaceData existingFace : allFaces) {
+            boolean isMatch = compareFacesWithPythonService(
+                    existingFace.getFaceEncoding(),
+                    newFaceEncoding
+            );
+
+            if (isMatch) {
+                throw new RuntimeException("This face is already registered to another user");
+            }
         }
 
         // Save image file with original file extension
@@ -185,6 +203,82 @@ public class FaceAuthService {
             Files.deleteIfExists(destinationPath);
             throw e;
         }
+    }
+
+    private String getFaceEncodingFromPythonService(MultipartFile faceImage) throws IOException {
+        // Chuyển đổi MultipartFile thành File và gọi API encode-face
+        Path tempPath = saveTemporaryFile(faceImage);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new FileSystemResource(tempPath));
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                    new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    pythonServiceUrl + "/encode-face",
+                    requestEntity,
+                    String.class
+            );
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                throw new RuntimeException("Failed to encode face");
+            }
+
+            return response.getBody();
+        } finally {
+            Files.deleteIfExists(tempPath);
+        }
+    }
+
+    private Path saveTemporaryFile(MultipartFile faceImage) throws IOException {
+        // Kiểm tra ảnh
+        validateImage(faceImage);
+
+        // Tạo tên file tạm thời duy nhất
+        String originalFilename = faceImage.getOriginalFilename();
+        String fileExtension = originalFilename != null && originalFilename.contains(".")
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : ".jpg";
+
+        String tempFileName = "temp_" + UUID.randomUUID().toString() + fileExtension;
+
+        // Sử dụng đường dẫn upload đã được chuẩn bị sẵn
+        Path tempPath = absoluteUploadDir.resolve(tempFileName);
+
+        // Đảm bảo thư mục tồn tại
+        Files.createDirectories(absoluteUploadDir);
+
+        // Ghi file tạm
+        try (InputStream inputStream = faceImage.getInputStream()) {
+            Files.copy(inputStream, tempPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return tempPath;
+    }
+
+    private boolean compareFacesWithPythonService(String knownEncoding, String unknownEncoding) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("known_encoding", knownEncoding);
+        body.put("unknown_encoding", unknownEncoding);
+        body.put("threshold", matchingThreshold);  // Sử dụng ngưỡng từ cấu hình
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                pythonServiceUrl + "/compare-faces",
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+
+        return Boolean.TRUE.equals(response.getBody().get("match"));
     }
 
     public AuthenticationResponse loginWithFace(MultipartFile faceImage) throws IOException {

@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/face-auth")
 public class FaceAuthController {
@@ -27,9 +29,15 @@ public class FaceAuthController {
         try {
             faceAuthService.registerFace(userId, faceImage);
             return ResponseEntity.ok(ApiResponse.success(true, "Face registered successfully"));
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("already registered")) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.badRequest("This face is already registered to another user"));
+            }
             return ResponseEntity.badRequest()
                     .body(ApiResponse.badRequest("Failed to register face: " + e.getMessage()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
