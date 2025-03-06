@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class RoomService extends ChangeNotifier {
   final RoomRepository _roomRepository;
   List<Room> rooms = [];
+  List<Room> packageRooms = [];
   Room? room;
   bool isLoading = false;
 
@@ -31,7 +32,7 @@ class RoomService extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try{
-      rooms = await _roomRepository.getAllRoomsByPackage(packageId);
+      packageRooms = await _roomRepository.getAllRoomsByPackage(packageId);
     }
     catch(e) {
       print("Error fetching room by packageId: $e");
@@ -40,6 +41,11 @@ class RoomService extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Hàm kiểm tra phòng có trong gói tập không
+  bool isRoomInPackage(int roomId) {
+    return packageRooms.any((room) => room.id == roomId);
   }
 
   Future<void> fetchRoomsByBranchId(int branchId) async {

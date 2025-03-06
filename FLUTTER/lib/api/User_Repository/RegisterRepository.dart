@@ -80,23 +80,19 @@ class RegisterRepository {
       String fileName = faceImage.path.split('/').last;
 
       // Xác định MIME type chính xác dựa vào extension
-      String mimeType;
-      if (fileName.toLowerCase().endsWith('.jpg') ||
-          fileName.toLowerCase().endsWith('.jpeg')) {
-        mimeType = 'image/jpeg';
-      } else if (fileName.toLowerCase().endsWith('.png')) {
-        mimeType = 'image/png';
-      } else {
-        // Mặc định sử dụng image/jpeg vì camera thường trả về định dạng này
-        mimeType = 'image/jpeg';
-      }
+      String mimeType = fileName.toLowerCase().endsWith('.jpg') ||
+          fileName.toLowerCase().endsWith('.jpeg')
+          ? 'image/jpeg'
+          : (fileName.toLowerCase().endsWith('.png')
+          ? 'image/png'
+          : 'image/jpeg');
 
-      // Tạo form data để gửi ảnh với MIME type chính xác
+      // Tạo form data để gửi ảnh
       FormData formData = FormData.fromMap({
         "file": await MultipartFile.fromFile(
           faceImage.path,
           filename: fileName,
-          contentType: MediaType.parse(mimeType), // Thêm content type
+          contentType: MediaType.parse(mimeType),
         ),
         "min_face_size": 20,
       });
@@ -121,10 +117,11 @@ class RegisterRepository {
             "Đăng ký khuôn mặt thất bại: ${response.statusCode} - ${response.data['message']}");
       }
     } catch (e) {
-      if (e.toString().contains("Face data already exists")) {
-        throw Exception("Dữ liệu khuôn mặt đã tồn tại cho người dùng này");
+      // Xử lý chi tiết các ngoại lệ
+      if (e.toString().contains("face is already registered")) {
+        throw Exception("This face has already been registered to another account. Multiple registrations are not possible.");
       }
-      throw Exception("Lỗi khi đăng ký khuôn mặt: $e");
+      throw Exception("Error while registering face: $e");
     }
   }
 }

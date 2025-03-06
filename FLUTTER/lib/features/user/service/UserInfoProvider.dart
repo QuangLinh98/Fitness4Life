@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:fitness4life/features/user/service/ProfileService.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../api/User_Repository/ProfileRepository.dart';
 import '../../../api/api_gateway.dart';
+import '../../../config/PollingService.dart';
 import '../data/models/UserResponseDTO.dart';
 
 class UserInfoProvider extends ChangeNotifier {
@@ -15,11 +18,15 @@ class UserInfoProvider extends ChangeNotifier {
   int? _workoutPackageId = 0;
 
   final ProfileService _profileService;
+  //Timer? _pollingTimer;
+  late PollingService _pollingService; // Sử dụng PollingService
 
   UserInfoProvider(this._profileService) {
     loadWorkoutPackageId().then((_) {
       if (_userId != null) {
         fetchUserInfo(); // Tự động gọi API khi app khởi động
+        _pollingService = PollingService(fetchFunction: fetchUserInfo);
+        _pollingService.startPolling(); // ✅ Khởi động polling
       }
     });
   }
@@ -30,7 +37,8 @@ class UserInfoProvider extends ChangeNotifier {
   int? get userPoint => _userPoint;
   int? get workoutPackageId => _workoutPackageId;
 
-  /// ==================== 🟢 HÀM LƯU DỮ LIỆU 🟢 ====================
+
+  /// ====================  HÀM LƯU DỮ LIỆU  ====================
   // Lưu workoutPackageId vào SharedPreferences
   Future<void> _saveWorkoutPackageId(int packageId) async {
     final prefs = await SharedPreferences.getInstance();
@@ -111,11 +119,19 @@ class UserInfoProvider extends ChangeNotifier {
     _userName = null;
     _userId = null;
     _workoutPackageId = 0;
+    _pollingService.stopPolling(); //  Dừng polling khi logout
 
     // Xóa workoutPackageId khỏi SharedPreferences khi logout
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('workoutPackageId');
     print("🗑 WorkoutPackageId đã bị xóa sau khi logout.");
     notifyListeners();
+  }
+
+  //  Hủy polling khi không cần nữa (Ví dụ: khi logout)
+  @override
+  void dispose() {
+    _pollingService.dispose(); // ✅ Dừng polling khi Provider bị hủy
+    super.dispose();
   }
 }

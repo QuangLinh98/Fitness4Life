@@ -1,13 +1,25 @@
+import 'dart:async';
+
 import 'package:fitness4life/api/User_Repository/ProfileRepository.dart';
 import 'package:flutter/material.dart';
 
+import '../../../config/PollingService.dart';
 import '../data/models/UserResponseDTO.dart';
 
 class ProfileService extends ChangeNotifier {
   final ProfileRepository _profileRepository;
   UserResponseDTO? _userProfile;
+  late PollingService _pollingService; // Thêm PollingService
 
-  ProfileService(this._profileRepository);
+  ProfileService(this._profileRepository){
+    _pollingService = PollingService(fetchFunction: () async {
+      if (_userProfile?.id != null) {
+        await getUserById(_userProfile!.id);
+      }
+    });
+    _pollingService.startPolling(); //  Khởi động polling
+  }
+
   UserResponseDTO? get userProfile => _userProfile;
 
   Future<bool> updateUserProfile({
@@ -62,6 +74,13 @@ class ProfileService extends ChangeNotifier {
       print("Error fetching user profile: $e");
       return null;
     }
+  }
+
+  // Hủy polling khi không cần nữa
+  @override
+  void dispose() {
+    _pollingService.dispose(); //  Dừng polling khi Service bị hủy
+    super.dispose();
   }
 
 }
