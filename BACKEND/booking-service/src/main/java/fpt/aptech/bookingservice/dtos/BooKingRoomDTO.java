@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 public class BooKingRoomDTO {
@@ -18,6 +19,8 @@ public class BooKingRoomDTO {
     @NotNull(message = "RoomId is required")
     private int roomId;
     private String roomName;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     private LocalDateTime bookingDate;
 
