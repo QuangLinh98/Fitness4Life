@@ -6,7 +6,7 @@ class PollingService extends ChangeNotifier {
   final Function _fetchFunction;
   final int _intervalSeconds;
 
-  PollingService({required Function fetchFunction, int intervalSeconds = 10})
+  PollingService({required Function fetchFunction, int intervalSeconds = 5})
       : _fetchFunction = fetchFunction,
         _intervalSeconds = intervalSeconds;
 

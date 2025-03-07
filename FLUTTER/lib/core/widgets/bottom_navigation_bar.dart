@@ -9,7 +9,10 @@ import 'package:flutter/material.dart';
 import '../../features/notification/presentation/NotificationScreen2.dart';
 
 class PageManager extends StatefulWidget {
-  const PageManager({super.key});
+  final int initialIndex;
+  final int? initialDashboardTabIndex;
+
+  const PageManager({super.key, this.initialIndex = 0, this.initialDashboardTabIndex});
 
   static _PageManagerState? of(BuildContext context) {
     return context.findAncestorStateOfType<_PageManagerState>();
@@ -20,21 +23,29 @@ class PageManager extends StatefulWidget {
 }
 
 class _PageManagerState extends State<PageManager> {
-  int _selectedIndex = 0;
+  late int _selectedIndex ;
+  late List<Widget> _pages;
 
-  final List<Widget> _pages = [
-    HomeScreen(), // Tab "Home"
-    ClassScreen(),  // Tab "Classes"
-    DashboardScreen(),  // Tab "Health"
-    NotificationScreen2(),  // Tab "Health"
-    AccountScreen(),  // Tab "Account"
-  ];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _selectedIndex = widget.initialIndex;
 
+    _pages = [
+      HomeScreen(),
+      // Tab "Home"
+      ClassScreen(),
+      // Tab "Classes"
+      DashboardScreen(initialTabIndex: widget.initialDashboardTabIndex ?? 0),
+      // Tab "Health"
+      NotificationScreen2(),
+      // Tab "Health"
+      AccountScreen(),
+      // Tab "Account"
+    ];
   }
+
 
   void updateIndex(int index) {
     setState(() {

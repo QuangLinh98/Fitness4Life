@@ -22,6 +22,7 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
   late PaypalService _paypalService;
   double? totalAmount; // ✅ Giá trị gói tập từ DB
   double? discountedAmount;  //Giá mã giảm giá
+  String? discountCode;
   bool _isLoading = false;
   String? _selectedDiscountCode;
   Map<String, double>? _discountCodes;
@@ -73,6 +74,7 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
     String enteredCode = _discountController.text;
     double discount = _discountCodes![enteredCode] ?? 0;
     print("✅ Mã giảm giá: $enteredCode");
+    discountCode = enteredCode;
     print("✅ Giá trị giảm: $discount");
     final promotionService = Provider.of<PromotionService>(context, listen: false);
 
@@ -117,7 +119,7 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
       print("🔑 Access Token: $accessToken");
 
       // ✅ Gửi yêu cầu tạo thanh toán tới PayPal
-      String? approvalUrl = await _paypalService.createPayment(discountedAmount ?? totalAmount!,widget.userId, widget.packageId,);
+      String? approvalUrl = await _paypalService.createPayment(discountedAmount ?? totalAmount!,widget.userId, widget.packageId,discountCode);
       if (approvalUrl != null) {
         print("✅ Lấy được Approval URL: $approvalUrl");
 
@@ -208,7 +210,9 @@ class _PayPalPaymentScreenState extends State<PayPalPaymentScreen> {
               ),
 
               value: _selectedDiscountCode,
-              items: availablePromotions.map((promo) {
+              items: availablePromotions
+                  .where((promo) => promo.promotionAmount > 0) // Lọc chỉ các promotionAmount > 0
+                  .map((promo) {
                 return DropdownMenuItem<String>(
                   value: promo.code,
                   child: Container(

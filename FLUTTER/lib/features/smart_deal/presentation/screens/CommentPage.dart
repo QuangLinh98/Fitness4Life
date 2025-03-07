@@ -1,6 +1,6 @@
-import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
 import 'package:intl/intl.dart';
 
 import 'CreateCommentForm.dart';
@@ -15,10 +15,10 @@ class CommentPage extends StatefulWidget {
 }
 
 class _CommentPageState extends State<CommentPage> {
-  Map<int, bool> showReplyForm = {};
+  int? activeReplyForm; // Lưu id của comment đang mở form trả lời
   bool showAll = false;
   static const int commentLimit = 5;
-  static const int maxLineLength = 50; // Giới hạn số ký tự trước khi xuống hàng
+  static const int maxLineLength = 50;
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _CommentPageState extends State<CommentPage> {
       children: [
         const SizedBox(height: 10),
         const Text(
-          "Comment",
+          "Comments",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
@@ -77,11 +77,11 @@ class _CommentPageState extends State<CommentPage> {
                     showAll = !showAll;
                   });
                 },
-                child: Text(showAll ? "Recall" : "More..."),
+                child: Text(showAll ? "Thu hồi" : "Xem thêm"),
               ),
           ],
         )
-            : const Center(child: Text("No Comment available")),
+            : const Center(child: Text("No comment")),
       ],
     );
   }
@@ -124,18 +124,32 @@ class _CommentPageState extends State<CommentPage> {
               _formatCommentText(comment.content),
               style: const TextStyle(fontSize: 14),
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  showReplyForm[comment.id] = !(showReplyForm[comment.id] ?? false);
-                });
-              },
-              child: const Text("   Reply", style: TextStyle(color: Colors.blue)),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      // Nếu đang mở form của comment này -> Đóng lại
+                      if (activeReplyForm == comment.id) {
+                        activeReplyForm = null;
+                      } else {
+                        activeReplyForm = comment.id;
+                      }
+                    });
+                  },
+                  child: const Text("   Reply", style: TextStyle(color: Colors.blue)),
+                ),
+              ],
             ),
-            if (showReplyForm[comment.id] ?? false)
+            if (activeReplyForm == comment.id)
               ReplyCommentForm(
                 questionId: widget.questionId,
                 parentCommentId: comment.id,
+                onCloseForm: () {
+                  setState(() {
+                    activeReplyForm = null; // Đóng form khi reply xong
+                  });
+                },
               ),
           ],
         ),

@@ -71,74 +71,74 @@ class GetAllBlog extends StatelessWidget {
                   );
                 },
                 child: Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (displayImages.isNotEmpty)
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: displayImages.length > 1 ? 2 : 1,
-                              crossAxisSpacing: 5,
-                              mainAxisSpacing: 5,
-                              childAspectRatio: 1,
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (displayImages.isNotEmpty)
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: displayImages.length > 1 ? 2 : 1,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5,
+                          childAspectRatio: 1,
+                        ),
+                        itemCount: displayImages.length,
+                        itemBuilder: (context, index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: CachedNetworkImage(
+                              imageUrl: displayImages[index],
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator()),
+                              errorWidget: (context, url, error) => Icon(
+                                  Icons.broken_image,
+                                  size: 50,
+                                  color: Colors.grey),
                             ),
-                            itemCount: displayImages.length,
-                            itemBuilder: (context, index) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: CachedNetworkImage(
-                                  imageUrl: displayImages[index],
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Center(
-                                      child: CircularProgressIndicator()),
-                                  errorWidget: (context, url, error) => Icon(
-                                      Icons.broken_image,
-                                      size: 50,
-                                      color: Colors.grey),
-                                ),
-                              );
-                            },
-                          ),
+                          );
+                        },
+                      ),
 
-                        // Tiêu đề của bài viết
-                        const SizedBox(height: 8),
-                        Text(
-                          blog.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-                        Text(
-                          "${blog.content.length > 300 ? blog.content.substring(0, 300) + '...' : blog.content}",
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            fontSize: 14,
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-                        Text(
-                          "${blog.createdAt.toLocal()}".split(' ')[0],
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
-                        ),
-                      ],
+                    // Tiêu đề của bài viết
+                    const SizedBox(height: 8),
+                    Text(
+                      blog.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                )
+
+                    const SizedBox(height: 8),
+                    Text(
+                      "${blog.content.length > 300 ? blog.content.substring(0, 300) + '...' : blog.content}",
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 14,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+                    Text(
+                      "${blog.createdAt.toLocal()}".split(' ')[0],
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            )
             );
           },
         ),

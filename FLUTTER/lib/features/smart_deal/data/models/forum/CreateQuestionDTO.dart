@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 class CreateQuestionDTO {
   final int authorId;
@@ -9,7 +8,6 @@ class CreateQuestionDTO {
   final String status;
   final List<String> category;
   final String rolePost;
-  final List<Uint8List> imageQuestionUrl;
 
   CreateQuestionDTO({
     required this.authorId,
@@ -20,7 +18,6 @@ class CreateQuestionDTO {
     required this.status,
     required this.category,
     required this.rolePost,
-    required this.imageQuestionUrl,
   });
 
   factory CreateQuestionDTO.fromJson(Map<String, dynamic> json) {
@@ -33,7 +30,6 @@ class CreateQuestionDTO {
       status: json['status'],
       category: List<String>.from(json['category']),
       rolePost: json['rolePost'],
-      imageQuestionUrl: (json['imageQuestionUrl'] as List<dynamic>).map((e) => Uint8List.fromList(e.cast<int>())).toList(),
     );
   }
 
@@ -47,7 +43,6 @@ class CreateQuestionDTO {
       'status': status,
       'category': category,
       'rolePost': rolePost,
-      'imageQuestionUrl': imageQuestionUrl.map((e) => e.toList()).toList(),
     };
   }
 }

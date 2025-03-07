@@ -28,6 +28,7 @@ class PaypalRepository {
           },
         ),
       );
+      print('request thanh toán : ${response.data}');
 
       if (response.statusCode == 200) {
         print("✅ Lấy được Access Token: ${response.data["access_token"]}");
@@ -42,7 +43,7 @@ class PaypalRepository {
   }
 
   /// **📌 Tạo thanh toán trên PayPal**
-  Future<Map<String, dynamic>?> createPayment(String accessToken, double amount, int userId, int packageId , {double? discountedAmount}) async {
+  Future<Map<String, dynamic>?> createPayment(String accessToken, double amount, int userId, int packageId,String? discountCode , {double? discountedAmount}) async {
     double finalAmount = discountedAmount ?? amount;  //Nếu áp mã giảm giá
     print("📌 Total Amount Sent to PayPal: \$${finalAmount.toStringAsFixed(2)}");
 
@@ -51,7 +52,7 @@ class PaypalRepository {
       "userId": userId, // Thêm userId vào request
       "description": "Membership Subscription",
       "cancelUrl": "fitness4life://paypal_cancel",
-      "successUrl": "fitness4life://paypal_success",
+      "successUrl": "fitness4life://paypal_success/?code=$discountCode",
       "currency": "USD",
       "intent": "sale",
       "transactions": [

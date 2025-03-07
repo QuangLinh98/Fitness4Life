@@ -1,18 +1,21 @@
-import 'package:fitness4life/features/smart_deal/data/models/forum/Comment.dart';
-import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
-import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fitness4life/features/smart_deal/service/CommentService.dart';
+import 'package:fitness4life/features/smart_deal/data/models/forum/Comment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../user/service/UserInfoProvider.dart';
 
 class ReplyCommentForm extends StatefulWidget {
   final int questionId;
   final int parentCommentId; // ID của bình luận cha
+  final Function onCloseForm; // Callback để đóng form
 
   const ReplyCommentForm({
     Key? key,
     required this.questionId,
     required this.parentCommentId,
+    required this.onCloseForm, // Nhận callback từ CommentPage
   }) : super(key: key);
 
   @override
@@ -40,6 +43,8 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
       String? userName = userInfo.userName;
       int? userId = userInfo.userId;
 
+      // print("Có user với id không ta: ${userName} ${userId}");
+
       if (userName == null || userId == null) {
         setState(() {
           _isSubmitting = false;
@@ -63,6 +68,7 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
         setState(() {
           _isSubmitting = false;
         });
+        widget.onCloseForm(); // Gọi callback để đóng for
       } else {
         print("Gửi bình luận thất bại!");
       }
@@ -83,7 +89,7 @@ class _ReplyCommentFormState extends State<ReplyCommentForm> {
         TextField(
           controller: _contentController,
           decoration: InputDecoration(
-            hintText: "Comment...",
+            hintText: "Write a comment...",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             suffixIcon: IconButton(
               icon: Icon(Icons.send, color: Colors.teal),

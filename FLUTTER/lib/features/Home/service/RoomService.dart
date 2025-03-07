@@ -92,6 +92,15 @@ class RoomService extends ChangeNotifier {
     }
   }
 
+  void stopPolling() {
+    _pollingService.stopPolling();
+  }
+
+  //  Thêm phương thức này để bắt đầu polling lại nếu cần
+  void startPolling() {
+    _pollingService.startPolling();
+  }
+
   // Hủy polling khi không cần nữa
   @override
   void dispose() {

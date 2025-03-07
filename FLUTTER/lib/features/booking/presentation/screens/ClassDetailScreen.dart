@@ -22,10 +22,14 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
   @override
   void initState() {
     super.initState();
+    final roomService = Provider.of<RoomService>(context, listen: false);
 
-    // 🚀 Gọi API ngay khi mở màn hình để lấy dữ liệu mới nhất
+    // Dừng polling khi vào màn hình này để tránh reload liên tục
+    roomService.stopPolling();
+
+
+    //  Gọi API ngay khi mở màn hình để lấy dữ liệu mới nhất
     Future.microtask(() async {
-      final roomService = Provider.of<RoomService>(context, listen: false);
       await roomService.getRoomById(widget.roomId); // Lấy dữ liệu phòng theo ID
     });
   }
@@ -45,6 +49,16 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
       return now.isAfter(startTime); // 🔥 Nếu thời gian hiện tại đã qua startTime, phòng hết hạn
     }
     return false;
+  }
+
+  @override
+  void dispose() {
+    final roomService = Provider.of<RoomService>(context, listen: false);
+
+    // Bật lại polling khi rời khỏi màn hình
+    roomService.startPolling();
+
+    super.dispose();
   }
 
   @override
@@ -183,63 +197,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
                       const SizedBox(height: 20),
 
                       // Nút đặt phòng với trạng thái cập nhật
-                      // SizedBox(
-                      //   width: double.infinity,
-                      //   child: ElevatedButton(
-                      //     onPressed: (isRoomFull || roomExpired)
-                      //         ? null
-                      //         : () async {
-                      //       try {
-                      //         bool success = await bookingRoomService.bookingRoom(
-                      //           room.id ?? 0,
-                      //           userInfo.userId!,
-                      //         );
-                      //
-                      //         if (success) {
-                      //           // Cập nhật lại dữ liệu phòng sau khi đặt thành công
-                      //           await roomService.getRoomById(widget.roomId);
-                      //
-                      //           // Hiển thị thông báo đặt thành công
-                      //           CustomDialog.show(
-                      //             context,
-                      //             title: "Success",
-                      //             content: "Room booked successfully!",
-                      //             buttonText: "OK",
-                      //             onButtonPressed: () {
-                      //               // Quay về màn hình chính và chọn tab "Booked Classes"
-                      //               Navigator.popUntil(context, (route) => route.isFirst);
-                      //             },
-                      //           );
-                      //         }
-                      //       } catch (e) {
-                      //         CustomDialog.show(
-                      //           context,
-                      //           title: "Error",
-                      //           content: "Failed to book the room. Please try again.",
-                      //           buttonText: "OK",
-                      //         );
-                      //       }
-                      //     },
-                      //     style: ElevatedButton.styleFrom(
-                      //       backgroundColor: (isRoomFull || roomExpired)
-                      //           ? Colors.grey
-                      //           : const Color(0xFFB00020),
-                      //       padding: const EdgeInsets.symmetric(vertical: 15),
-                      //       shape: RoundedRectangleBorder(
-                      //         borderRadius: BorderRadius.circular(12),
-                      //       ),
-                      //     ),
-                      //     child: Text(
-                      //       isRoomFull
-                      //           ? "Full"
-                      //           : roomExpired
-                      //           ? "Expired"
-                      //           : "Book",
-                      //       style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                      //     ),
-                      //   ),
-                      // ),
-
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(

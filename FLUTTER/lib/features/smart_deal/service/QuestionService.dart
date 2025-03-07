@@ -1,4 +1,5 @@
 import 'package:fitness4life/api/SmartDeal_Repository/QuestionRepository.dart';
+import 'package:fitness4life/features/smart_deal/data/models/forum/CreateQuestionDTO.dart';
 import 'package:fitness4life/features/smart_deal/data/models/forum/Question.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -14,6 +15,22 @@ class QuestionService extends ChangeNotifier {
 
   QuestionService(this._questionRepository);
 
+
+  Future<bool> CreateQuestion(CreateQuestionDTO newQuestion) async {
+    isFetchingSingle = true;
+    notifyListeners();
+    try {
+      await _questionRepository.createQuestion(newQuestion);
+      await fetchQuestions();
+      return true;
+    } catch (e) {
+      print("Error create question: $e");
+      return false;
+    } finally {
+      isFetchingSingle = false;
+      notifyListeners();
+    }
+  }
   // Get all questions
   Future<void> fetchQuestions() async {
     isLoading = true;
@@ -44,20 +61,16 @@ class QuestionService extends ChangeNotifier {
     }
   }
 
-  Future<bool> CreateQuestion(CreateQuestionDTO newQuestion) async {
-    isFetchingSingle = true;
-    notifyListeners();
-    try {
-      await _questionRepository.createQuestion(newQuestion);
-      await fetchQuestions();
-      return true;
-    } catch (e) {
-      print("Error create question: $e");
-      return false;
-    } finally {
-      isFetchingSingle = false;
-      notifyListeners();
-    }
-  }
+
+  // Future<bool> handleVote(int questionId, int userId, String voteType) async {
+  //   try {
+  //     await _questionRepository.voteQuestion(questionId, userId, voteType);
+  //     return true;
+  //   } catch (e) {
+  //     debugPrint("Lỗi khi vote: $e");
+  //     return false;
+  //   }
+  // }
+
 
 }

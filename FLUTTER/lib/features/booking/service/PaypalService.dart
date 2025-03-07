@@ -12,14 +12,14 @@ class PaypalService extends ChangeNotifier {
   }
 
   /// **📌 Bước 2: Tạo thanh toán trên PayPal**
-  Future<String?> createPayment(double amount, int userId, int packageId) async {
+  Future<String?> createPayment(double amount, int userId, int packageId , discountCode) async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) {
       print("❌ Không lấy được Access Token!");
       return null;
     }
 
-    final response = await _paypalRepository.createPayment(accessToken, amount, userId, packageId);
+    final response = await _paypalRepository.createPayment(accessToken, amount, userId, packageId,discountCode);
     print("📥 Response Data: $response");
 
     // ✅ Cách mới để lấy approvalUrl

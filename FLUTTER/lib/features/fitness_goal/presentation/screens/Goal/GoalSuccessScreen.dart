@@ -135,8 +135,12 @@ class _GoalSuccessScreenState extends State<GoalSuccessScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
-                  debugPrint("Current widget context: ${context.widget}");
+                  //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => PageManager(initialIndex: 2, initialDashboardTabIndex: 1)), // Chuyển thẳng đến tab DashboardScreen
+                        (route) => false, // Xóa hết màn hình trước đó
+                  );
                 },
                 child: Text('Continue'),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),

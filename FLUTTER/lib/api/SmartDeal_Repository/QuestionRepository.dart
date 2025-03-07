@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:fitness4life/features/smart_deal/data/models/forum/CreateQuestionDTO.dart';
 import 'package:fitness4life/features/smart_deal/data/models/forum/Question.dart';
@@ -9,12 +11,36 @@ class QuestionRepository {
 
   QuestionRepository(this._apiGateWayService);
 
+
+  Future<Response> createQuestion(CreateQuestionDTO question) async {
+    try {
+      final url = '/deal/forums/questions/create';
+      // Tạo FormData
+      FormData formData = FormData.fromMap({
+        'authorId': question.authorId,
+        'author': question.author,
+        'title': question.title,
+        'content': question.content,
+        'tag': question.tag,
+        'status': question.status,
+        'category': question.category,
+        'rolePost': question.rolePost,
+      });
+      Response response = await _apiGateWayService.postDataWithFormData(url,formData: formData,);
+
+      print("✅ API Response: ${response.data}");
+      return response;
+    } catch (e) {
+      print("❌ Lỗi khi tạo câu hỏi: $e");
+      rethrow;
+    }
+  }
   Future<List<Question>> getAllQuestion() async {
     try {
       final response = await _apiGateWayService.getData('/deal/forums/questions');
 
       // In dữ liệu API trả về
-      debugPrint("Response từ API all: ${response.data}");
+      debugPrint("Response từ getAllQuestion API all: ${response.data}");
 
       if (response.data != null && response.data['data'] is List) {
         List<dynamic> dataList = response.data['data'];
@@ -71,39 +97,7 @@ class QuestionRepository {
     }
   }
 
-  Future<Response> createQuestion(CreateQuestionDTO question) async {
-    try {
-      // Chuyển danh sách Uint8List thành MultipartFile
-      List<MultipartFile> images = await Future.wait(
-        question.imageQuestionUrl.map((image) async {
-          return MultipartFile.fromBytes(image, filename: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg');
-        }),
-      );
 
-      final url = '/deal/forums/questions/create';
-      // Tạo FormData
-      FormData formData = FormData.fromMap({
-        'authorId': question.authorId,
-        'author': question.author,
-        'title': question.title,
-        'content': question.content,
-        'tag': question.tag,
-        'status': question.status,
-        'category': question.category,
-        'rolePost': question.rolePost,
-        'imageQuestionUrl': images,
-      });
-
-      // Gửi dữ liệu qua phương thức postDataWithFormData
-      Response response = await _apiGateWayService.postDataWithFormData(url,formData: formData,);
-
-      print("✅ API Response: ${response.data}");
-      return response;
-    } catch (e) {
-      print("❌ Lỗi khi tạo câu hỏi: $e");
-      rethrow;
-    }
-  }
 
 
 

@@ -25,12 +25,21 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
   TextEditingController weightController = TextEditingController();
   TextEditingController trackingDateController = TextEditingController();
   DateTime trackingDate = DateTime.now();
+  double? previousWeight; // Cân nặng trước đó
 
   @override
   void initState() {
     super.initState();
     selectedMetric = MetricName.WEIGHT;
     trackingDateController.text = trackingDate.toIso8601String().split('T')[0];
+  }
+
+
+  /// **Hàm hiển thị thông báo lỗi**
+  void showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   /// **Hàm xử lý khi nhấn nút Save**
@@ -48,17 +57,51 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
           ? DateTime.tryParse(trackingDateController.text) ?? DateTime.now()
           : DateTime.now();
 
+      // Kiểm tra nếu trackingDate là ngày trong tương lai**
+      if (trackingDate.isAfter(DateTime.now())) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Tracking date cannot be in the future."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      /// Validate giá trị theo dõi
+      double? value = double.tryParse(valueController.text);
+      if (value == null || value <= 0) {
+        showErrorMessage("Value must be greater than 0.");
+        return;
+      }
+
+      /// Xử lý cân nặng
+      double? weight;
+      if (selectedMetric == MetricName.WEIGHT) {
+        weight = value; // Nếu MetricName là WEIGHT, gán weight bằng value
+      } else {
+        weight = double.tryParse(weightController.text);
+        if (weight == null || weight < 30 || weight > 300) {
+          showErrorMessage("Weight must be between 30kg and 300kg.");
+          return;
+        }
+      }
+
       ProgressDTO progress = ProgressDTO(
         userId: userId ?? 1,
         goal: widget.goalId,
         trackingDate: trackingDate.toIso8601String().split('T')[0],
         metricName: selectedMetric ?? MetricName.WEIGHT,
         value: double.tryParse(valueController.text) ?? 0,
-        weight: double.tryParse(weightController.text),
+       // weight: double.tryParse(weightController.text),
+        weight: weight, // Giá trị weight tự động gán hoặc null
         caloriesConsumed: double.tryParse(caloriesController.text) ?? 0,
       );
 
-      print("🚀 Dữ liệu gửi lên backend: ${progress.toJson()}");
+      print(" Dữ liệu gửi lên backend: ${progress.toJson()}");
       await progressService.createProgress(progress);
 
       if (progressService.errorMessage.isEmpty) {
@@ -74,7 +117,7 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
           );
         }
       } else {
-        print("❌ API Error: ${progressService.errorMessage}");
+        print(" API Error: ${progressService.errorMessage}");
         if (context.mounted) {
           CustomDialog.show(
             context,
@@ -85,7 +128,7 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
         }
       }
     } catch (e) {
-      print("🚨 Exception: ${extractErrorMessage(e)}");
+      print(" Exception: ${extractErrorMessage(e)}");
       if (context.mounted) {
         CustomDialog.show(
           context,
@@ -169,14 +212,29 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: weightController,
-              decoration: const InputDecoration(
-                labelText: 'Weight',
-                border: OutlineInputBorder(),
+            // TextFormField(
+            //   controller: weightController,
+            //   decoration: const InputDecoration(
+            //     labelText: 'Weight',
+            //     border: OutlineInputBorder(),
+            //   ),
+            //   keyboardType: TextInputType.number,
+            // ),
+            // Cân nặng (chỉ hiển thị nếu MetricName != WEIGHT)
+            if (selectedMetric != MetricName.WEIGHT) ...[
+              Text("Previous Weight: ${previousWeight != null ? "${previousWeight!} kg" : 'No data'}",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: weightController,
+                decoration: const InputDecoration(
+                  labelText: 'New Weight',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
               ),
-              keyboardType: TextInputType.number,
-            ),
+            ],
+
             const SizedBox(height: 16),
             TextFormField(
               controller: trackingDateController,
@@ -191,7 +249,8 @@ class _CreateProgressScreenState extends State<CreateProgressScreen> {
                   context: context,
                   initialDate: trackingDate,
                   firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
+                  //lastDate: DateTime(2100),
+                  lastDate: DateTime.now(),
                 );
                 if (pickedDate != null) {
                   setState(() {

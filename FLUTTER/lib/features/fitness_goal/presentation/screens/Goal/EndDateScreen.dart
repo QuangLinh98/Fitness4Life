@@ -1,10 +1,8 @@
 import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/ActivityLevelScreen.dart';
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/SubmitGoalScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/TargetValueScreen.dart';
 import 'package:intl/intl.dart';
 
 class EndDateScreen extends StatefulWidget {
@@ -13,7 +11,17 @@ class EndDateScreen extends StatefulWidget {
 }
 
 class _EndDateScreenState extends State<EndDateScreen> {
-  DateTime selectedDate = DateTime(2025, 1, 1); // Mặc định 01/01/2025
+  late DateTime selectedDate; // Khai báo selectedDate
+
+  @override
+  void initState() {
+    super.initState();
+    final today = DateTime.now();
+    final tomorrow = DateTime(today.year, today.month, today.day + 1); // Ngày mai lúc 00:00:00
+
+    // Đảm bảo selectedDate luôn >= minimumDate (ngày mai)
+    selectedDate = tomorrow;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,27 +80,25 @@ class _EndDateScreenState extends State<EndDateScreen> {
             Expanded(
               child: CupertinoTheme(
                 data: const CupertinoThemeData(
-                  brightness: Brightness.dark, // Đảm bảo hiển thị rõ ràng trên nền tối
+                  brightness: Brightness.dark,
                   textTheme: CupertinoTextThemeData(
                     dateTimePickerTextStyle: TextStyle(
-                      color: Colors.white, // Đảm bảo màu chữ sáng
+                      color: Colors.white,
                       fontSize: 20,
                     ),
                   ),
                 ),
                 child: CupertinoDatePicker(
                   mode: CupertinoDatePickerMode.date,
-                  initialDateTime: _getValidInitialDate(selectedDate),
-                  minimumDate: DateTime(2020, 1, 1),
+                  initialDateTime: selectedDate, // Đảm bảo giá trị hợp lệ
+                  minimumDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day + 1), // Ngày mai lúc 00:00:00
                   maximumDate: DateTime(2030, 12, 31),
-                  backgroundColor: Colors.black, // Đảm bảo nền không gây lỗi hiển thị
+                  backgroundColor: Colors.black,
                   onDateTimeChanged: (DateTime newDate) {
-                    if (newDate.year >= 2020 && newDate.year <= 2030) {
-                      setState(() {
-                        selectedDate = newDate;
-                      });
-                      goalSetupState.setEndDate(newDate.toIso8601String());
-                    }
+                    setState(() {
+                      selectedDate = newDate;
+                    });
+                    goalSetupState.setEndDate(newDate.toIso8601String());
                   },
                 ),
               ),
@@ -112,6 +118,17 @@ class _EndDateScreenState extends State<EndDateScreen> {
                   ),
                 ),
                 onPressed: () {
+                  // Kiểm tra nếu ngày kết thúc phải lớn hơn hôm nay
+                  if (selectedDate.isBefore(DateTime.now())) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("End date must be in the future."),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -138,12 +155,5 @@ class _EndDateScreenState extends State<EndDateScreen> {
         ),
       ),
     );
-  }
-
-  /// Hàm điều chỉnh ngày hợp lệ nếu nằm ngoài phạm vi
-  DateTime _getValidInitialDate(DateTime date) {
-    if (date.year < 2020) return DateTime(2020, date.month, date.day);
-    if (date.year > 2030) return DateTime(2030, date.month, date.day);
-    return date;
   }
 }

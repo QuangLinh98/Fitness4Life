@@ -1,10 +1,9 @@
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/EndDateScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
-import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/TargetValueScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:fitness4life/features/fitness_goal/data/Goal/GoalSetupState.dart';
+import 'package:fitness4life/features/fitness_goal/presentation/screens/Goal/EndDateScreen.dart';
 
 class StartDateScreen extends StatefulWidget {
   @override
@@ -12,7 +11,19 @@ class StartDateScreen extends StatefulWidget {
 }
 
 class _StartDateScreenState extends State<StartDateScreen> {
-  DateTime selectedDate = DateTime(2025, 1, 1); // Mặc định 01/01/2025
+  DateTime selectedDate = DateTime.now(); // Lấy ngày hiện tại
+
+  @override
+  void initState() {
+    super.initState();
+    final goalSetupState = Provider.of<GoalSetupState>(context, listen: false);
+
+    // Chỉ lấy ngày tháng năm, không lấy giờ phút giây
+    selectedDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+    // Lưu vào GoalSetupState
+    goalSetupState.setStartDate(selectedDate.toIso8601String());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +64,10 @@ class _StartDateScreenState extends State<StartDateScreen> {
             ),
             SizedBox(height: 30),
 
-            // Hiển thị ngày tháng năm đã chọn
+            // Hiển thị ngày tháng năm thực tế (không có giờ phút)
             Center(
               child: Text(
-                DateFormat("dd/MM/yyyy").format(selectedDate),
+                DateFormat("dd/MM/yyyy").format(selectedDate), // Chỉ lấy ngày tháng năm
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 40,
@@ -65,33 +76,33 @@ class _StartDateScreenState extends State<StartDateScreen> {
               ),
             ),
 
-            SizedBox(height: 10),
+            SizedBox(height: 20),
 
             // Picker chọn ngày tháng năm
             Expanded(
               child: CupertinoTheme(
                 data: CupertinoThemeData(
-                  brightness: Brightness.dark, // Đảm bảo hiển thị rõ ràng trên nền tối
+                  brightness: Brightness.dark,
                   textTheme: CupertinoTextThemeData(
                     dateTimePickerTextStyle: TextStyle(
-                      color: Colors.white, // Đảm bảo màu chữ sáng
+                      color: Colors.white,
                       fontSize: 20,
                     ),
                   ),
                 ),
                 child: CupertinoDatePicker(
                   mode: CupertinoDatePickerMode.date,
-                  initialDateTime: _getValidInitialDate(selectedDate),
+                  initialDateTime: selectedDate,
                   minimumDate: DateTime(2020, 1, 1),
                   maximumDate: DateTime(2030, 12, 31),
-                  backgroundColor: Colors.black, // Đảm bảo nền không gây lỗi hiển thị
+                  backgroundColor: Colors.black,
                   onDateTimeChanged: (DateTime newDate) {
-                    if (newDate.year >= 2020 && newDate.year <= 2030) {
-                      setState(() {
-                        selectedDate = newDate;
-                      });
-                      goalSetupState.setStartDate(newDate.toIso8601String());
-                    }
+                    setState(() {
+                      selectedDate = DateTime(newDate.year, newDate.month, newDate.day);
+                    });
+
+                    // Cập nhật vào GoalSetupState
+                    goalSetupState.setStartDate(selectedDate.toIso8601String());
                   },
                 ),
               ),
@@ -138,12 +149,5 @@ class _StartDateScreenState extends State<StartDateScreen> {
         ),
       ),
     );
-  }
-
-  /// Hàm điều chỉnh ngày hợp lệ nếu nằm ngoài phạm vi
-  DateTime _getValidInitialDate(DateTime date) {
-    if (date.year < 2020) return DateTime(2020, date.month, date.day);
-    if (date.year > 2030) return DateTime(2030, date.month, date.day);
-    return date;
   }
 }

@@ -144,6 +144,28 @@ class PromotionRepository {
       throw Exception("Failed to fetch PromotionOfUserDTO. Please try again later.");
     }
   }
+  
+  Future<PromotionPointDTO> getPromotionInJsonById(String promotionId) async {
+    try {
+      final response = await _apiGateWayService.getData('/deal/promotions/json/$promotionId');
+
+      debugPrint("lấy được data từ api ko ta:  ${response.data}");
+      if (response.data != null && response.data['data'] != null) {
+        try {
+          PromotionPointDTO code = PromotionPointDTO.fromJson(response.data['data']);
+          return code;
+        } catch (e) {
+          print("❌ Lỗi chuyển đổi PromotionPointDTO one: $e");
+          return response.data;
+        }
+      }else {
+        throw Exception("Invalid response structure or 'data' is not a List.");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi lấy danh sách PromotionPointDTO: $e");
+      throw Exception("Failed to fetch PromotionPointDTO. Please try again later.");
+    }
+  }
 
   Future<bool> usedPointChangeCode(int userId,int point, String promotionId) async {
     try {

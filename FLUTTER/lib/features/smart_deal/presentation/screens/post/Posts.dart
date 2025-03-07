@@ -1,6 +1,6 @@
-import 'package:fitness4life/features/smart_deal/service/QuestionService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fitness4life/features/smart_deal/service/QuestionService.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 
@@ -31,16 +31,42 @@ class _PostsState extends State<Posts> {
     final question = questionService.selectedQuestion;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Question Detail",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60), // Chiều cao AppBar
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFB00020), // Đổi màu nền AppBar
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(15), // Bo góc phía dưới
+            ),
+          ),
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      "Explore Posts",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 48), // Để căn giữa tiêu đề
+              ],
+            ),
           ),
         ),
-        backgroundColor: const Color(0xFFB00020),
-        centerTitle: true,
       ),
       body: questionService.isFetchingSingle
           ? const Center(child: CircularProgressIndicator())
@@ -122,3 +148,5 @@ class _PostsState extends State<Posts> {
     );
   }
 }
+
+

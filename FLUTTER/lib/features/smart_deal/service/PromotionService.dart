@@ -10,6 +10,7 @@ class PromotionService extends ChangeNotifier {
   PromotionService(this._promotionRepository);
 
   List<PromotionPointDTO> promotionPoints = [];
+  PromotionPointDTO? promotionPoint;
 
   PromotionOfUserDTO? promotionOfUser;
 
@@ -19,6 +20,17 @@ class PromotionService extends ChangeNotifier {
 
   bool isFetchingSingle = false; // Biến trạng thái khi lấy 1 câu hỏi
 
+
+  Future<String> fetchUsedCode(int userId, String promotionCode) async {
+    try {
+      String result = await _promotionRepository.UsedPromotionCode(userId, promotionCode);
+      debugPrint("Fetched promotions $userId: $promotionCode");
+      return result;
+    } catch (e) {
+      print("Error fetching promotions by ID: $e");
+      return "có lỗi trong qua trình sử dụng mã";
+    }
+  }
   Future<Point?> fetchPoint(int userId) async {
     isFetchingSingle = true;
     notifyListeners();
@@ -62,6 +74,20 @@ class PromotionService extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchPromotionInJsonById(String promotionId) async {
+    isFetchingSingle = true;
+    notifyListeners();
+    try {
+      promotionPoint = await _promotionRepository.getPromotionInJsonById(promotionId);
+      debugPrint("Fetched fetchPromotionInJsonById được gọi ko: $promotionPoints");
+    } catch (e) {
+      print("Error fetching promotions by ID: $e");
+    } finally {
+      isFetchingSingle = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> findCodeOfUser(String promotionCode,int userId) async {
     isFetchingSingle = true;
     notifyListeners();
@@ -79,16 +105,7 @@ class PromotionService extends ChangeNotifier {
   }
 
 
-  Future<String> fetchUsedCode(int userId, String promotionCode) async {
-    try {
-      String result = await _promotionRepository.UsedPromotionCode(userId, promotionCode);
-      debugPrint("Fetched promotions $userId: $promotionCode");
-      return result;
-    } catch (e) {
-      print("Error fetching promotions by ID: $e");
-      return "có lỗi trong qua trình sử dụng mã";
-    }
-  }
+
 
   Future<bool> changeCode(int userId, int point, String promotionId) async {
     try {

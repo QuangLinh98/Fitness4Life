@@ -18,7 +18,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialTabIndex); // 4 tab items
+    _tabController = TabController(
+        length: 4,
+        vsync: this,
+        initialIndex: widget.initialTabIndex,
+
+    ); // 4 tab items
   }
 
   @override
@@ -36,7 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             Tab(text: 'Dashboard'),
             Tab(text: 'Goals'),
             Tab(text: 'Progress'),
-            Tab(text: 'Discover'),
+            //Tab(text: 'Discover'),
           ],
           labelColor: Colors.orange,  // Màu chữ của tab
           indicatorColor: Colors.orange,  // Màu chỉ dưới tab
