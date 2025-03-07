@@ -1,5 +1,6 @@
 package kj001.user_service.service;
 import jakarta.annotation.PostConstruct;
+import kj001.user_service.dtos.FaceDataReponse;
 import kj001.user_service.models.*;
 import kj001.user_service.repository.FaceDataRepository;
 import kj001.user_service.repository.TokenRepository;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FaceAuthService {
@@ -112,7 +114,7 @@ public class FaceAuthService {
      * Generates a public-facing URL for the face image
      */
     private String generatePublicUrl(String fileName) {
-        return "http://localhost:" + serverPort + "/faces/" + fileName;
+        return "http://localhost:" + serverPort + "/uploads/faces/" + fileName;
     }
 
     public void registerFace(Long userId, MultipartFile faceImage) throws IOException {
@@ -204,7 +206,6 @@ public class FaceAuthService {
             throw e;
         }
     }
-
     private String getFaceEncodingFromPythonService(MultipartFile faceImage) throws IOException {
         // Chuyển đổi MultipartFile thành File và gọi API encode-face
         Path tempPath = saveTemporaryFile(faceImage);
@@ -233,7 +234,6 @@ public class FaceAuthService {
             Files.deleteIfExists(tempPath);
         }
     }
-
     private Path saveTemporaryFile(MultipartFile faceImage) throws IOException {
         // Kiểm tra ảnh
         validateImage(faceImage);
@@ -385,5 +385,122 @@ public class FaceAuthService {
             // Clean up temp file
             Files.deleteIfExists(tempPath);
         }
+    }
+
+    public void updateFace(Long userId, MultipartFile newFaceImage) throws IOException {
+        validateImage(newFaceImage);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check if user has face data
+        FaceData existingFaceData = faceDataRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("No face data exists for this user"));
+
+        // Get encoding of the new face
+        String newFaceEncoding = getFaceEncodingFromPythonService(newFaceImage);
+
+        // Check for matches with other users (excluding current user)
+        List<FaceData> allOtherFaces = faceDataRepository.findAll().stream()
+                .filter(face -> !Long.valueOf(face.getUser().getId()).equals(userId))
+                .toList();
+
+        for (FaceData otherFace : allOtherFaces) {
+            boolean isMatch = compareFacesWithPythonService(
+                    otherFace.getFaceEncoding(),
+                    newFaceEncoding
+            );
+
+            if (isMatch) {
+                throw new RuntimeException("This face is already registered to another user");
+            }
+        }
+
+        // Save new image file with original file extension
+        String originalFilename = newFaceImage.getOriginalFilename();
+        String fileExtension = originalFilename != null && originalFilename.contains(".")
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : ".jpg";
+
+        String fileName = UUID.randomUUID().toString() + fileExtension;
+        String publicUrl = generatePublicUrl(fileName);
+
+        // Use the absolute path created during initialization
+        Path destinationPath = absoluteUploadDir.resolve(fileName);
+
+        // Double-check directory exists (in case it was deleted after initialization)
+        Files.createDirectories(absoluteUploadDir);
+
+        System.out.println("Saving new face image to: " + destinationPath);
+
+        // Transfer the file using NIO
+        Files.copy(newFaceImage.getInputStream(), destinationPath);
+
+        try {
+            // Get face encoding from Python service for the new image
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new FileSystemResource(destinationPath));
+            body.add("min_face_size", minFaceSize);
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                    new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    pythonServiceUrl + "/encode-face",
+                    requestEntity,
+                    String.class
+            );
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                throw new RuntimeException("Failed to encode face");
+            }
+
+            // Extract old image path to delete later
+            String oldImagePath = existingFaceData.getOriginalImagePath();
+            String oldFileName = null;
+            if (oldImagePath != null && oldImagePath.contains("/")) {
+                oldFileName = oldImagePath.substring(oldImagePath.lastIndexOf("/") + 1);
+            }
+
+            // Update face data
+            existingFaceData.setFaceEncoding(response.getBody());
+            existingFaceData.setOriginalImagePath(publicUrl);
+            faceDataRepository.save(existingFaceData);
+
+            // Delete old image file
+            if (oldFileName != null) {
+                Path oldImageFilePath = absoluteUploadDir.resolve(oldFileName);
+                Files.deleteIfExists(oldImageFilePath);
+                System.out.println("Deleted old face image: " + oldImageFilePath);
+            }
+
+        } catch (Exception e) {
+            // Clean up new file if encoding or saving fails
+            Files.deleteIfExists(destinationPath);
+            throw e;
+        }
+    }
+    public List<FaceDataReponse> getAllFaceData() {
+        List<FaceData> allFaceData = faceDataRepository.findAll();
+
+        return allFaceData.stream()
+                .map(faceData -> {
+                    FaceDataReponse response = new FaceDataReponse();
+                    response.setFaceId(faceData.getId());
+                    response.setUserId(faceData.getUser().getId());
+                    response.setImageUrl(faceData.getOriginalImagePath());
+                    response.setRegisteredAt(faceData.getCreatedAt());
+
+                    // Add user details
+                    User user = faceData.getUser();
+                    response.setUsername(user.getUsername());
+                    response.setEmail(user.getEmail());
+
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 }
