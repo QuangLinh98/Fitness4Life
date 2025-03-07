@@ -134,8 +134,15 @@ public class BlogService {
         }
         blogRepository.deleteById(id);
     }
+    public Blog changePublishedStatus(Long id, Boolean isPublished) {
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Blog not found with id: " + id));
 
+        blog.setIsPublished(isPublished);
+        blog.setUpdatedAt(LocalDateTime.now());
 
-
+        return blogRepository.save(blog);
+    }
 
 }
+

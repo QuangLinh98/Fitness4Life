@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 public class ArticleService {
@@ -26,12 +27,27 @@ public class ArticleService {
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
+    // Danh sách các từ khóa liên quan đến GYM
+    private static final List<String> GYM_KEYWORDS = Arrays.asList(
+            "gym", "fitness", "workout", "exercise", "training", "bodybuilding",
+            "strength", "cardio", "weight lifting", "muscle", "nutrition",
+            "protein", "athletic", "sports", "physical fitness"
+    );
+
     public ArticleService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     public ArticleGenerationResponse generateArticle(ArticleGenerationRequest request) {
         try {
+            // Kiểm tra xem chủ đề có liên quan đến GYM không
+            if (!isGymRelated(request.getTopic())) {
+                ArticleGenerationResponse errorResponse = new ArticleGenerationResponse();
+                errorResponse.setStatus("error");
+                errorResponse.setMessage("Only GYM-related topics are allowed");
+                return errorResponse;
+            }
+
             // Prepare the request for Gemini
             Map<String, Object> geminiRequest = prepareGeminiRequest(request);
 
@@ -48,6 +64,9 @@ public class ArticleService {
             // Process response
             String generatedContent = extractContentFromGeminiResponse(response);
 
+            // Loại bỏ dấu sao không cần thiết
+            generatedContent = removeUnnecessaryAsterisks(generatedContent);
+
             // Create response
             ArticleGenerationResponse result = new ArticleGenerationResponse();
             result.setContent(generatedContent);
@@ -62,6 +81,37 @@ public class ArticleService {
             errorResponse.setMessage("Error generating article: " + e.getMessage());
             return errorResponse;
         }
+    }
+
+    // Kiểm tra xem chủ đề có liên quan đến GYM không
+    private boolean isGymRelated(String topic) {
+        if (topic == null || topic.isEmpty()) {
+            return false;
+        }
+
+        String topicLower = topic.toLowerCase();
+
+        // Kiểm tra xem chủ đề có chứa bất kỳ từ khóa nào liên quan đến GYM không
+        for (String keyword : GYM_KEYWORDS) {
+            if (topicLower.contains(keyword.toLowerCase())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Loại bỏ dấu sao không cần thiết
+    private String removeUnnecessaryAsterisks(String content) {
+        if (content == null || content.isEmpty()) {
+            return content;
+        }
+
+        // Loại bỏ dấu sao đơn lẻ không phải là phần của định dạng Markdown
+        // Giữ lại dấu sao trong các định dạng Markdown như **bold** hoặc *italic*
+        return content.replaceAll("(?<!\\*)\\*(?!\\*)|(?<!\\*)\\*\\s|\\s\\*(?!\\*)", " ")
+                .replaceAll("\\s{2,}", " ")
+                .trim();
     }
 
     public ArticleGenerationResponse calculateMetrics(ArticleGenerationResponse article) {
@@ -142,9 +192,22 @@ public class ArticleService {
             prompt.append(". Use a ").append(request.getTone()).append(" tone");
         }
 
+        // Thêm yêu cầu về số đoạn văn
+        if (request.getParagraphCount() != null && request.getParagraphCount() > 0) {
+            prompt.append(". Divide the article into exactly ")
+                    .append(request.getParagraphCount())
+                    .append(" paragraphs");
+        }
+
+        // Thêm hướng dẫn không sử dụng dấu sao không cần thiết
+        prompt.append(". Do not use unnecessary asterisks (*) in the text");
+
         if (request.getAdditionalInstructions() != null && !request.getAdditionalInstructions().isEmpty()) {
             prompt.append(". ").append(request.getAdditionalInstructions());
         }
+
+        // Thêm hướng dẫn bổ sung để tạo nội dung liên quan đến GYM
+        prompt.append(". Make sure the article is specifically focused on GYM, fitness, or workout-related topics. Include practical advice and information that would be useful for GYM enthusiasts.");
 
         return prompt.toString();
     }

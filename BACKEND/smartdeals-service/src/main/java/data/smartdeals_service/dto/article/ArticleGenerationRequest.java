@@ -7,6 +7,8 @@ public class ArticleGenerationRequest {
     private Integer maxWords;
     private String tone; // professional, casual, informative, etc.
     private String additionalInstructions;
+    private Integer paragraphCount; // Số đoạn văn cần tạo
+
 
     // Getters and Setters
     public String getTopic() {
@@ -55,6 +57,13 @@ public class ArticleGenerationRequest {
 
     public void setAdditionalInstructions(String additionalInstructions) {
         this.additionalInstructions = additionalInstructions;
+    }
+    public Integer getParagraphCount() {
+        return paragraphCount;
+    }
+
+    public void setParagraphCount(Integer paragraphCount) {
+        this.paragraphCount = paragraphCount;
     }
 
 }
