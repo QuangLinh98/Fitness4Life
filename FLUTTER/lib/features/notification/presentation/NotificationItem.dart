@@ -42,7 +42,7 @@ class NotificationItem extends StatelessWidget {
     }
     // Kiểm tra các mục tiêu fitness
     else if (content.contains('WEIGHT_LOSS') ||
-        content.contains('MUC TIEU') ||
+        content.contains('GOAL') ||
         content.contains('FAT_LOSS') ||
         content.contains('WEIGHT_GAIN') ||
         content.contains('MUSCLE_GAIN') ||

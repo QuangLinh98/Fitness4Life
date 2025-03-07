@@ -19,7 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   void initState() {
     super.initState();
     _tabController = TabController(
-        length: 4,
+        length: 3,
         vsync: this,
         initialIndex: widget.initialTabIndex,
 
