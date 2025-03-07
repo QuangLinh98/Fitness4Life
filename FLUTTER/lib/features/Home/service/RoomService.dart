@@ -2,14 +2,20 @@ import 'package:fitness4life/api/Dashboard_Repository/RoomRepository.dart';
 import 'package:fitness4life/features/Home/data/Room.dart';
 import 'package:flutter/material.dart';
 
+import '../../../config/PollingService.dart';
+
 class RoomService extends ChangeNotifier {
   final RoomRepository _roomRepository;
   List<Room> rooms = [];
   List<Room> packageRooms = [];
   Room? room;
   bool isLoading = false;
+  late PollingService _pollingService;
 
-  RoomService(this._roomRepository);
+  RoomService(this._roomRepository){
+    _pollingService = PollingService(fetchFunction: fetchRooms, intervalSeconds: 10);
+    _pollingService.startPolling();   //Khởi động Polling
+  }
 
   //Get All data
   Future<void> fetchRooms() async {
@@ -84,5 +90,12 @@ class RoomService extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Hủy polling khi không cần nữa
+  @override
+  void dispose() {
+    _pollingService.dispose(); //  Dừng polling khi Service bị hủy
+    super.dispose();
   }
 }

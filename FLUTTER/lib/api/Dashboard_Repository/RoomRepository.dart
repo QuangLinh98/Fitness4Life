@@ -50,6 +50,7 @@ class RoomRepository{
   Future<Room> getRoomById(int roomId) async {
     try{
       final response = await _apiGateWayService.getData('/dashboard/room/$roomId');
+      print('Room by id : ${response.data}');
       if (response.statusCode == 200) {
         final roomData = response.data; // Dữ liệu trả về từ API
         // Chuyển đổi dữ liệu JSON thành đối tượng Room

@@ -5,6 +5,7 @@ import 'package:fitness4life/features/Home/service/BranchService.dart';
 import 'package:fitness4life/features/Home/service/RoomService.dart';
 import 'package:fitness4life/features/booking/data/BookingRoom.dart';
 import 'package:fitness4life/features/booking/presentation/screens/BookingDetailScreen.dart';
+import 'package:fitness4life/features/booking/presentation/screens/ClassDetailScreen.dart';
 import 'package:fitness4life/features/booking/presentation/screens/WorkoutPackageScreen.dart';
 import 'package:fitness4life/features/booking/service/BookingRoomService.dart';
 import 'package:fitness4life/features/user/service/UserInfoProvider.dart';
@@ -394,105 +395,115 @@ class _ClassScreenState extends State<ClassScreen> {
     // Sử dụng chỉ số index để ánh xạ hình ảnh
     final image = images[index % images.length];
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(
-          color: Colors.redAccent, // Màu viền
-          width: 0.8, // Độ dày viền
-        ),
-      ),
-      elevation: 10, //Hiệu ứng đổ bóng card
-
-      child: Row(
-        children: [
-          // HÌnh ảnh random
-          Container(
-            width: 90,
-            height: 100,
-            decoration: BoxDecoration(
-              //color: Colors.purple,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              image: DecorationImage(
-                image: AssetImage(image),
-                fit: BoxFit.cover,
-              ),
-            ),
-            margin: const EdgeInsets.only(left: 12),
+    return GestureDetector(
+      onTap: () {
+        // Điều hướng đến ClassDetailScreen khi click vào card
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ClassDetailScreen(roomId: room.id ?? 0),
           ),
-          const SizedBox(width: 12),
-          // Thông tin lớp học
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Tên lớp học
-                  Text(
-                    room.roomname ?? "Unknown Room",
-                    style: const TextStyle(
-                      color: Color(0xFFB00020),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+        );
+      },
+      child:  Card(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(
+            color: Colors.redAccent, // Màu viền
+            width: 0.8, // Độ dày viền
+          ),
+        ),
+        elevation: 10, //Hiệu ứng đổ bóng card
+
+        child: Row(
+          children: [
+            // HÌnh ảnh random
+            Container(
+              width: 90,
+              height: 100,
+              decoration: BoxDecoration(
+                //color: Colors.purple,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                image: DecorationImage(
+                  image: AssetImage(image),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              margin: const EdgeInsets.only(left: 12),
+            ),
+            const SizedBox(width: 12),
+            // Thông tin lớp học
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Tên lớp học
+                    Text(
+                      room.roomname ?? "Unknown Room",
+                      style: const TextStyle(
+                        color: Color(0xFFB00020),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  if (room.trainer != null) ...[
+                    if (room.trainer != null) ...[
+                      Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Trainer: ${room.trainer!.fullName}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    const SizedBox(height: 4),
+                    // Thời gian lớp học
+                    Text(
+                      "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Nút "Book"
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        // Số chỗ trống
+                        Row(
                           children: [
+                            const Icon(
+                              Icons.people,
+                              color: Color(0xFFB00020),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
                             Text(
-                              "Trainer: ${room.trainer!.fullName}",
+                              "${room.availableseats ?? 0} / ${room.capacity}",
                               style: const TextStyle(
-                                color: Colors.black,
+                                color: Color(0xFFB00020),
                                 fontSize: 14,
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  const SizedBox(height: 4),
-                  // Thời gian lớp học
-                  Text(
-                    "${formatTime(room.starttimeList)} - ${formatTime(room.endtimeList)}",
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Nút "Book"
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      // Số chỗ trống
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.people,
-                            color: Color(0xFFB00020),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "${room.availableseats ?? 0} / ${room.capacity}",
-                            style: const TextStyle(
-                              color: Color(0xFFB00020),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      //Nút "Book" hoặc "Full"
-                      ElevatedButton(
-                        onPressed: () async {
+                        //Nút "Book" hoặc "Full"
+                        ElevatedButton(
+                          onPressed: () async {
                             if (userInfo.workoutPackageId == null ||
                                 userInfo.workoutPackageId == 0) {
                               // 🔥 Hiển thị dialog yêu cầu thanh toán trước khi chuyển hướng
@@ -500,7 +511,7 @@ class _ClassScreenState extends State<ClassScreen> {
                                 context,
                                 title: "Payment Required",
                                 content:
-                                    "You need to purchase a workout package before booking a class.",
+                                "You need to purchase a workout package before booking a class.",
                                 buttonText: "OK",
                                 onButtonPressed: () {
                                   Navigator.push(
@@ -521,8 +532,8 @@ class _ClassScreenState extends State<ClassScreen> {
                                 content: !isInPackage
                                     ? "This room belongs to a different package. Please check your subscription."
                                     : isRoomExpired
-                                        ? "This room's time slot has expired. Please select another room."
-                                        : "This room is already full.",
+                                    ? "This room's time slot has expired. Please select another room."
+                                    : "This room is already full.",
                                 buttonText: "OK",
                               );
                             } else {
@@ -562,44 +573,46 @@ class _ClassScreenState extends State<ClassScreen> {
                                 }
                               });
                             }
-                          
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: (userInfo.workoutPackageId == null ||
-                                  userInfo.workoutPackageId == 0)
-                              ? const Color(0xFFB00020) /// Nếu user chưa đăng ký, đổi màu sang xanh
-                              : (!isInPackage || isRoomFull || isRoomExpired)
-                                  ? Colors
-                                      .grey ///  Nếu phòng không hợp lệ, disable
-                                  : const Color(0xFFB00020),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: (userInfo.workoutPackageId == null ||
+                                userInfo.workoutPackageId == 0)
+                                ? const Color(0xFFB00020) /// Nếu user chưa đăng ký, đổi màu sang xanh
+                                : (!isInPackage || isRoomFull || isRoomExpired)
+                                ? Colors
+                                .grey ///  Nếu phòng không hợp lệ, disable
+                                : const Color(0xFFB00020),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            (userInfo.workoutPackageId == null ||
+                                userInfo.workoutPackageId == 0)
+                                ? "Book"
+                                : !isInPackage
+                                ? "Not in Package"
+                                : isRoomFull
+                                ? "Full"
+                                : isRoomExpired
+                                ? "Expired"
+                                : "Book",
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
                           ),
                         ),
-                        child: Text(
-                          (userInfo.workoutPackageId == null ||
-                                  userInfo.workoutPackageId == 0)
-                              ? "Book"
-                              : !isInPackage
-                                  ? "Not in Package"
-                                  : isRoomFull
-                                      ? "Full"
-                                      : isRoomExpired
-                                          ? "Expired"
-                                          : "Book",
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 14),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+
   }
 
   String extractErrorMessage(dynamic error) {

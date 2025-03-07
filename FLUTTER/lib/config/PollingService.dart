@@ -14,6 +14,8 @@ class PollingService extends ChangeNotifier {
     stopPolling(); // Hủy polling cũ nếu có
     _timer = Timer.periodic(Duration(seconds: _intervalSeconds), (_) async {
       await _fetchFunction(); // Gọi API cập nhật dữ liệu
+      notifyListeners();
+      print("✅ Data updated, UI should refresh now!");
     });
   }
 
