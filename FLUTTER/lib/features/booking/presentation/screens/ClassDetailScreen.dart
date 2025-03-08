@@ -25,7 +25,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
     final roomService = Provider.of<RoomService>(context, listen: false);
 
     // Dừng polling khi vào màn hình này để tránh reload liên tục
-    roomService.stopPolling();
+    //roomService.stopPolling();
 
 
     //  Gọi API ngay khi mở màn hình để lấy dữ liệu mới nhất
@@ -56,7 +56,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
     final roomService = Provider.of<RoomService>(context, listen: false);
 
     // Bật lại polling khi rời khỏi màn hình
-    roomService.startPolling();
+    //roomService.startPolling();
 
     super.dispose();
   }
