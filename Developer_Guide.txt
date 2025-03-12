@@ -1,6 +1,7 @@
 Chạy FaceID-Service : 
-    bước 1: Chạy câu lệnh: venv/Scripts/activate 
-    bước 2: Chạy câu lệnh: uvicorn app.main:app --reload
+    bước 1: Chạy câu lênh: myenv/Scripts/activate
+    bước 2: Chạy câu lệnh: venv/Scripts/activate 
+    bước 3: Chạy câu lệnh: uvicorn app.main:app --reload
 
 Chạy Web-React : 
     bước 1 : Chạy câu lệnh : npm install
