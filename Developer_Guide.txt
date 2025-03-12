@@ -1,0 +1,13 @@
+Chạy FaceID-Service : 
+    bước 1: Chạy câu lệnh: venv/Scripts/activate 
+    bước 2: Chạy câu lệnh: uvicorn app.main:app --reload
+
+Chạy Web-React : 
+    bước 1 : Chạy câu lệnh : npm install
+    bước 2 : Chạy câu lệnh : npm start
+
+Chạy Back-end :
+    1. Chạy SmartDeal-service : Ban đầu mở terminal trong dự án và chạy câu lệnh docker : docker-compose up -d 
+    2. Chạy FinessGoal-service : Ban đầu mở terminal trong dự án và chạy câu lệnh docker : docker-compose up -d
+
+   => Sau đó mở docker và start cả 2 container lên 
